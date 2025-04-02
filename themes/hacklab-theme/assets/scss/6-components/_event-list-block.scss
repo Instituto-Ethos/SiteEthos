@@ -75,3 +75,12 @@
         }
     }
 }
+
+.tribe-events-l-container{
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    min-height: 400px !important;
+    .tribe-events-c-subscribe-dropdown__container{
+        display: none !important;
+    }
+}
