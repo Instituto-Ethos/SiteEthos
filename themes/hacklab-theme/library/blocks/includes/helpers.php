@@ -205,6 +205,7 @@ function normalize_posts_query ($attributes) {
         'orderBy' => 'date',
         'postsPerPage' => 3,
         'postType' => 'post',
+        'preventRepeatPosts' => true,
         'queryTerms' => [],
         'showChildren' => true,
         'taxonomy' => '',
@@ -219,6 +220,8 @@ function normalize_posts_query ($attributes) {
             $normalized_attributes[$key] = $default_value;
         }
     }
+
+    do_action( 'logger', $normalized_attributes );
 
     return $normalized_attributes;
 }
