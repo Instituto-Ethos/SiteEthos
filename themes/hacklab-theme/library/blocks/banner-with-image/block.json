@@ -6,6 +6,7 @@
     "description": "A banner with image and text side-by-side",
     "category": "text",
     "icon": "align-pull-left",
+    "version": "1.0.0",
     "supports": {
         "align": ["center", "wide", "full"],
         "color": {
