@@ -4,39 +4,38 @@
     margin-left: 0;
 }
 
-.formCadastroEmail{
+.formCadastroEmail {
     h5 {
         text-align: left !important;
     }
 
-    #doifd_statusmsg{
-        text-align: right;
-        .doifd_error_msg{
-            text-align: right !important;
+    // Mensagens de erro do formulário do plugin DOIFD
+    #doifd_statusmsg {
+        .doifd_error_msg {
             font-family: $font-family--primary;
             font-size: $font-size--small;
             font-weight: $font-weight--regular !important;
-            padding: 0 7rem;
+            padding: .25rem;
             position: relative;
-            top: 209px;
-            @media(max-width: 992px){
-                padding: 0 1.6rem;
-            }
+            text-align: left;
         }
     }
 
-    #doifd_form{
-        text-align: left;
-        border-radius: $border-radius--large;
+    #doifd_form {
         background-color: $color--high-light;
+        border-radius: $border-radius--large;
+        margin-top: $margin--large;
         padding: 2rem 7rem;
-        @media(max-width: 992px){
+        text-align: left;
+
+        @include tablet {
             padding: 1rem 2rem;
         }
-        margin-top: $margin--large;
-        :nth-child(4){
+
+        .doifd-form--fields {
             padding-inline-start: 0 !important;
-            li{
+
+            li {
                 display: flex;
                 flex-direction: column;
                 label{
@@ -98,5 +97,17 @@
     }
     .doifd_privacy_link{
         display: none !important;
+    }
+
+    // Captcha
+    .captcha-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1rem;
+        width: 100%;
+
+        .g-recaptcha {
+            transform: scale(1) !important;
+        }
     }
 }

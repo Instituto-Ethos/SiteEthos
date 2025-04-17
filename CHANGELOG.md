@@ -5,14 +5,18 @@ Todas as mudanças desse projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/)
 
 ## [Unreleased]
-
 ### Added
+### Changed
+### Fixed
+### Removed
+
+## [Releases]
+
+## [v1.1.16]
 
 ### Changed
 
-### Fixed
-
-### Removed
+- Ajustes CSS no formulário de download do plugin DOIFD
 
 ## [v1.1.9] - 2024-11-13
 
