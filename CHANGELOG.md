@@ -8,6 +8,8 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 ### Added
 
 ### Changed
+
+- Remove margem negativa do topo da página de login
 - Ajustes CSS no formulário de login
 
 ### Fixed
