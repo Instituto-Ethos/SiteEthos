@@ -5,14 +5,23 @@ Todas as mudanças desse projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/)
 
 ## [Unreleased]
-
 ### Added
 
 ### Changed
 
-### Fixed
+- Remove margem negativa do topo da página de login
+- Ajustes CSS no formulário de login
 
+### Fixed
 ### Removed
+
+## [Releases]
+
+## [v1.1.16]
+
+### Changed
+
+- Ajustes CSS no formulário de download do plugin DOIFD
 
 ## [v1.1.9] - 2024-11-13
 

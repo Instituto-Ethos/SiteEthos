@@ -15,10 +15,6 @@
         }
     }
     .pmpro-login{
-        margin-top: 0;
-        position: relative;
-        top: -3rem;
-
         .pmpro_card {
             border: none ;
             box-shadow: none;
@@ -48,12 +44,14 @@
         .pmpro_login_wrap{
             margin-bottom: 0;
 
-            .pmpro_card_content{
+            .pmpro_card_content {
                 padding-bottom: 0px;
+                padding-left: 0;
+                padding-right: 0;
+
                 & > form{
                     text-transform: uppercase;
                     .login-username{
-                        width: 470px !important;
                         width: 100%;
                         max-width: 100%;
                         text-transform: math-auto;
@@ -86,7 +84,10 @@
                             > button {
                                 flex-direction: row-reverse;
 
-                                &:active {
+                                &:active,
+                                &:focus {
+                                    background-color: transparent;
+                                    border: 0;
                                     box-shadow: none;
                                     outline: 0;
                                 }

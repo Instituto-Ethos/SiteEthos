@@ -915,3 +915,33 @@ if ( ! function_exists( 'get_logger' ) ) {
         }
     }
 }
+
+add_filter( 'wp_mail', 'fix_attachments_on_wp_mail' );
+
+/**
+ * Corrige os anexos no envio de e-mails no WordPress.
+ *
+ * Esta função verifica se a classe `Mailgun` está disponível e, caso contrário,
+ * retorna os atributos do e-mail sem alterações. Se a classe estiver disponível,
+ * ela verifica se o campo de anexos (`attachments`) é uma string e, se for igual
+ * ao nome do site, redefine os anexos como um array vazio.
+ *
+ * @param array $atts Os atributos do e-mail, incluindo os anexos.
+ *
+ * @return array Os atributos do e-mail corrigidos.
+ */
+function fix_attachments_on_wp_mail( $atts ) {
+    if ( ! class_exists( 'Mailgun' ) ) {
+        return $atts;
+    }
+
+    if ( isset( $atts['attachments'] ) && is_string( $atts['attachments'] ) ) {
+        $site_name = get_bloginfo( 'name' );
+
+        if ( trim( $atts['attachments'] ) === trim( $site_name ) ) {
+            $atts['attachments'] = [];
+        }
+    }
+
+    return $atts;
+}
