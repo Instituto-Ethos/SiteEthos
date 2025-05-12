@@ -457,6 +457,14 @@ class Assets
                 'global' => true,
             ],
 
+            'event-registration' => [
+                'file' => 'event-registration.js',
+                'pre-load' => false,
+                'preload_callback' => function () {
+                    return is_singular( 'tribe_events' );
+                }
+            ],
+
             'sync-crm' => [
                 'file' => 'sync-crm.js',
                 'pre-load' => false,

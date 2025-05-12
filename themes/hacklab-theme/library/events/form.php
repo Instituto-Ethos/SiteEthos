@@ -2,13 +2,6 @@
 
 namespace hacklabr;
 
-function enqueue_event_registration_assets() {
-    if ( is_singular( 'tribe_events' ) ) {
-        wp_enqueue_script( 'form-scripts', get_stylesheet_directory_uri() . '/dist/blocks/form/index.js' );
-    }
-}
-add_action( 'wp_enqueue_scripts', 'hacklabr\\enqueue_event_registration_assets' );
-
 function get_event_registration_fields() {
     $a11y_options = [
     ];
@@ -51,7 +44,7 @@ function get_event_registration_fields() {
             'label' => __('Phone number', 'hacklabr'),
             'mask' => '(00) 0000-0000|(00) 00000-0000',
             'placeholder' => __('Enter the phone number', 'hacklabr'),
-            'required' => true,
+            'required' => false,
             'validate' => function ($value) {
                 if (!is_numeric($value) || strlen($value) < 10 || strlen($value) > 11) {
                     return __('Invalid phone number', 'hacklabr');
@@ -86,26 +79,26 @@ function get_event_registration_fields() {
                 return true;
             },
         ],
-        'nome_empresa' => [
+        'nome_fantasia' => [
             'type' => 'text',
             'class' => '-colspan-12',
             'label' => __('Business name', 'hacklabr'),
             'placeholder' => __('Enter the business name', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'cargo' => [
             'type' => 'text',
             'class' => '-colspan-12',
             'label' => __('Role', 'hacklabr'),
             'placeholder' => __('Enter the role in company', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'nivel_hierarquico' => [
             'type' => 'select',
             'class' => '-colspan-12',
             'label' =>__('Hierarchical level', 'hacklabr'),
             'options' => $hierarchy_options,
-            'required' => true,
+            'required' => false,
             'validate' => function ($value) use ($hierarchy_options) {
                 if (!array_key_exists($value, $hierarchy_options)) {
                     return __('Invalid hierarchical level', 'hacklabr');
@@ -118,7 +111,7 @@ function get_event_registration_fields() {
             'class' => '-colspan-12',
             'label' => _x('Area', 'company', 'hacklabr'),
             'placeholder' => __('Enter the area in company', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'acessibilidade' => [
             'type' => 'select',
@@ -143,11 +136,21 @@ function get_event_registration_params() {
 
     if ( ! empty( $user_id ) ) {
         $fields = get_event_registration_fields();
-        $meta = get_user_meta( $user_id );
+        $user_meta = get_user_meta( $user_id );
 
         foreach ( $fields as $key => $field ) {
-            if ( empty( $params[ $key ] ) && ! empty( $meta[ $key ] ) ) {
-                $params[ $key ] = $meta[ $key ][0];
+            if ( empty( $params[ $key ] ) && ! empty( $user_meta[ $key ] ) ) {
+                $params[ $key ] = $user_meta[ $key ][0];
+            }
+        }
+
+        if ( $organization = get_organization_by_user( $user_id ) ) {
+            $post_meta = get_post_meta( $organization->ID );
+
+            foreach ( $fields as $key => $field ) {
+                if ( empty( $params[ $key ] ) && ! empty( $post_meta[ $key ] ) ) {
+                    $params[ $key ] = $post_meta[ $key ][0];
+                }
             }
         }
     }
@@ -172,3 +175,27 @@ add_action( 'wp_head', 'hacklabr\\register_event_registration_form' );
 function render_event_registration_form( array $attrs ) {
     return render_form_callback( [ 'formId' => 'event-registration' ] );
 }
+
+function wrap_event_registration_form( string $form_html, array $form ) {
+    if ( $form['id'] !== 'event-registration' ) {
+        return $form_html;
+    }
+
+    $user_id = get_current_user_id();
+    $event_id = get_the_ID();
+
+    $hidden_fields = [
+        "<input type='hidden' id='__user_id' value='{$user_id}'>",
+    ];
+
+    if ( $fut_pf_id = get_post_meta( $event_id, '_ethos_crm:fut_pf_id', true ) ) {
+        $hidden_fields[] = "<input type='hidden' id='__fut_pf_id' value='{$fut_pf_id}'>";
+    }
+
+    $form_lines = explode( "\n", $form_html );
+    array_splice( $form_lines, 1, 0, $hidden_fields );
+    $form_html = implode( "\n", $form_lines );
+
+    return $form_html;
+}
+add_action( 'hacklabr\\form_output', 'hacklabr\\wrap_event_registration_form', 10, 2 );
