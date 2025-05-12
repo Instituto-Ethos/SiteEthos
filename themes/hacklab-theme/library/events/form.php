@@ -2,6 +2,13 @@
 
 namespace hacklabr;
 
+function enqueue_event_registration_assets() {
+    if ( is_singular( 'tribe_events' ) ) {
+        wp_enqueue_script( 'form-scripts', get_stylesheet_directory_uri() . '/dist/blocks/form/index.js' );
+    }
+}
+add_action( 'wp_enqueue_scripts', 'hacklabr\\enqueue_event_registration_assets' );
+
 function get_event_registration_fields() {
     $a11y_options = [
     ];
@@ -149,15 +156,18 @@ function get_event_registration_params() {
 }
 
 function register_event_registration_form() {
-    $fields = get_event_registration_fields();
+    if ( is_singular( 'tribe_events' ) ) {
+        $fields = get_event_registration_fields();
 
-    register_form( 'event-registration', __( 'Event registration', 'hacklabr' ), [
-        'fields' => $fields,
-        'get_params' => 'hacklabr\\get_event_registration_params',
-        'submit_label' => _x( 'Register', 'event', 'hacklabr' ),
-    ] );
+        register_form( 'event-registration', __( 'Event registration', 'hacklabr' ), [
+            'fields' => $fields,
+            'get_params' => 'hacklabr\\get_event_registration_params',
+            'submit_label' => _x( 'Register', 'event', 'hacklabr' ),
+        ] );
+    }
+
 }
-add_action( 'init', 'hacklabr\\register_event_registration_form' );
+add_action( 'wp_head', 'hacklabr\\register_event_registration_form' );
 
 function render_event_registration_form( array $attrs ) {
     return render_form_callback( [ 'formId' => 'event-registration' ] );
