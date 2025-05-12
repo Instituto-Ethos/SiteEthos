@@ -36,6 +36,8 @@ require __DIR__ . '/library/forms/edit-organization.php';
 require __DIR__ . '/library/forms/my-data.php';
 require __DIR__ . '/library/forms/requests.php';
 
+require __DIR__ . '/library/events/index.php';
+
 add_action( 'init', function() {
     if(isset($_GET['crm_sync_events']) && current_user_can('manage_options')) {
         ini_set('max_execution_time', 0);

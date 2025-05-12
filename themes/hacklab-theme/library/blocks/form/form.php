@@ -40,6 +40,4 @@ function render_form_callback ($attributes) {
     $output = ob_get_clean();
 
     return apply_filters('hacklabr\\form_output', $output, $form, $params);
-
-    return $output;
 }
