@@ -44,7 +44,7 @@ function get_event_registration_fields() {
             'label' => __('Phone number', 'hacklabr'),
             'mask' => '(00) 0000-0000|(00) 00000-0000',
             'placeholder' => __('Enter the phone number', 'hacklabr'),
-            'required' => true,
+            'required' => false,
             'validate' => function ($value) {
                 if (!is_numeric($value) || strlen($value) < 10 || strlen($value) > 11) {
                     return __('Invalid phone number', 'hacklabr');
@@ -84,21 +84,21 @@ function get_event_registration_fields() {
             'class' => '-colspan-12',
             'label' => __('Business name', 'hacklabr'),
             'placeholder' => __('Enter the business name', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'cargo' => [
             'type' => 'text',
             'class' => '-colspan-12',
             'label' => __('Role', 'hacklabr'),
             'placeholder' => __('Enter the role in company', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'nivel_hierarquico' => [
             'type' => 'select',
             'class' => '-colspan-12',
             'label' =>__('Hierarchical level', 'hacklabr'),
             'options' => $hierarchy_options,
-            'required' => true,
+            'required' => false,
             'validate' => function ($value) use ($hierarchy_options) {
                 if (!array_key_exists($value, $hierarchy_options)) {
                     return __('Invalid hierarchical level', 'hacklabr');
@@ -111,7 +111,7 @@ function get_event_registration_fields() {
             'class' => '-colspan-12',
             'label' => _x('Area', 'company', 'hacklabr'),
             'placeholder' => __('Enter the area in company', 'hacklabr'),
-            'required' => true,
+            'required' => false,
         ],
         'acessibilidade' => [
             'type' => 'select',
