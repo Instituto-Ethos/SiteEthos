@@ -2,18 +2,18 @@
 
 namespace hacklabr;
 
-function get_event_registration_fields() {
+function get_event_registration_fields () {
     $a11y_options = [
     ];
 
     $hierarchy_options = [
-        '969830000' => _x( 'Analyst', 'hierarchical level', 'hacklabr' ),
-        '969830001' => _x( 'Advisor', 'hierarchical level', 'hacklabr' ),
-        '969830002' => _x( 'Coordinator', 'hierarchical level', 'hacklabr' ),
-        '969830003' => _x( 'Director', 'hierarchical level', 'hacklabr' ),
-        '969830004' => _x( 'Manager', 'hierarchical level', 'hacklabr' ),
-        '969830005' => _x( 'Supervisor', 'hierarchical level', 'hacklabr' ),
-        '969830006' => _x( 'Other', 'hierarchical level', 'hacklabr' ),
+        '969830000' => _x('Analyst', 'hierarchical level', 'hacklabr'),
+        '969830001' => _x('Advisor', 'hierarchical level', 'hacklabr'),
+        '969830002' => _x('Coordinator', 'hierarchical level', 'hacklabr'),
+        '969830003' => _x('Director', 'hierarchical level', 'hacklabr'),
+        '969830004' => _x('Manager', 'hierarchical level', 'hacklabr'),
+        '969830005' => _x('Supervisor', 'hierarchical level', 'hacklabr'),
+        '969830006' => _x('Other', 'hierarchical level', 'hacklabr'),
     ];
 
     return [
@@ -129,27 +129,27 @@ function get_event_registration_fields() {
     ];
 }
 
-function get_event_registration_params() {
+function get_event_registration_params () {
     $params = sanitize_form_params();
 
     $user_id = get_current_user_id();
 
-    if ( ! empty( $user_id ) ) {
+    if (!empty($user_id)) {
         $fields = get_event_registration_fields();
-        $user_meta = get_user_meta( $user_id );
+        $user_meta = get_user_meta($user_id);
 
-        foreach ( $fields as $key => $field ) {
-            if ( empty( $params[ $key ] ) && ! empty( $user_meta[ $key ] ) ) {
-                $params[ $key ] = $user_meta[ $key ][0];
+        foreach ($fields as $key => $field) {
+            if (empty($params[$key]) && !empty($user_meta[$key])) {
+                $params[$key] = $user_meta[$key][0];
             }
         }
 
-        if ( $organization = get_organization_by_user( $user_id ) ) {
-            $post_meta = get_post_meta( $organization->ID );
+        if ($organization = get_organization_by_user($user_id)) {
+            $post_meta = get_post_meta($organization->ID);
 
-            foreach ( $fields as $key => $field ) {
-                if ( empty( $params[ $key ] ) && ! empty( $post_meta[ $key ] ) ) {
-                    $params[ $key ] = $post_meta[ $key ][0];
+            foreach ($fields as $key => $field) {
+                if (empty($params[$key]) && !empty($post_meta[$key])) {
+                    $params[$key] = $post_meta[$key][0];
                 }
             }
         }
@@ -158,26 +158,44 @@ function get_event_registration_params() {
     return $params;
 }
 
-function register_event_registration_form() {
-    if ( is_singular( 'tribe_events' ) ) {
+function register_event_registration_form () {
+    if (is_singular('tribe_events')) {
         $fields = get_event_registration_fields();
 
-        register_form( 'event-registration', __( 'Event registration', 'hacklabr' ), [
+        register_form('event-registration', __('Event registration', 'hacklabr'), [
             'fields' => $fields,
             'get_params' => 'hacklabr\\get_event_registration_params',
-            'submit_label' => _x( 'Register', 'event', 'hacklabr' ),
-        ] );
+            'submit_label' => _x('Register', 'event', 'hacklabr'),
+        ]);
     }
-
 }
-add_action( 'wp_head', 'hacklabr\\register_event_registration_form' );
+add_action('wp_head', 'hacklabr\\register_event_registration_form');
 
-function render_event_registration_form( array $attrs ) {
-    return render_form_callback( [ 'formId' => 'event-registration' ] );
+function render_event_registration_form (array $attrs) {
+    return render_form_callback([ 'formId' => 'event-registration' ]);
 }
 
-function wrap_event_registration_form( string $form_html, array $form ) {
-    if ( $form['id'] !== 'event-registration' ) {
+function validate_event_registration_form (string $form_id, array $form, array $params) {
+    if ($form_id === 'event-registration') {
+        $validation = validate_form($form['fields'], $params);
+
+        if ($validation !== true) {
+            return;
+        }
+
+        $user = get_user_by('email', $params['email']);
+
+        if (!$user) {
+            // @TODO
+        }
+
+        // @TODO
+    }
+}
+add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
+
+function wrap_event_registration_form (string $form_html, array $form) {
+    if ($form['id'] !== 'event-registration') {
         return $form_html;
     }
 
@@ -188,14 +206,14 @@ function wrap_event_registration_form( string $form_html, array $form ) {
         "<input type='hidden' id='__user_id' value='{$user_id}'>",
     ];
 
-    if ( $fut_pf_id = get_post_meta( $event_id, '_ethos_crm:fut_pf_id', true ) ) {
+    if ($fut_pf_id = get_post_meta($event_id, '_ethos_crm:fut_pf_id', true)) {
         $hidden_fields[] = "<input type='hidden' id='__fut_pf_id' value='{$fut_pf_id}'>";
     }
 
-    $form_lines = explode( "\n", $form_html );
-    array_splice( $form_lines, 1, 0, $hidden_fields );
-    $form_html = implode( "\n", $form_lines );
+    $form_lines = explode("\n", $form_html);
+    array_splice($form_lines, 1, 0, $hidden_fields);
+    $form_html = implode("\n", $form_lines);
 
     return $form_html;
 }
-add_action( 'hacklabr\\form_output', 'hacklabr\\wrap_event_registration_form', 10, 2 );
+add_action('hacklabr\\form_output', 'hacklabr\\wrap_event_registration_form', 10, 2);
