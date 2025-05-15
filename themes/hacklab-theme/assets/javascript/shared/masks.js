@@ -43,6 +43,10 @@ export function applyMasks () {
 
         maskedEl.addEventListener('change', () => {
             unmaskedEl.value = mask.unmaskedValue
+
+            const unmaskEvent = new Event('hacklabr:change')
+            unmaskEvent.data = mask.unmaskedValue
+            unmaskedEl.dispatchEvent(unmaskEvent)
         })
     })
 }

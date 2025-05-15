@@ -462,6 +462,11 @@ class Assets
                 'pre-load' => false,
                 'preload_callback' => function () {
                     return is_singular( 'tribe_events' );
+                },
+                'localize_callback' => function () {
+                    return [
+                        'baseUrl' => rest_url( 'hacklabr/v2/' ),
+                    ];
                 }
             ],
 
