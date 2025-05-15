@@ -65,6 +65,21 @@ function get_event_registration_fields () {
                 return true;
             },
         ],
+        'confirma_email' => [
+            'type' => 'email',
+            'class' => '-colspan-12',
+            'label' => __('Confirm email', 'hacklabr'),
+            'placeholder' => __('Enter the email', 'hacklabr'),
+            'required' => true,
+            'validate' => function ($value, $context) {
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    return __('Invalid email', 'hacklabr');
+                } elseif ($value !== $context['email']) {
+                    return __('Emails do not match', 'hacklabr');
+                }
+                return true;
+            },
+        ],
         'cnpj' => [
             'type' => 'masked',
             'class' => '-colspan-12',
@@ -152,6 +167,10 @@ function get_event_registration_params () {
                     $params[$key] = $post_meta[$key][0];
                 }
             }
+        }
+
+        if (empty($params['confirma_email']) && !empty($user_meta['email'])) {
+            $params['confirma_email'] = $user_meta['email'][0];
         }
 
         if (empty($params['nivel_hierarquico']) && !empty($user_meta['_ethos_crm:fut_pl_nivelhierarquico'])) {
