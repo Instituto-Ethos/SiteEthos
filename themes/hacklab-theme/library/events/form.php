@@ -23,6 +23,16 @@ function get_event_registration_fields () {
         '969830006' => _x('Other', 'hierarchical level', 'hacklabr'),
     ];
 
+    $source_options = [
+        '0' => __('Advertisement', 'hacklabr'),
+		'1' => __('Marketing email', 'hacklabr'),
+		'2' => __('Referral', 'hacklabr'),
+		'3' => __('Conference', 'hacklabr'),
+		'4' => __('Events', 'hacklabr'),
+		'5' => __('Web search', 'hacklabr'),
+		'6' => _x('Other', 'lead source', 'hacklabr'),
+    ];
+
     $fields = [
         'nome_completo' => [
             'type' => 'text',
@@ -151,6 +161,20 @@ function get_event_registration_fields () {
     ];
 
     if (is_paid_event($post_id)) {
+        $fields['origem_lead'] = [
+            'type' => 'select',
+            'class' => '-colspan-12',
+            'label' =>__('How did you know about Ethos?', 'hacklabr'),
+            'options' => $source_options,
+            'required' => false,
+            'validate' => function ($value) use ($source_options) {
+                if (!array_key_exists($value, $source_options)) {
+                    return __('Invalid option', 'hacklabr');
+                }
+                return true;
+            },
+        ];
+
         $fields['voucher'] = [
             'type' => 'text',
             'class' => '-colspan-12',
