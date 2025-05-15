@@ -153,6 +153,10 @@ function get_event_registration_params () {
                 }
             }
         }
+
+        if (empty($params['nivel_hierarquico']) && !empty($user_meta['_ethos_crm:fut_pl_nivelhierarquico'])) {
+            $params['nivel_hierarquico'] = $user_meta['_ethos_crm:fut_pl_nivelhierarquico'][0];
+        }
     }
 
     return $params;
