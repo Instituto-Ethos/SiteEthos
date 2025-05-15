@@ -2,7 +2,14 @@
 
 namespace hacklabr;
 
+function is_paid_event (int $post_id) {
+    $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago'));
+    return $is_paid;
+}
+
 function get_event_registration_fields () {
+    $post_id = get_the_ID();
+
     $a11y_options = [
     ];
 
@@ -16,7 +23,7 @@ function get_event_registration_fields () {
         '969830006' => _x('Other', 'hierarchical level', 'hacklabr'),
     ];
 
-    return [
+    $fields = [
         'nome_completo' => [
             'type' => 'text',
             'class' => '-colspan-12',
@@ -142,6 +149,18 @@ function get_event_registration_fields () {
             },
         ],
     ];
+
+    if (is_paid_event($post_id)) {
+        $fields['voucher'] = [
+            'type' => 'text',
+            'class' => '-colspan-12',
+            'label' => __('Voucher', 'hacklabr'),
+            'placeholder' => __('Enter the voucher code, if you have any', 'hacklabr'),
+            'required' => false,
+        ];
+    }
+
+    return $fields;
 }
 
 function get_event_registration_params () {
