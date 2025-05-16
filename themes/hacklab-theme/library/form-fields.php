@@ -82,6 +82,15 @@ function render_masked_field (string $name, $value, array $definition) {
 <?php
 }
 
+function render_recaptcha_field (string $name, $value, array $definition) {
+?>
+    <div class="captcha-container">
+        <?php \WPCaptcha_Functions::captcha_fields_print(); ?>
+        <?php \WPCaptcha_Functions::login_scripts_print(); ?>
+    </div>
+<?
+}
+
 function render_select_field (string $name, $value, array $definition) {
     $placeholder = $definition['placeholder'] ?? __('Select an option', 'hacklabr');
 ?>

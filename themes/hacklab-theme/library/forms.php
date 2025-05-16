@@ -53,6 +53,8 @@ function sanitize_form_params () {
     foreach ($_POST as $key => $value) {
         if (str_starts_with($key, '_')) {
             $params[substr($key, 1)] = filter_input(INPUT_POST, $key);
+        } elseif ($key === 'g-recaptcha-response') {
+            $params['g-recaptcha-response'] = filter_input(INPUT_POST, 'g-recaptcha-response');
         }
     }
 
@@ -83,13 +85,14 @@ function render_field (string $name, array $definition, array $context = [], $sk
     $value = array_key_exists($name, $context) ? $context[$name] : '';
 
     $validation = ($skip_validation || empty($context)) ? true : validate_field($definition, $value, $context);
+    $has_label = !in_array($definition['type'], ['hidden', 'recaptcha', 'static']);
 
     if (isset($definition['conditional']) && !call_user_func($definition['conditional'])) {
         return;
     }
 ?>
     <div class="<?= concat_class_list(['form-field', $definition['class'], ($validation === true) ? null : 'form-field--invalid']) ?>">
-        <?php if ($definition['type'] !== 'static' && $definition['type'] !== 'hidden'): ?>
+        <?php if ($has_label): ?>
             <label class="form-field__label" for="<?= $name ?>">
                 <?= $definition['label'] ?>
                 <?php if ($definition['required']): ?>
@@ -205,4 +208,24 @@ function validate_form (array $fields, array $params = []) {
     } else {
         return true;
     }
+}
+
+/**
+ * Cache reCAPTCHA validation, because checking the same answer
+ * twice against Google API causes validation error
+ */
+function validate_recaptcha_field () {
+    global $hacklabr_recaptcha_validation;
+
+    if (!empty($hacklabr_recaptcha_validation)) {
+        return $hacklabr_recaptcha_validation;
+    }
+
+    $recaptcha_response = \WPCaptcha_Functions::handle_captcha();
+    if (is_wp_error($recaptcha_response)) {
+        $recaptcha_response = $recaptcha_response->get_error_message();
+    }
+
+    $hacklabr_recaptcha_validation = $recaptcha_response;
+    return $recaptcha_response;
 }

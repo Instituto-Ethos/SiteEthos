@@ -3,6 +3,16 @@
 namespace hacklabr;
 
 function is_paid_event (int $post_id) {
+    /*
+    $event_type = get_post_meta($post_id, '_ethos_crm:fut_lk_tipoparceria', true);
+    if ($event_type) {
+        $event_type = json_encode($event_type)['Name'];
+        if ($event_type === 'Conferência') {
+            return true;
+        }
+    }
+    */
+
     $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago'));
     return $is_paid;
 }
@@ -184,6 +194,18 @@ function get_event_registration_fields () {
         ];
     }
 
+    if (class_exists('WPCaptcha_Functions')) {
+        $fields['g-recaptcha-response'] = [
+            'type' => 'recaptcha',
+            'class' => '-colspan-12',
+            'required' => true,
+            'required_text' => __('Prove you are not a robot', 'hacklabr'),
+            'validate' => function ($value) {
+                return validate_recaptcha_field();
+            },
+        ];
+    }
+
     return $fields;
 }
 
@@ -235,7 +257,7 @@ function register_event_registration_form () {
         ]);
     }
 }
-add_action('wp_head', 'hacklabr\\register_event_registration_form');
+add_action('wp', 'hacklabr\\register_event_registration_form');
 
 function render_event_registration_form (array $attrs) {
     return render_form_callback([ 'formId' => 'event-registration' ]);
