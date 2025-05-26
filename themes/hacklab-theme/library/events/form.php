@@ -259,6 +259,10 @@ function get_event_registration_params () {
             }
         }
 
+        if ((empty($params['area']) || !is_numeric($params['area'])) && !empty($user_meta['_ethos_crm:fut_pl_area'])) {
+            $params['area'] = $user_meta['_ethos_crm:fut_pl_area'][0];
+        }
+
         if (empty($params['confirma_email']) && !empty($user_meta['email'])) {
             $params['confirma_email'] = $user_meta['email'][0];
         }

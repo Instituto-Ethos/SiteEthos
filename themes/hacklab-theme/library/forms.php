@@ -128,7 +128,7 @@ function render_field (string $name, array $definition, array $context = [], $sk
 }
 
 function should_skip_form_validation ($form, $params) {
-    if (empty($params)) {
+    if (empty($params) || empty($_POST['__hacklabr_form'])) {
         return true;
     }
     if (!empty($form['options']['disabled'])) {
