@@ -2,12 +2,11 @@
 
 namespace hacklabr;
 
-function create_registration (array $params) {
+function create_registration (string $project_id, array $params) {
     $systemuser = get_option('systemuser');
 
     $account_id = get_registration_account($params);
     $contact_id = get_registration_contact($params);
-    $project_id = $params['project_id'];
 
     $attibutes = [
         'fut_lk_contato'   => create_crm_reference('contact', $contact_id),
@@ -208,12 +207,10 @@ function get_registration_lead (array $params): string {
     return create_registration_lead($params);
 }
 
-function register_for_event (array $params) {
-    $post_id = get_the_ID();
+function register_for_event (int $post_id, array $params) {
+    $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
-    $params['project_id'] = get_post_meta($post_id, 'entity_fut_projeto', true);
-
-    create_registration($params);
+    create_registration($project_id, $params);
 
     if ($user_id = get_current_user_id()) {
         wp_update_user([

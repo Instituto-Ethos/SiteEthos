@@ -300,13 +300,9 @@ function validate_event_registration_form (string $form_id, array $form, array $
             return;
         }
 
-        $user = get_user_by('email', $params['email']);
+        $post_id = get_the_ID();
 
-        if (!$user) {
-            // @TODO
-        }
-
-        // @TODO
+        register_for_event($post_id, $params);
     }
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
