@@ -23,6 +23,24 @@ function get_event_registration_fields () {
     $a11y_options = [
     ];
 
+    $area_options = [
+        '969830000' => _x('Administration', 'area', 'hacklabr'),
+		'969830001' => _x('Commercial', 'area', 'hacklabr'),
+		'969830002' => _x('Communication', 'area', 'hacklabr'),
+		'969830003' => _x('Financial', 'area', 'hacklabr'),
+		'969830014' => _x('Juridical', 'area', 'hacklabr'),
+		'969830004' => _x('Marketing', 'area', 'hacklabr'),
+		'969830005' => _x('Environment', 'area', 'hacklabr'),
+		'969830010' => _x('Production', 'area', 'hacklabr'),
+		'969830011' => _x('Human Resources', 'area', 'hacklabr'),
+		'969830007' => _x('Institutional Relations', 'area', 'hacklabr'),
+		'969830008' => _x('Social Responsibility', 'area', 'hacklabr'),
+		'969830009' => _x('Sustainability', 'area', 'hacklabr'),
+		'969830012' => _x('Supply', 'area', 'hacklabr'),
+		'969830013' => _x('IT', 'area', 'hacklabr'),
+		'969830006' => _x('Other', 'area', 'hacklabr'),
+    ];
+
     $hierarchy_options = [
         '969830000' => _x('Analyst', 'hierarchical level', 'hacklabr'),
         '969830001' => _x('Advisor', 'hierarchical level', 'hacklabr'),
@@ -149,11 +167,18 @@ function get_event_registration_fields () {
             },
         ],
         'area' => [
-            'type' => 'text',
+            'type' => 'select',
             'class' => '-colspan-12',
             'label' => _x('Area', 'company', 'hacklabr'),
-            'placeholder' => __('Enter the area in company', 'hacklabr'),
+            'label' =>__('Hierarchical level', 'hacklabr'),
+            'options' => $area_options,
             'required' => false,
+            'validate' => function ($value) use ($area_options) {
+                if (!array_key_exists($value, $area_options)) {
+                    return __('Invalid area', 'hacklabr');
+                }
+                return true;
+            },
         ],
         'acessibilidade' => [
             'type' => 'select',
