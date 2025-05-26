@@ -3,28 +3,27 @@
 namespace hacklabr;
 
 function create_registration (array $params) {
-    $contact_id = $params['contact_id'];
+    $systemuser = get_option('systemuser');
+
+    $account_id = get_registration_account($params);
+    $contact_id = get_registration_contact($params);
     $project_id = $params['project_id'];
 
     $attibutes = [
-        // 'createdbyyominame' => '',
-        // 'createdonbehalfbyyominame' => '',
-        'fut_lk_contato' => create_crm_reference('contato', $contact_id),
-        // 'fut_lk_empresa' => create_crm_reference('account', ''),
-        // 'fut_lk_empresa_associada' => create_crm_reference('account', ''),
-        // 'fut_lk_fatura_pf' => create_crm_reference('contato', $contact_id),
-        // 'fut_lk_fatura_pj' => create_crm_reference('account', $contact_id),
-        // 'fut_parceria_participante_id' => create_crm_reference('fut_parceria', ''),
-        // 'fut_pl_cortesia' => '',
-        'fut_lk_projeto' => create_crm_reference('fut_projeto', $project_id),
+        'fut_lk_contato'   => create_crm_reference('contact', $contact_id),
+        'fut_lk_fatura_pf' => create_crm_reference('contact', $contact_id),
+        // 'fut_pl_cortesia'  => '',
+        'fut_lk_projeto'   => create_crm_reference('fut_projeto', $project_id),
         // 'fut_participanteid' => '',
-        // 'modifiedbyyominame' => '',
-        // 'modifiedonbehalfbyyominame' => '',
-        // 'organizationid' => create_crm_reference('organization', ''),
-        // 'organizationidname' => '',
+        'ownerid'          => create_crm_reference('systemuser', $systemuser),
         // 'statecode' => '',
-        // 'transactioncurrencyid' => create_crm_reference('transactioncurrency', ''),
     ];
+
+    if (!empty($account_id)) {
+        $attibutes['fut_lk_empresa']           = create_crm_reference('account', $account_id);
+        $attibutes['fut_lk_empresa_associada'] = create_crm_reference('account', $account_id);
+        $attibutes['fut_lk_fatura_pj']         = create_crm_reference('account', $account_id);
+    }
 
     try {
         $entity_id = create_crm_entity('fut_participante', $attibutes);
@@ -83,7 +82,6 @@ function create_registration_lead (array $params) {
     $last_name = implode(' ', $name_parts);
 
     $attributes = [
-        'ownerid' => create_crm_reference('systemuser', $systemuser),
         'companyname'                => $company_name,
         'firstname'                  => $company_name,
         'fullname'                   => $company_name,
@@ -94,6 +92,7 @@ function create_registration_lead (array $params) {
         'fut_st_nomefantasiaempresa' => $company_name,
         'fut_st_sobrenome'           => $last_name,
         'leadsourcecode'             => 4, // Eventos
+        'ownerid'                    => create_crm_reference('systemuser', $systemuser),
         'yomifirstname'              => $first_name,
         'yomifullname'               => $company_name,
         'yomilastname'               => $last_name,
@@ -117,6 +116,36 @@ function get_event_registrations (int $post_id) {
     }
 
     return $account_ids;
+}
+
+function get_registration_account (array $params): string|null {
+    // Case 1. Retrieve UUID from current user's organization
+    if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
+        return $account_id;
+    }
+
+    // Case 2. Retrieve UUID from other WordPress organizations
+    $posts = get_posts([
+        'meta_query' => [
+            [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
+        ],
+    ]);
+    if (!empty($posts) && ($account_id = get_post_meta($posts[0]->ID, '_ethos_crm_account_id', true))) {
+        return $account_id;
+    }
+
+    // Case 3. Retrieve UUID directly from CRM accounts
+    $accounts = get_crm_entities('account', [
+        'filters' => [
+            'fut_st_cnpjsemmascara' => $params['cnpj'],
+        ],
+    ]);
+    if (!empty($accounts->Entities)) {
+        return $accounts->Entities[0]->Id;
+    }
+
+    // Case 4. If account does not exist, return null
+    return null;
 }
 
 function get_registration_contact (array $params): string {
@@ -180,5 +209,19 @@ function get_registration_lead (array $params): string {
 }
 
 function register_for_event (array $params) {
+    $post_id = get_the_ID();
 
+    $params['project_id'] = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true);
+
+    create_registration($params);
+
+    if ($user_id = get_current_user_id()) {
+        wp_update_user([
+            'ID' => $user_id,
+            'meta_input' => [
+                'area'              => trim($params['area']),
+                'nivel_hierarquico' => trim($params['nivel_hierarquico']),
+            ],
+        ]);
+    }
 }
