@@ -211,7 +211,7 @@ function get_registration_lead (array $params): string {
 function register_for_event (array $params) {
     $post_id = get_the_ID();
 
-    $params['project_id'] = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true);
+    $params['project_id'] = get_post_meta($post_id, 'entity_fut_projeto', true);
 
     create_registration($params);
 
