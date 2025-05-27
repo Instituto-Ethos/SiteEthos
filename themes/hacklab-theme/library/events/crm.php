@@ -89,7 +89,6 @@ function create_registration_lead (array $params) {
         'firstname'                  => $company_name,
         'fullname'                   => $company_name,
         'fut_st_cnpj'                => format_cnpj($cnpj),
-        'fut_st_cnpjsemmascara'      => $cnpj,
         'fut_st_nome'                => $first_name,
         'fut_st_nomecompleto'        => $full_name,
         'fut_st_nomefantasiaempresa' => $company_name,
