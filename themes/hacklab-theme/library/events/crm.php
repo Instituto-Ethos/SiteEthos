@@ -2,26 +2,30 @@
 
 namespace hacklabr;
 
-function create_registration (string $project_id, array $params) {
+function create_registration (int $post_id, array $params) {
     $systemuser = get_option('systemuser');
+    $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
     $account_id = get_registration_account($params);
     $contact_id = get_registration_contact($params);
 
     $attibutes = [
-        'fut_lk_contato'   => create_crm_reference('contact', $contact_id),
-        'fut_lk_fatura_pf' => create_crm_reference('contact', $contact_id),
-        // 'fut_pl_cortesia'  => '',
-        'fut_lk_projeto'   => create_crm_reference('fut_projeto', $project_id),
-        // 'fut_participanteid' => '',
-        'ownerid'          => create_crm_reference('systemuser', $systemuser),
-        // 'statecode' => '',
+        'fut_lk_contato'        => create_crm_reference('contact', $contact_id),
+        'fut_lk_fatura_pf'      => create_crm_reference('contact', $contact_id),
+        'fut_pl_cortesia'       => 969830000, // @TODO
+        'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
+        'fut_txt_nro_inscricao' => generate_registration_number($post_id, $project_id),
+        'ownerid'               => create_crm_reference('systemuser', $systemuser),
     ];
 
     if (!empty($account_id)) {
         $attibutes['fut_lk_empresa']           = create_crm_reference('account', $account_id);
         $attibutes['fut_lk_empresa_associada'] = create_crm_reference('account', $account_id);
         $attibutes['fut_lk_fatura_pj']         = create_crm_reference('account', $account_id);
+    }
+
+    if (!empty($params['acessibilidade'])) {
+        $attibutes['fut_txt_necessidades_especiais'] = trim($params['acessibilidade']);
     }
 
     try {
@@ -100,12 +104,18 @@ function create_registration_lead (array $params) {
     return create_crm_entity('lead', $attributes);
 }
 
-function get_event_registrations (int $post_id) {
-    $fut_projeto_id = get_post_meta($post_id, 'entity_fut_projeto', true);
+function generate_registration_number (int $post_id, string $project_id) {
+    $prefix = get_post_meta($post_id, '_ethos_crm:fut_txt_prefixo', true);
 
+    $registered_ids = get_event_registrations($project_id);
+
+    return $prefix . (count($registered_ids) + 1);
+}
+
+function get_event_registrations (string $project_id) {
     $registrations = iterate_crm_entities('fut_participante', [
         'filters' => [
-            'fut_lk_projeto' => $fut_projeto_id,
+            'fut_lk_projeto' => $project_id,
         ],
     ]);
 
@@ -208,9 +218,7 @@ function get_registration_lead (array $params): string {
 }
 
 function register_for_event (int $post_id, array $params) {
-    $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
-
-    create_registration($project_id, $params);
+    create_registration($post_id, $params);
 
     if ($user_id = get_current_user_id()) {
         wp_update_user([
