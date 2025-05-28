@@ -3,7 +3,6 @@
 namespace hacklabr;
 
 function create_registration (int $post_id, array $params) {
-    $systemuser = get_option('systemuser');
     $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
     $account_id = get_registration_account($params);
@@ -15,7 +14,6 @@ function create_registration (int $post_id, array $params) {
         'fut_pl_cortesia'       => 969830000, // @TODO
         'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $project_id),
-        'ownerid'               => create_crm_reference('systemuser', $systemuser),
     ];
 
     if (!empty($account_id)) {
