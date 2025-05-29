@@ -302,7 +302,8 @@ function validate_event_registration_form (string $form_id, array $form, array $
 
         $post_id = get_the_ID();
 
-        register_for_event($post_id, $params);
+        sleep(10);
+        // register_for_event($post_id, $params);
     }
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
@@ -325,6 +326,8 @@ function wrap_event_registration_form (string $form_html, array $form) {
     if ($form['id'] !== 'event-registration') {
         return $form_html;
     }
+
+    $form_html = '<h3>' . __('Event registration', 'hacklabr') . '</h3>' . "\n" . $form_html;
 
     $search = 'enctype="multipart/form-data"';
     $form_html = str_replace($search, $search . ' x-data="{ formLoading: false }" @submit="formLoading = true"', $form_html);
