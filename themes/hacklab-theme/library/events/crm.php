@@ -98,6 +98,10 @@ function create_registration_lead (array $params) {
         'yomilastname'               => $last_name,
     ];
 
+    if (!empty($params['origem_lead'])) {
+        $attributes['leadsourcecode'] = intval($params['origem_lead']);
+    }
+
     return create_crm_entity('lead', $attributes);
 }
 
