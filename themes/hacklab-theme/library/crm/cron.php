@@ -36,9 +36,21 @@ add_action('hacklabr\\run_every_5_minutes', 'ethos\\crm\\call_next_job');
 function schedule_job (string $name, mixed $payload) {
     global $wpdb;
 
+    $json_payload = json_encode($payload);
+
+    // If job already exists, don't try to re-enqueue it
+    $query_sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}ethos_jobs WHERE job_name = %s AND job_payload = %s LIMIT 1", [
+        $name,
+        $json_payload
+    ]);
+    $query = $wpdb->get_row($query_sql, \OBJECT);
+    if (!empty($query)) {
+        return false;
+    }
+
     $result = $wpdb->insert($wpdb->prefix . 'ethos_jobs', [
         'job_name' => $name,
-        'job_payload' => json_encode($payload),
+        'job_payload' => $json_payload,
     ], ['%s', '%s']);
     return !empty($result);
 }
