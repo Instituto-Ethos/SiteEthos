@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2025-03-24T18:00:53+00:00\n"
-"PO-Revision-Date: 2025-03-24 15:02-0300\n"
+"POT-Creation-Date: 2025-05-29T20:26:42+00:00\n"
+"PO-Revision-Date: 2025-05-29 17:37-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: hacklabr\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Poedit 3.6\n"
 "X-Domain: hacklabr\n"
 "X-Poedit-Basepath: .\n"
 
@@ -151,19 +151,304 @@ msgstr "A cada %s minutos"
 msgid "Hourly"
 msgstr "De hora em hora"
 
-#: library/form-fields.php:86
+#: library/events/form.php:27
+msgctxt "area"
+msgid "Administration"
+msgstr "Administração"
+
+#: library/events/form.php:28
+msgctxt "area"
+msgid "Commercial"
+msgstr "Comercial"
+
+#: library/events/form.php:29
+msgctxt "area"
+msgid "Communication"
+msgstr "Comunicação"
+
+#: library/events/form.php:30
+msgctxt "area"
+msgid "Financial"
+msgstr "Financeiro"
+
+#: library/events/form.php:31
+msgctxt "area"
+msgid "Juridical"
+msgstr "Jurídico"
+
+#: library/events/form.php:32
+msgctxt "area"
+msgid "Marketing"
+msgstr "Marketing"
+
+#: library/events/form.php:33
+msgctxt "area"
+msgid "Environment"
+msgstr "Meio Ambiente"
+
+#: library/events/form.php:34
+msgctxt "area"
+msgid "Production"
+msgstr "Produção"
+
+#: library/events/form.php:35
+msgctxt "area"
+msgid "Human Resources"
+msgstr "Recursos Humanos"
+
+#: library/events/form.php:36
+msgctxt "area"
+msgid "Institutional Relations"
+msgstr "Rel. Institucionais"
+
+#: library/events/form.php:37
+msgctxt "area"
+msgid "Social Responsibility"
+msgstr "Responsabilidade Social"
+
+#: library/events/form.php:38
+msgctxt "area"
+msgid "Sustainability"
+msgstr "Sustentabilidade"
+
+#: library/events/form.php:39
+msgctxt "area"
+msgid "Supply"
+msgstr "Suprimentos"
+
+#: library/events/form.php:40
+msgctxt "area"
+msgid "IT"
+msgstr "TI"
+
+#: library/events/form.php:41
+msgctxt "area"
+msgid "Other"
+msgstr "Outra"
+
+#: library/events/form.php:45
+msgctxt "hierarchical level"
+msgid "Analyst"
+msgstr "Analista"
+
+#: library/events/form.php:46
+msgctxt "hierarchical level"
+msgid "Advisor"
+msgstr "Assessoria"
+
+#: library/events/form.php:47
+msgctxt "hierarchical level"
+msgid "Coordinator"
+msgstr "Coordenador"
+
+#: library/events/form.php:48
+msgctxt "hierarchical level"
+msgid "Director"
+msgstr "Diretor"
+
+#: library/events/form.php:49
+msgctxt "hierarchical level"
+msgid "Manager"
+msgstr "Gerente"
+
+#: library/events/form.php:50
+msgctxt "hierarchical level"
+msgid "Supervisor"
+msgstr "Supervisor"
+
+#: library/events/form.php:51
+msgctxt "hierarchical level"
+msgid "Other"
+msgstr "Outro"
+
+#: library/events/form.php:55
+msgid "Advertisement"
+msgstr "Anúncio"
+
+#: library/events/form.php:56
+msgid "Marketing email"
+msgstr "Email de marketing"
+
+#: library/events/form.php:57
+msgid "Referral"
+msgstr "Indicação"
+
+#: library/events/form.php:58
+msgid "Conference"
+msgstr "Conferência"
+
+#: library/events/form.php:59
+msgid "Events"
+msgstr "Eventos"
+
+#: library/events/form.php:60
+msgid "Web search"
+msgstr "Pesquisa na Web"
+
+#: library/events/form.php:61
+msgctxt "lead source"
+msgid "Other"
+msgstr "Outros"
+
+#: library/events/form.php:68 library/forms/registration.php:330
+msgid "Full name"
+msgstr "Nome completo"
+
+#: library/events/form.php:69 library/forms/registration.php:331
+msgid "Enter the full name"
+msgstr "Insira o nome completo"
+
+#: library/events/form.php:75 library/forms/registration.php:337
+msgid "CPF number"
+msgstr "CPF"
+
+#: library/events/form.php:77 library/forms/registration.php:339
+msgid "Enter the CPF number"
+msgstr "Insira o CPF"
+
+#: library/events/form.php:81 library/forms/registration.php:343
+msgid "Invalid CPF number"
+msgstr "CPF inválido"
+
+#: library/events/form.php:89 library/forms/registration.php:419
+msgid "Phone number"
+msgstr "Telefone"
+
+#: library/events/form.php:91 library/forms/registration.php:421
+msgid "Enter the phone number"
+msgstr "Insira o número de telefone"
+
+#: library/events/form.php:95 library/forms/registration.php:405
+#: library/forms/registration.php:427
+msgid "Invalid phone number"
+msgstr "Número de telefone inválido"
+
+#: library/events/form.php:103 library/forms/custom-forms.php:313
+#: library/forms/registration.php:365
+msgid "Email"
+msgstr "Email"
+
+#: library/events/form.php:104 library/events/form.php:117
+#: library/forms/registration.php:366
+msgid "Enter the email"
+msgstr "Insira o email"
+
+#: library/events/form.php:108 library/events/form.php:121
+#: library/forms/edit-organization.php:10 library/forms/registration.php:370
+msgid "Invalid email"
+msgstr "Email inválido"
+
+#: library/events/form.php:116
+msgid "Confirm email"
+msgstr "Confirmar email"
+
+#: library/events/form.php:123
+msgid "Emails do not match"
+msgstr "Emails não coincidem"
+
+#: library/events/form.php:131 library/forms/registration.php:103
+msgid "CNPJ number"
+msgstr "CNPJ"
+
+#: library/events/form.php:133 library/forms/registration.php:105
+msgid "Enter the company' CNPJ number"
+msgstr "Insira o CNPJ da empresa"
+
+#: library/events/form.php:137 library/forms/registration.php:109
+msgid "Invalid CNPJ number"
+msgstr "CNPJ inválido"
+
+#: library/events/form.php:145
+msgid "Business name"
+msgstr "Nome da empresa"
+
+#: library/events/form.php:146
+msgid "Enter the business name"
+msgstr "Insira o nome da empresa"
+
+#: library/events/form.php:152 library/forms/registration.php:351
+msgid "Role"
+msgstr "Cargo"
+
+#: library/events/form.php:153 library/forms/registration.php:352
+msgid "Enter the role in company"
+msgstr "Insira o cargo na companhia"
+
+#: library/events/form.php:159 library/events/form.php:173
+msgid "Hierarchical level"
+msgstr "Nível hierárquico"
+
+#: library/events/form.php:164
+msgid "Invalid hierarchical level"
+msgstr "Nível hierárquico inválido"
+
+#: library/events/form.php:172 library/forms/registration.php:358
+msgctxt "company"
+msgid "Area"
+msgstr "Área"
+
+#: library/events/form.php:178
+msgid "Invalid area"
+msgstr "Área inválida"
+
+#: library/events/form.php:186
+msgid "Accessibility"
+msgstr "Acessibilidade"
+
+#: library/events/form.php:191
+msgid "Invalid accessibility option"
+msgstr "Opção de acessibilidade inválida"
+
+#: library/events/form.php:202
+msgid "How did you know about Ethos?"
+msgstr "Como ficou sabendo do Ethos?"
+
+#: library/events/form.php:207
+msgid "Invalid option"
+msgstr "Opção inválida"
+
+#: library/events/form.php:216
+msgid "Voucher"
+msgstr "Voucher"
+
+#: library/events/form.php:217
+msgid "Enter the voucher code, if you have any"
+msgstr "Insira o código do voucher, se tiver"
+
+#: library/events/form.php:227
+msgid "Prove you are not a robot"
+msgstr "Prove que você não é um robô"
+
+#: library/events/form.php:282
+msgid "Event registration"
+msgstr "Inscrição no evento"
+
+#: library/events/form.php:285
+msgctxt "event"
+msgid "Register"
+msgstr "Inscrever-se"
+
+#: library/events/form.php:317
+msgid "Await"
+msgstr "Aguarde"
+
+#: library/events/form.php:318
+msgid "It may take some minutes."
+msgstr "Isso pode levar alguns minutos."
+
+#: library/form-fields.php:95
 msgid "Select an option"
 msgstr "Selecione uma opção"
 
-#: library/forms.php:145
+#: library/forms.php:148
 msgid "Submit"
 msgstr "Enviar"
 
-#: library/forms.php:154
+#: library/forms.php:157
 msgid "Skip step"
 msgstr "Próxima etapa"
 
-#: library/forms.php:180
+#: library/forms.php:183
 msgid "Required field"
 msgstr "Campo obrigatório"
 
@@ -244,10 +529,6 @@ msgstr "Adicionar mais um contato"
 msgid "Name"
 msgstr "Nome"
 
-#: library/forms/custom-forms.php:313 library/forms/registration.php:365
-msgid "Email"
-msgstr "Email"
-
 #: library/forms/custom-forms.php:314
 msgid "Approver"
 msgstr "Aprovador"
@@ -263,10 +544,6 @@ msgstr "Editar"
 #: library/forms/custom-forms.php:317 library/forms/custom-forms.php:341
 msgid "Delete"
 msgstr "Remover"
-
-#: library/forms/edit-organization.php:10 library/forms/registration.php:370
-msgid "Invalid email"
-msgstr "Email inválido"
 
 #: library/forms/edit-organization.php:16 library/forms/registration.php:376
 msgid "Email is already in use"
@@ -328,18 +605,6 @@ msgstr "Média empresa"
 #: library/forms/registration.php:63
 msgid "Large business"
 msgstr "Grande empresa"
-
-#: library/forms/registration.php:103
-msgid "CNPJ number"
-msgstr "CNPJ"
-
-#: library/forms/registration.php:105
-msgid "Enter the company' CNPJ number"
-msgstr "Insira o CNPJ da empresa"
-
-#: library/forms/registration.php:109
-msgid "Invalid CNPJ number"
-msgstr "CNPJ inválido"
 
 #: library/forms/registration.php:117
 msgid "Legal name"
@@ -518,46 +783,9 @@ msgid ""
 msgstr ""
 "Li e concordo com o <a href=\"%s\" target=\"_blank\">Código de Conduta</a>"
 
-#: library/forms/registration.php:330
-msgid "Full name"
-msgstr "Nome completo"
-
-#: library/forms/registration.php:331
-msgid "Enter the full name"
-msgstr "Insira o nome completo"
-
-#: library/forms/registration.php:337
-msgid "CPF number"
-msgstr "CPF"
-
-#: library/forms/registration.php:339
-msgid "Enter the CPF number"
-msgstr "Insira o CPF"
-
-#: library/forms/registration.php:343
-msgid "Invalid CPF number"
-msgstr "CPF inválido"
-
-#: library/forms/registration.php:351
-msgid "Role"
-msgstr "Cargo"
-
-#: library/forms/registration.php:352
-msgid "Enter the role in company"
-msgstr "Insira o cargo na companhia"
-
-#: library/forms/registration.php:358
-msgctxt "company"
-msgid "Area"
-msgstr "Área"
-
 #: library/forms/registration.php:359
 msgid "Enter the area in company"
 msgstr "Insira a área na companhia"
-
-#: library/forms/registration.php:366
-msgid "Enter the email"
-msgstr "Insira o email"
 
 #: library/forms/registration.php:386
 msgid "Password"
@@ -579,21 +807,9 @@ msgstr "Celular"
 msgid "Enter the cell phone number"
 msgstr "Insira o número de celular"
 
-#: library/forms/registration.php:405 library/forms/registration.php:427
-msgid "Invalid phone number"
-msgstr "Número de telefone inválido"
-
 #: library/forms/registration.php:413
 msgid "This is also a WhatsApp number"
 msgstr "Este também é um número de WhatsApp"
-
-#: library/forms/registration.php:419
-msgid "Phone number"
-msgstr "Telefone"
-
-#: library/forms/registration.php:421
-msgid "Enter the phone number"
-msgstr "Insira o número de telefone"
 
 #: library/forms/registration.php:474
 msgctxt "membership"
@@ -1066,11 +1282,6 @@ msgstr "Meu Plano - Tabela"
 msgid "My Plan"
 msgstr "Meu Plano"
 
-#: dist/blocks/payments-history/editor.js:19
-#: dist/blocks/payments-history/editor.js:63
-msgid "Payments history"
-msgstr "Histórico de pagamentos"
-
 #: dist/blocks/posts-grid/editor.js:19 library/blocks/posts-grid/editor.js:40
 #: dist/blocks/posts-grid/editor.js:1931
 msgid "Grid columns"
@@ -1112,7 +1323,6 @@ msgid "Show taxonomies"
 msgstr "Mostrar taxonomias"
 
 #: dist/blocks/posts-grid/editor.js:19 library/blocks/posts-grid/editor.js:106
-#: dist/blocks/posts-grid/editor.js:1997
 msgid "Prevent repeat posts"
 msgstr "Evitar repetição de posts"
 
@@ -1696,14 +1906,14 @@ msgctxt "Font family name"
 msgid "Title"
 msgstr "Título"
 
+#~ msgid "Payments history"
+#~ msgstr "Histórico de pagamentos"
+
 #~ msgid "Cards per row"
 #~ msgstr "Cards por linha"
 
 #~ msgid "Cards rows"
 #~ msgstr "Linhas do grid"
-
-#~ msgid "Event type"
-#~ msgstr "Tipo de evento"
 
 #~ msgid "Invoice area"
 #~ msgstr "Área de comprovante"

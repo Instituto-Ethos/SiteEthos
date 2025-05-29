@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ethos 1.1.10\n"
+"Project-Id-Version: Ethos 1.1.16\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-19T20:45:25+00:00\n"
+"POT-Creation-Date: 2025-05-29T20:26:42+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -152,19 +152,323 @@ msgstr ""
 msgid "Hourly"
 msgstr ""
 
-#: library/form-fields.php:86
+#: library/events/form.php:27
+msgctxt "area"
+msgid "Administration"
+msgstr ""
+
+#: library/events/form.php:28
+msgctxt "area"
+msgid "Commercial"
+msgstr ""
+
+#: library/events/form.php:29
+msgctxt "area"
+msgid "Communication"
+msgstr ""
+
+#: library/events/form.php:30
+msgctxt "area"
+msgid "Financial"
+msgstr ""
+
+#: library/events/form.php:31
+msgctxt "area"
+msgid "Juridical"
+msgstr ""
+
+#: library/events/form.php:32
+msgctxt "area"
+msgid "Marketing"
+msgstr ""
+
+#: library/events/form.php:33
+msgctxt "area"
+msgid "Environment"
+msgstr ""
+
+#: library/events/form.php:34
+msgctxt "area"
+msgid "Production"
+msgstr ""
+
+#: library/events/form.php:35
+msgctxt "area"
+msgid "Human Resources"
+msgstr ""
+
+#: library/events/form.php:36
+msgctxt "area"
+msgid "Institutional Relations"
+msgstr ""
+
+#: library/events/form.php:37
+msgctxt "area"
+msgid "Social Responsibility"
+msgstr ""
+
+#: library/events/form.php:38
+msgctxt "area"
+msgid "Sustainability"
+msgstr ""
+
+#: library/events/form.php:39
+msgctxt "area"
+msgid "Supply"
+msgstr ""
+
+#: library/events/form.php:40
+msgctxt "area"
+msgid "IT"
+msgstr ""
+
+#: library/events/form.php:41
+msgctxt "area"
+msgid "Other"
+msgstr ""
+
+#: library/events/form.php:45
+msgctxt "hierarchical level"
+msgid "Analyst"
+msgstr ""
+
+#: library/events/form.php:46
+msgctxt "hierarchical level"
+msgid "Advisor"
+msgstr ""
+
+#: library/events/form.php:47
+msgctxt "hierarchical level"
+msgid "Coordinator"
+msgstr ""
+
+#: library/events/form.php:48
+msgctxt "hierarchical level"
+msgid "Director"
+msgstr ""
+
+#: library/events/form.php:49
+msgctxt "hierarchical level"
+msgid "Manager"
+msgstr ""
+
+#: library/events/form.php:50
+msgctxt "hierarchical level"
+msgid "Supervisor"
+msgstr ""
+
+#: library/events/form.php:51
+msgctxt "hierarchical level"
+msgid "Other"
+msgstr ""
+
+#: library/events/form.php:55
+msgid "Advertisement"
+msgstr ""
+
+#: library/events/form.php:56
+msgid "Marketing email"
+msgstr ""
+
+#: library/events/form.php:57
+msgid "Referral"
+msgstr ""
+
+#: library/events/form.php:58
+msgid "Conference"
+msgstr ""
+
+#: library/events/form.php:59
+msgid "Events"
+msgstr ""
+
+#: library/events/form.php:60
+msgid "Web search"
+msgstr ""
+
+#: library/events/form.php:61
+msgctxt "lead source"
+msgid "Other"
+msgstr ""
+
+#: library/events/form.php:68
+#: library/forms/registration.php:330
+msgid "Full name"
+msgstr ""
+
+#: library/events/form.php:69
+#: library/forms/registration.php:331
+msgid "Enter the full name"
+msgstr ""
+
+#: library/events/form.php:75
+#: library/forms/registration.php:337
+msgid "CPF number"
+msgstr ""
+
+#: library/events/form.php:77
+#: library/forms/registration.php:339
+msgid "Enter the CPF number"
+msgstr ""
+
+#: library/events/form.php:81
+#: library/forms/registration.php:343
+msgid "Invalid CPF number"
+msgstr ""
+
+#: library/events/form.php:89
+#: library/forms/registration.php:419
+msgid "Phone number"
+msgstr ""
+
+#: library/events/form.php:91
+#: library/forms/registration.php:421
+msgid "Enter the phone number"
+msgstr ""
+
+#: library/events/form.php:95
+#: library/forms/registration.php:405
+#: library/forms/registration.php:427
+msgid "Invalid phone number"
+msgstr ""
+
+#: library/events/form.php:103
+#: library/forms/custom-forms.php:313
+#: library/forms/registration.php:365
+msgid "Email"
+msgstr ""
+
+#: library/events/form.php:104
+#: library/events/form.php:117
+#: library/forms/registration.php:366
+msgid "Enter the email"
+msgstr ""
+
+#: library/events/form.php:108
+#: library/events/form.php:121
+#: library/forms/edit-organization.php:10
+#: library/forms/registration.php:370
+msgid "Invalid email"
+msgstr ""
+
+#: library/events/form.php:116
+msgid "Confirm email"
+msgstr ""
+
+#: library/events/form.php:123
+msgid "Emails do not match"
+msgstr ""
+
+#: library/events/form.php:131
+#: library/forms/registration.php:103
+msgid "CNPJ number"
+msgstr ""
+
+#: library/events/form.php:133
+#: library/forms/registration.php:105
+msgid "Enter the company' CNPJ number"
+msgstr ""
+
+#: library/events/form.php:137
+#: library/forms/registration.php:109
+msgid "Invalid CNPJ number"
+msgstr ""
+
+#: library/events/form.php:145
+msgid "Business name"
+msgstr ""
+
+#: library/events/form.php:146
+msgid "Enter the business name"
+msgstr ""
+
+#: library/events/form.php:152
+#: library/forms/registration.php:351
+msgid "Role"
+msgstr ""
+
+#: library/events/form.php:153
+#: library/forms/registration.php:352
+msgid "Enter the role in company"
+msgstr ""
+
+#: library/events/form.php:159
+#: library/events/form.php:173
+msgid "Hierarchical level"
+msgstr ""
+
+#: library/events/form.php:164
+msgid "Invalid hierarchical level"
+msgstr ""
+
+#: library/events/form.php:172
+#: library/forms/registration.php:358
+msgctxt "company"
+msgid "Area"
+msgstr ""
+
+#: library/events/form.php:178
+msgid "Invalid area"
+msgstr ""
+
+#: library/events/form.php:186
+msgid "Accessibility"
+msgstr ""
+
+#: library/events/form.php:191
+msgid "Invalid accessibility option"
+msgstr ""
+
+#: library/events/form.php:202
+msgid "How did you know about Ethos?"
+msgstr ""
+
+#: library/events/form.php:207
+msgid "Invalid option"
+msgstr ""
+
+#: library/events/form.php:216
+msgid "Voucher"
+msgstr ""
+
+#: library/events/form.php:217
+msgid "Enter the voucher code, if you have any"
+msgstr ""
+
+#: library/events/form.php:227
+msgid "Prove you are not a robot"
+msgstr ""
+
+#: library/events/form.php:282
+msgid "Event registration"
+msgstr ""
+
+#: library/events/form.php:285
+msgctxt "event"
+msgid "Register"
+msgstr ""
+
+#: library/events/form.php:317
+msgid "Await"
+msgstr ""
+
+#: library/events/form.php:318
+msgid "It may take some minutes."
+msgstr ""
+
+#: library/form-fields.php:95
 msgid "Select an option"
 msgstr ""
 
-#: library/forms.php:145
+#: library/forms.php:148
 msgid "Submit"
 msgstr ""
 
-#: library/forms.php:154
+#: library/forms.php:157
 msgid "Skip step"
 msgstr ""
 
-#: library/forms.php:180
+#: library/forms.php:183
 msgid "Required field"
 msgstr ""
 
@@ -240,11 +544,6 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: library/forms/custom-forms.php:313
-#: library/forms/registration.php:365
-msgid "Email"
-msgstr ""
-
 #: library/forms/custom-forms.php:314
 msgid "Approver"
 msgstr ""
@@ -261,11 +560,6 @@ msgstr ""
 #: library/forms/custom-forms.php:317
 #: library/forms/custom-forms.php:341
 msgid "Delete"
-msgstr ""
-
-#: library/forms/edit-organization.php:10
-#: library/forms/registration.php:370
-msgid "Invalid email"
 msgstr ""
 
 #: library/forms/edit-organization.php:16
@@ -329,18 +623,6 @@ msgstr ""
 
 #: library/forms/registration.php:63
 msgid "Large business"
-msgstr ""
-
-#: library/forms/registration.php:103
-msgid "CNPJ number"
-msgstr ""
-
-#: library/forms/registration.php:105
-msgid "Enter the company' CNPJ number"
-msgstr ""
-
-#: library/forms/registration.php:109
-msgid "Invalid CNPJ number"
 msgstr ""
 
 #: library/forms/registration.php:117
@@ -513,45 +795,8 @@ msgstr ""
 msgid "I have read and agreed with the <a href=\"%s\" target=\"_blank\">Code of Conduct</a>"
 msgstr ""
 
-#: library/forms/registration.php:330
-msgid "Full name"
-msgstr ""
-
-#: library/forms/registration.php:331
-msgid "Enter the full name"
-msgstr ""
-
-#: library/forms/registration.php:337
-msgid "CPF number"
-msgstr ""
-
-#: library/forms/registration.php:339
-msgid "Enter the CPF number"
-msgstr ""
-
-#: library/forms/registration.php:343
-msgid "Invalid CPF number"
-msgstr ""
-
-#: library/forms/registration.php:351
-msgid "Role"
-msgstr ""
-
-#: library/forms/registration.php:352
-msgid "Enter the role in company"
-msgstr ""
-
-#: library/forms/registration.php:358
-msgctxt "company"
-msgid "Area"
-msgstr ""
-
 #: library/forms/registration.php:359
 msgid "Enter the area in company"
-msgstr ""
-
-#: library/forms/registration.php:366
-msgid "Enter the email"
 msgstr ""
 
 #: library/forms/registration.php:386
@@ -574,21 +819,8 @@ msgstr ""
 msgid "Enter the cell phone number"
 msgstr ""
 
-#: library/forms/registration.php:405
-#: library/forms/registration.php:427
-msgid "Invalid phone number"
-msgstr ""
-
 #: library/forms/registration.php:413
 msgid "This is also a WhatsApp number"
-msgstr ""
-
-#: library/forms/registration.php:419
-msgid "Phone number"
-msgstr ""
-
-#: library/forms/registration.php:421
-msgid "Enter the phone number"
 msgstr ""
 
 #: library/forms/registration.php:474
@@ -896,6 +1128,10 @@ msgstr ""
 msgid "Published by "
 msgstr ""
 
+#: taxonomy.php:104
+msgid "No results found."
+msgstr ""
+
 #. Template Name of the theme
 msgid "Membership area"
 msgstr ""
@@ -962,9 +1198,9 @@ msgstr ""
 #: library/blocks/banner-with-image/editor.js:11
 #: library/blocks/card-header/editor.js:11
 #: library/blocks/download-image/editor.js:11
-#: dist/blocks/banner-with-image/editor.js:128
+#: dist/blocks/banner-with-image/editor.js:129
 #: dist/blocks/card-header/editor.js:115
-#: dist/blocks/download-image/editor.js:128
+#: dist/blocks/download-image/editor.js:129
 msgid "Header content"
 msgstr ""
 
@@ -974,7 +1210,7 @@ msgstr ""
 #: library/blocks/banner-with-image/editor.js:25
 #: library/blocks/card-header/editor.js:38
 #: library/blocks/posts-grid/editor.js:23
-#: dist/blocks/banner-with-image/editor.js:142
+#: dist/blocks/banner-with-image/editor.js:143
 #: dist/blocks/card-header/editor.js:142
 #: dist/blocks/posts-grid/editor.js:1914
 msgid "Layout"
@@ -986,10 +1222,10 @@ msgstr ""
 #: dist/blocks/download-image/editor.js:39
 #: library/blocks/banner-with-image/editor.js:28
 #: library/blocks/shared/SelectImage.js:32
-#: dist/blocks/banner-with-image/editor.js:96
-#: dist/blocks/banner-with-image/editor.js:145
+#: dist/blocks/banner-with-image/editor.js:97
+#: dist/blocks/banner-with-image/editor.js:146
 #: dist/blocks/card-header/editor.js:83
-#: dist/blocks/download-image/editor.js:96
+#: dist/blocks/download-image/editor.js:97
 msgid "Image"
 msgstr ""
 
@@ -997,9 +1233,9 @@ msgstr ""
 #: dist/blocks/card-header/editor.js:29
 #: dist/blocks/download-image/editor.js:39
 #: library/blocks/shared/SelectImage.js:15
-#: dist/blocks/banner-with-image/editor.js:79
+#: dist/blocks/banner-with-image/editor.js:80
 #: dist/blocks/card-header/editor.js:66
-#: dist/blocks/download-image/editor.js:79
+#: dist/blocks/download-image/editor.js:80
 msgid "Change image"
 msgstr ""
 
@@ -1007,9 +1243,9 @@ msgstr ""
 #: dist/blocks/card-header/editor.js:29
 #: dist/blocks/download-image/editor.js:39
 #: library/blocks/shared/SelectImage.js:18
-#: dist/blocks/banner-with-image/editor.js:82
+#: dist/blocks/banner-with-image/editor.js:83
 #: dist/blocks/card-header/editor.js:69
-#: dist/blocks/download-image/editor.js:82
+#: dist/blocks/download-image/editor.js:83
 msgid "Remove image"
 msgstr ""
 
@@ -1017,9 +1253,9 @@ msgstr ""
 #: dist/blocks/card-header/editor.js:29
 #: dist/blocks/download-image/editor.js:39
 #: library/blocks/shared/SelectImage.js:24
-#: dist/blocks/banner-with-image/editor.js:88
+#: dist/blocks/banner-with-image/editor.js:89
 #: dist/blocks/card-header/editor.js:75
-#: dist/blocks/download-image/editor.js:88
+#: dist/blocks/download-image/editor.js:89
 msgid "Select image"
 msgstr ""
 
@@ -1073,11 +1309,6 @@ msgstr ""
 #: library/blocks/my-plan/editor.js:22
 #: dist/blocks/my-plan/editor.js:72
 msgid "My Plan"
-msgstr ""
-
-#: dist/blocks/payments-history/editor.js:19
-#: dist/blocks/payments-history/editor.js:63
-msgid "Payments history"
 msgstr ""
 
 #: dist/blocks/posts-grid/editor.js:19
@@ -1335,6 +1566,8 @@ msgid "Iconify ID"
 msgstr ""
 
 #: dist/js/functionalities/sync-crm.js:29
+#: dist/js/functionalities/sync-crm.js:119
+#: dist/js/functionalities/sync-crm.js:122
 msgid "Sync with CRM"
 msgstr ""
 
