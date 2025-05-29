@@ -307,25 +307,33 @@ function validate_event_registration_form (string $form_id, array $form, array $
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
 
+function form_spinner() {
+    ob_start();
+?>
+    <div class="form__loading -colspan-12" x-show="formLoading">
+        <img src="<?= get_stylesheet_directory_uri() ?>/assets/images/spinner.svg" alt="">
+        <p>
+            <strong><?= _e('Await', 'hacklabr') ?></strong>
+            <span><?php _e('It may take some minutes.', 'hacklabr') ?></span>
+        </p>
+    </div>
+<?php
+    return ob_get_clean();
+}
+
 function wrap_event_registration_form (string $form_html, array $form) {
     if ($form['id'] !== 'event-registration') {
         return $form_html;
     }
 
-    $user_id = get_current_user_id();
-    $event_id = get_the_ID();
+    $search = 'enctype="multipart/form-data"';
+    $form_html = str_replace($search, $search . ' x-data="{ formLoading: false }" @submit="formLoading = true"', $form_html);
 
-    $hidden_fields = [
-        "<input type='hidden' id='__user_id' value='{$user_id}'>",
-    ];
+    $search = '<div class="form__buttons">';
+    $form_html = str_replace($search, form_spinner() . "\n" . $search, $form_html);
 
-    if ($fut_pf_id = get_post_meta($event_id, '_ethos_crm:fut_pf_id', true)) {
-        $hidden_fields[] = "<input type='hidden' id='__fut_pf_id' value='{$fut_pf_id}'>";
-    }
-
-    $form_lines = explode("\n", $form_html);
-    array_splice($form_lines, 1, 0, $hidden_fields);
-    $form_html = implode("\n", $form_lines);
+    $search = 'type="submit"';
+    $form_html = str_replace($search, $search . ' x-show="!formLoading"', $form_html);
 
     return $form_html;
 }
