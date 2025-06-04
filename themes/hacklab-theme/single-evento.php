@@ -192,7 +192,8 @@ if( isset($recurrence['rules']) ) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
             echo do_shortcode('[ethosDadosEvento menu_order=""]');
-            echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
+            echo do_shortcode('[event-registration]');
+            // echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
         }
     }
     ?>
