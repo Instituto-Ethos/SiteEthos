@@ -2,18 +2,71 @@
 
 namespace hacklabr;
 
+function check_event_availability (int $post_id, string $project_id, string $contact_id): array {
+    if (!registrations_are_open($post_id)) {
+        return [
+            'clear'   => true,
+            'status'  => 'error',
+            'message' => __('Registrations are closed.', 'hacklabr'),
+        ];
+    }
+
+    $registration_end = get_post_meta($post_id, '_ethos_crm:fut_dt_data_encerramento_inscricoes', true);
+    $current_date = date('c');
+
+    if ($current_date > $registration_end) {
+        update_post_meta($post_id, '_ethos:event_status', 'PAST');
+
+        return [
+            'clear'   => true,
+            'status'  => 'error',
+            'message' => __('Registrations are closed.', 'hacklabr'),
+        ];
+    }
+
+    $registered_ids = get_event_registrations($project_id);
+    $filled_slots = count($registered_ids);
+    $total_slots = intval(get_post_meta($post_id, '_ethos_crm:fut_int_nrovagastotal', true));
+
+    if ($filled_slots >= $total_slots) {
+        update_post_meta($post_id, '_ethos:event_status', 'FULL');
+
+        return [
+            'clear'   => true,
+            'status'  => 'error',
+            'message' => __('Registrations are closed.', 'hacklabr'),
+        ];
+    } elseif (in_array($contact_id, $registered_ids)) {
+        return [
+            'clear'   => false,
+            'status'  => 'error',
+            'message' => __('You are already registered in this event.', 'hacklabr'),
+        ];
+    } else {
+        return [
+            'filled'    => $filled_slots,
+            'available' => $total_slots - $filled_slots,
+        ];
+    }
+}
+
 function create_registration (int $post_id, array $params) {
     $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
     $account_id = get_registration_account($params);
     $contact_id = get_registration_contact($params);
 
+    $availability = check_event_availability($post_id, $project_id, $contact_id);
+    if (!empty($availability['status'])) {
+        return $availability;
+    }
+
     $attibutes = [
         'fut_lk_contato'        => create_crm_reference('contact', $contact_id),
         'fut_lk_fatura_pf'      => create_crm_reference('contact', $contact_id),
         'fut_pl_cortesia'       => 969830000, // @TODO
         'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
-        'fut_txt_nro_inscricao' => generate_registration_number($post_id, $project_id),
+        'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
 
     if (!empty($account_id)) {
@@ -30,14 +83,16 @@ function create_registration (int $post_id, array $params) {
         $entity_id = create_crm_entity('fut_participante', $attibutes);
 
         return [
+            'clear'     => true,
             'status'    => 'success',
-            'message'   => 'Entidade criada com sucesso no CRM.',
+            'message'   => __('You are successfully registered to this event!', 'hacklabr'),
             'entity_id' => $entity_id,
         ];
     } catch (\Exception $e) {
         return [
+            'clear'   => false,
             'status'  => 'error',
-            'message' => "Erro ao inscrever-se no event {$project_id}: " . $e->getMessage()
+            'message' => $e->getMessage(),
         ];
     }
 }
@@ -105,12 +160,10 @@ function create_registration_lead (array $params) {
     return create_crm_entity('lead', $attributes);
 }
 
-function generate_registration_number (int $post_id, string $project_id) {
+function generate_registration_number (int $post_id, int $count) {
     $prefix = get_post_meta($post_id, '_ethos_crm:fut_txt_prefixo', true);
 
-    $registered_ids = get_event_registrations($project_id);
-
-    return $prefix . (count($registered_ids) + 1);
+    return $prefix . ($count + 1);
 }
 
 function get_event_registrations (string $project_id) {
@@ -218,8 +271,20 @@ function get_registration_lead (array $params): string {
     return create_registration_lead($params);
 }
 
+function registrations_are_open (int $post_id): bool {
+    $crm_status = get_post_meta($post_id, '_ethos_crm:statuscode', true);
+    $event_status = get_post_meta($post_id, '_ethos:event_status', true);
+
+    if ($crm_status !== '1' || $event_status === 'FULL' || $event_status === 'PAST') {
+        return false;
+    }
+
+    return true;
+}
+
 function register_for_event (int $post_id, array $params) {
-    create_registration($post_id, $params);
+    global $hl_event_registration;
+    $hl_event_registration = create_registration($post_id, $params);
 
     if ($user_id = get_current_user_id()) {
         wp_update_user([

@@ -302,8 +302,7 @@ function validate_event_registration_form (string $form_id, array $form, array $
 
         $post_id = get_the_ID();
 
-        sleep(10);
-        // register_for_event($post_id, $params);
+        register_for_event($post_id, $params);
     }
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
