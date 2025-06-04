@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2025-05-29T20:26:42+00:00\n"
-"PO-Revision-Date: 2025-05-29 17:37-0300\n"
+"POT-Creation-Date: 2025-06-04T13:06:30+00:00\n"
+"PO-Revision-Date: 2025-06-04 10:07-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -150,6 +150,19 @@ msgstr "A cada %s minutos"
 #: library/cron.php:13
 msgid "Hourly"
 msgstr "De hora em hora"
+
+#: library/events/crm.php:10 library/events/crm.php:23
+#: library/events/crm.php:37 library/events/form.php:340
+msgid "Registrations are closed."
+msgstr "As inscrições foram encerradas."
+
+#: library/events/crm.php:43
+msgid "You are already registered in this event."
+msgstr "Você já se inscreveu neste evento."
+
+#: library/events/crm.php:88
+msgid "You are successfully registered to this event!"
+msgstr "Inscrição realizada com sucesso!"
 
 #: library/events/form.php:27
 msgctxt "area"
@@ -419,7 +432,7 @@ msgstr "Insira o código do voucher, se tiver"
 msgid "Prove you are not a robot"
 msgstr "Prove que você não é um robô"
 
-#: library/events/form.php:282
+#: library/events/form.php:282 library/events/form.php:333
 msgid "Event registration"
 msgstr "Inscrição no evento"
 
@@ -428,11 +441,11 @@ msgctxt "event"
 msgid "Register"
 msgstr "Inscrever-se"
 
-#: library/events/form.php:317
+#: library/events/form.php:316
 msgid "Await"
 msgstr "Aguarde"
 
-#: library/events/form.php:318
+#: library/events/form.php:317
 msgid "It may take some minutes."
 msgstr "Isso pode levar alguns minutos."
 
@@ -993,8 +1006,8 @@ msgid "YouTube Key"
 msgstr "Chave do YouTube"
 
 #: library/utils.php:432 library/utils.php:440
-msgid "A verificação do reCAPTCHA falhou. Tente novamente!"
-msgstr ""
+msgid "The reCAPTCHA verification failed. Try again!"
+msgstr "A verificação do reCAPTCHA falhou. Tente novamente!"
 
 #. Template Name of the theme
 msgid "Page with anchors"

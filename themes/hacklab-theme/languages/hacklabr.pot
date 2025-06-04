@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-05-29T20:26:42+00:00\n"
+"POT-Creation-Date: 2025-06-04T13:06:30+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -150,6 +150,21 @@ msgstr ""
 
 #: library/cron.php:13
 msgid "Hourly"
+msgstr ""
+
+#: library/events/crm.php:10
+#: library/events/crm.php:23
+#: library/events/crm.php:37
+#: library/events/form.php:340
+msgid "Registrations are closed."
+msgstr ""
+
+#: library/events/crm.php:43
+msgid "You are already registered in this event."
+msgstr ""
+
+#: library/events/crm.php:88
+msgid "You are successfully registered to this event!"
 msgstr ""
 
 #: library/events/form.php:27
@@ -440,6 +455,7 @@ msgid "Prove you are not a robot"
 msgstr ""
 
 #: library/events/form.php:282
+#: library/events/form.php:333
 msgid "Event registration"
 msgstr ""
 
@@ -448,11 +464,11 @@ msgctxt "event"
 msgid "Register"
 msgstr ""
 
-#: library/events/form.php:317
+#: library/events/form.php:316
 msgid "Await"
 msgstr ""
 
-#: library/events/form.php:318
+#: library/events/form.php:317
 msgid "It may take some minutes."
 msgstr ""
 
@@ -1007,7 +1023,7 @@ msgstr ""
 
 #: library/utils.php:432
 #: library/utils.php:440
-msgid "A verificação do reCAPTCHA falhou. Tente novamente!"
+msgid "The reCAPTCHA verification failed. Try again!"
 msgstr ""
 
 #. Template Name of the theme

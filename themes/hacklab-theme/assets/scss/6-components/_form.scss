@@ -35,6 +35,20 @@
         }
     }
 
+    &__message {
+        font-size: $font-size--large;
+        font-weight: $font-weight--bold;
+        margin-block: $gap--large;
+
+        &--success {
+            color: $color--helper-dark;
+        }
+
+        &--error {
+            color: $color--warning-pure;
+        }
+    }
+
     &__loading {
         align-items: center;
         display: flex;

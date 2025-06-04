@@ -322,11 +322,26 @@ function form_spinner() {
 }
 
 function wrap_event_registration_form (string $form_html, array $form) {
+    global $hl_event_registration;
+
     if ($form['id'] !== 'event-registration') {
         return $form_html;
     }
 
-    $form_html = '<h3>' . __('Event registration', 'hacklabr') . '</h3>' . "\n" . $form_html;
+    $post_id = get_the_ID();
+
+    $heading = "<h3>" . __('Event registration', 'hacklabr') . "</h3>\n";
+
+    $message_template = "<div class='form__message form__message--%s'>%s</div>\n";
+    $message = '';
+    if (!empty($hl_event_registration)) {
+        $message = sprintf($message_template, $hl_event_registration['status'], $hl_event_registration['message']);
+    } elseif (!registrations_are_open($post_id)) {
+        $message = sprintf($message_template, 'error', __('Registrations are closed.', 'hacklabr'));
+        return $heading . $message;
+    }
+
+    $form_html = $heading . $message . $form_html;
 
     $search = 'enctype="multipart/form-data"';
     $form_html = str_replace($search, $search . ' x-data="{ formLoading: false }" @submit="formLoading = true"', $form_html);
