@@ -28,6 +28,7 @@
   "devDependencies": {
     "@babel/preset-react": "^7.24.1",
     "@wordpress/dependency-extraction-webpack-plugin": "^5.8.0",
+    "caniuse-lite": "^1.0.30001721",
     "fast-glob": "^3.3.2",
     "laravel-mix": "^6.0.49",
     "resolve-url-loader": "^5.0.0",
