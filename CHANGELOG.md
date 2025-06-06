@@ -17,7 +17,11 @@ O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.
 
 ## [Releases]
 
-## [v1.1.16]
+## [v1.1.17] - 2025-06-06
+
+- Adiciona parâmetros GET `import_account`, `import_contact` e `import_fut_projeto` para manualmente importar entidade do CRM (experimental)
+
+## [v1.1.16] - 2025-04-17
 
 ### Changed
 

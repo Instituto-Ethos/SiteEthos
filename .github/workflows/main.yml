@@ -100,7 +100,7 @@ jobs:
               sleep 30
             fi
           done
-          echo "success=$SUCCESS" >> $GITHUB_ENV)
+          echo "success=$SUCCESS" >> $GITHUB_ENV
 
           if [ "$SUCCESS" = false ]; then
             echo "Failed to find asset after $MAX_ATTEMPTS attempts."
