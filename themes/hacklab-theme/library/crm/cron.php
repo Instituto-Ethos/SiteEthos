@@ -36,9 +36,21 @@ add_action('hacklabr\\run_every_5_minutes', 'ethos\\crm\\call_next_job');
 function schedule_job (string $name, mixed $payload) {
     global $wpdb;
 
+    $json_payload = json_encode($payload);
+
+    // If job already exists, don't try to re-enqueue it
+    $query_sql = $wpdb->prepare("SELECT * FROM {$wpdb->prefix}ethos_jobs WHERE job_name = %s AND job_payload = %s LIMIT 1", [
+        $name,
+        $json_payload
+    ]);
+    $query = $wpdb->get_row($query_sql, \OBJECT);
+    if (!empty($query)) {
+        return false;
+    }
+
     $result = $wpdb->insert($wpdb->prefix . 'ethos_jobs', [
         'job_name' => $name,
-        'job_payload' => json_encode($payload),
+        'job_payload' => $json_payload,
     ], ['%s', '%s']);
     return !empty($result);
 }
@@ -110,3 +122,23 @@ function run_syncs () {
     enqueue_last_modified_items('fut_projeto', $last_sync);
 }
 add_action('hacklabr\\run_every_hour', 'ethos\\crm\\run_syncs');
+
+function manually_sync_entity() {
+    //@TODO Deprecate in favor of `PUT /hacklabr/v2/crm/entity` endpoint
+
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (!empty($_GET['import_account'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_account', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['account', $entity_id]);
+    } elseif (!empty($_GET['import_contact'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_contact', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['contact', $entity_id]);
+    } elseif (!empty($_GET['import_fut_projeto'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_fut_projeto', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['fut_projeto', $entity_id]);
+    }
+}
+add_action('admin_init', 'ethos\\crm\\manually_sync_entity');
