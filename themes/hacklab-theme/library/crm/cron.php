@@ -122,3 +122,23 @@ function run_syncs () {
     enqueue_last_modified_items('fut_projeto', $last_sync);
 }
 add_action('hacklabr\\run_every_hour', 'ethos\\crm\\run_syncs');
+
+function manually_sync_entity() {
+    //@TODO Deprecate in favor of `PUT /hacklabr/v2/crm/entity` endpoint
+
+    if (!current_user_can('manage_options')) {
+        return;
+    }
+
+    if (!empty($_GET['import_account'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_account', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['account', $entity_id]);
+    } elseif (!empty($_GET['import_contact'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_contact', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['contact', $entity_id]);
+    } elseif (!empty($_GET['import_fut_projeto'])) {
+        $entity_id = filter_input(INPUT_GET, 'import_fut_projeto', FILTER_SANITIZE_ADD_SLASHES);
+        sync_next_entity(['fut_projeto', $entity_id]);
+    }
+}
+add_action('admin_init', 'ethos\\crm\\manually_sync_entity');
