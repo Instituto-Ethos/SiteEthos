@@ -218,12 +218,8 @@ function get_registration_contact (array $params): string {
     }
 
     // Case 2. Retrieve UUID from other WordPress users
-    $users = get_users([
-        'meta_query' => [
-            [ 'key' => 'cpf', 'value' => $params['cpf'] ],
-        ],
-    ]);
-    if (!empty($users) && ($contact_id = get_user_meta($users[0]->ID, '_ethos_crm_contact_id', true))) {
+    $user = get_user_by('email', $params['email']);
+    if (!empty($user) && ($contact_id = get_user_meta($user->ID, '_ethos_crm_contact_id', true))) {
         return $contact_id;
     }
 
