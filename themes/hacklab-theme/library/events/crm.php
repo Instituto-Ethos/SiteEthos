@@ -115,12 +115,15 @@ function create_registration_contact (array $params) {
         'fut_st_cpf'              => format_cpf(trim($params['cpf'])),
         'jobtitle'                => trim($params['cargo']),
         'lastname'                => $last_name,
-        'originatingleadid'       => create_crm_reference('lead', $lead_id),
         'telephone1'              => trim($params['telefone']),
         'yomifirstname'           => $first_name,
         'yomifullname'            => $full_name,
         'yomilastname'            => $last_name,
     ];
+
+    if (!empty($lead_id)) {
+        $attributes['originatingleadid'] = create_crm_reference('lead', $lead_id);
+    }
 
     return create_crm_entity('contact', $attributes);
 }
