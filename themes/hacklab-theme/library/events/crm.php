@@ -241,34 +241,37 @@ function get_registration_contact (array $params): string {
     return create_registration_contact($params);
 }
 
-function get_registration_lead (array $params): string {
+function get_registration_lead (array $params): string|null {
     // Case 1. Retrieve UUID from current user's organization
     if (($post_id = get_organization_by_user()) && ($lead_id = get_post_meta($post_id, '_ethos_crm_lead_id', true))) {
         return $lead_id;
     }
 
-    // Case 2. Retrieve UUID from other WordPress organizations
-    $posts = get_posts([
-        'meta_query' => [
-            [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
-        ],
-    ]);
-    if (!empty($posts) && ($lead_id = get_post_meta($posts[0]->ID, '_ethos_crm_lead_id', true))) {
-        return $lead_id;
-    }
+    if (!empty($params['cnpj'])) {
+        // Case 2. Retrieve UUID from other WordPress organizations
+        $posts = get_posts([
+            'meta_query' => [
+                [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
+            ],
+        ]);
+        if (!empty($posts) && ($lead_id = get_post_meta($posts[0]->ID, '_ethos_crm_lead_id', true))) {
+            return $lead_id;
+        }
 
-    // Case 3. Retrieve UUID directly from CRM leads
-    $leads = get_crm_entities('lead', [
-        'filters' => [
-            'fut_st_cnpjsemmascara' => $params['cnpj'],
-        ],
-    ]);
-    if (!empty($leads->Entities)) {
-        return $leads->Entities[0]->Id;
+        // Case 3. Retrieve UUID directly from CRM leads
+        // $leads = get_crm_entities('lead', [
+        //     'filters' => [
+        //         'fut_st_cnpjsemmascara' => $params['cnpj'],
+        //     ],
+        // ]);
+        // if (!empty($leads->Entities)) {
+        //     return $leads->Entities[0]->Id;
+        // }
     }
 
     // Case 4. If lead does not exist, create it, and return its UUID
-    return create_registration_lead($params);
+    // return create_registration_lead($params);
+    return null;
 }
 
 function registrations_are_open (int $post_id): bool {
