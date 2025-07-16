@@ -131,9 +131,14 @@ function get_event_registration_fields () {
             'label' => __('CNPJ number', 'hacklabr'),
             'mask' => '00.000.000/0000-00',
             'placeholder' => __("Enter the company' CNPJ number", 'hacklabr'),
-            'required' => true,
+            'required' => false,
             'validate' => function ($value) {
-                if (!is_numeric($value) || strlen($value) !== 14) {
+                $cnpj = preg_replace('/\D/', '', $value);
+                if ($cnpj === '') {
+                    return true;
+                }
+
+                if (strlen($cnpj) !== 14) {
                     return __('Invalid CNPJ number', 'hacklabr');
                 }
                 return true;
