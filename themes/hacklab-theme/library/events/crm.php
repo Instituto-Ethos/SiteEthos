@@ -188,6 +188,9 @@ function get_registration_account (array $params): string|null {
     }
 
     // Case 2. Retrieve UUID from other WordPress organizations
+    if (empty($params['cnpj'])) {
+        return null;
+    }
     $posts = get_posts([
         'meta_query' => [
             [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
