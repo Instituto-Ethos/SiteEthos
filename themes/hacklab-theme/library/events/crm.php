@@ -107,19 +107,27 @@ function create_registration_contact (array $params) {
     $last_name = implode(' ', $name_parts);
 
     $attributes = [
-        'emailaddress1'           => trim($params['email']),
-        'firstname'               => $first_name,
-        'fullname'                => $full_name,
-        'fut_pl_area'             => trim($params['area']),
-        'fut_pl_nivelhierarquico' => trim($params['nivel_hierarquico']),
-        'fut_st_cpf'              => format_cpf(trim($params['cpf'])),
-        'jobtitle'                => trim($params['cargo']),
-        'lastname'                => $last_name,
-        'telephone1'              => trim($params['telefone']),
-        'yomifirstname'           => $first_name,
-        'yomifullname'            => $full_name,
-        'yomilastname'            => $last_name,
+        'emailaddress1' => trim($params['email']),
+        'firstname'     => $first_name,
+        'fullname'      => $full_name,
+        'fut_st_cpf'    => format_cpf(trim($params['cpf'])),
+        'lastname'      => $last_name,
+        'yomifirstname' => $first_name,
+        'yomifullname'  => $full_name,
+        'yomilastname'  => $last_name,
     ];
+
+    $optional_fields = [
+        'fut_pl_area'             => 'area',
+        'fut_pl_nivelhierarquico' => 'nivel_hierarquico',
+        'jobtitle'                => 'cargo',
+        'telephone1'              => 'telefone',
+    ];
+    foreach ($optional_fields as $attribute_key => $param_key) {
+        if ($value = trim($params[$param_key] ?? '')) {
+            $attributes[$attribute_key] = $value;
+        }
+    }
 
     if (!empty($lead_id)) {
         $attributes['originatingleadid'] = create_crm_reference('lead', $lead_id);
@@ -132,7 +140,7 @@ function create_registration_lead (array $params) {
     $systemuser = get_option('systemuser');
 
     $cnpj = trim($params['cnpj']);
-    $company_name = trim($params['nome_fantasia']);
+    $company_name = trim($params['nome_fantasia'] ?? '');
 
     $full_name = trim($params['nome_completo']);
     $name_parts = explode(' ',  $full_name);
