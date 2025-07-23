@@ -292,12 +292,19 @@ function register_for_event (int $post_id, array $params) {
     $hl_event_registration = create_registration($post_id, $params);
 
     if ($user_id = get_current_user_id()) {
-        wp_update_user([
-            'ID' => $user_id,
-            'meta_input' => [
-                'area'              => trim($params['area']),
-                'nivel_hierarquico' => trim($params['nivel_hierarquico']),
-            ],
-        ]);
+        $meta_input = [];
+
+        foreach (['area', 'nivel_hierarquico'] as $key) {
+            if (!empty($params[$key])) {
+                $meta_input[$key] = trim($params[$key]);
+            }
+        }
+
+        if (!empty($meta_input)) {
+            wp_update_user([
+                'ID' => $user_id,
+                'meta_input' => $meta_input,
+            ]);
+        }
     }
 }
