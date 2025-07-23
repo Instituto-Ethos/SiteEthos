@@ -175,7 +175,6 @@ function get_event_registration_fields () {
             'type' => 'select',
             'class' => '-colspan-12',
             'label' => _x('Area', 'company', 'hacklabr'),
-            'label' =>__('Hierarchical level', 'hacklabr'),
             'options' => $area_options,
             'required' => false,
             'validate' => function ($value) use ($area_options) {
