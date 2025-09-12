@@ -221,8 +221,6 @@ function normalize_posts_query ($attributes) {
         }
     }
 
-    do_action( 'logger', $normalized_attributes );
-
     return $normalized_attributes;
 }
 
