@@ -15,43 +15,131 @@ function get_posts_grid_data($attributes): \WP_Query {
     return $query;
 }
 
-function render_posts_grid_callback ($attributes) {
-    $card_model = $attributes['cardModel'];
-    $card_modifiers = $attributes['cardModifiers'] ?? [];
-    $hide_author = $attributes['hideAuthor'] ?? false;
-    $hide_categories = $attributes['hideCategories'] ?? false;
-    $hide_date = $attributes['hideDate'] ?? false;
-    $hide_excerpt = $attributes['hideExcerpt'] ?? false;
-    $posts_per_column = $attributes['postsPerColumn'] ?? 1;
-    $posts_per_row = $attributes['postsPerRow'] ?? 1;
-    $show_taxonomies = $attributes['showTaxonomies'] ?? [];
+function render_posts_grid_callback( $attributes ) {
+    $attributes = (array) $attributes;
 
-    // Normalize attributes before calling `build_posts_query`
-    $query_attributes = normalize_posts_query($attributes);
-    $query_attributes['postsPerPage'] = $posts_per_column * $posts_per_row;
+    // Calculate postsPerPage if pagination is disabled
+    if ( empty( $attributes['enablePagination'] ) || $attributes['enablePagination'] === false ) {
+        $attributes['postsPerPage'] = (int) ( $attributes['postsPerColumn'] ?? 1 ) * (int) ( $attributes['postsPerRow'] ?? 1 );
+    }
 
-    $query = get_posts_grid_data($query_attributes);
+    $html_inner = render_posts_grid_inner( $attributes, 1 );
 
-    ob_start();
-    ?>
+    $config = [
+        'attributes' => $attributes,
+        'rest'       => [
+            'root'  => rest_url( 'hacklabr/v1/' ),
+            'nonce' => wp_create_nonce( 'wp_rest' ),
+        ],
+    ];
 
-    <div class="<?= build_class_list('hacklabr-posts-grid-block', $attributes) ?>" style="--grid-columns: <?= $posts_per_row ?>">
-        <?php foreach ($query->posts as $post):
-            mark_post_id_as_used($post->ID);
-            get_template_part('template-parts/post-card', $card_model ?: null, [
-                'hide_author' => $hide_author,
-                'hide_categories' => $hide_categories,
-                'hide_date' => $hide_date,
-                'hide_excerpt' => $hide_excerpt,
-                'modifiers' => $card_modifiers,
-                'post' => $post,
-                'show_taxonomies' => $show_taxonomies,
-            ]);
+    // Add pagination navigation if enabled
+    if ( ! empty( $attributes['enablePagination'] ) ) {
+        $html_inner .= '<div class="hacklabr-posts-grid__nav"></div>';
+    }
+
+    return sprintf(
+        '<div class="hacklabr-posts-grid__root" data-config="%s">%s</div>',
+        esc_attr( wp_json_encode( $config ) ),
+        $html_inner
+    );
+}
+
+function render_posts_grid_inner( array $attributes, int $page = 1 ): string {
+    $posts_per_row    = (int) ( $attributes['postsPerRow'] ?? 1 );
+    $posts_per_column = (int) ( $attributes['postsPerColumn'] ?? 1 );
+
+    $card_model       = $attributes['cardModel'] ?? '';
+    $card_modifiers   = $attributes['cardModifiers'] ?? [];
+    $hide_author      = (bool)( $attributes['hideAuthor'] ?? false );
+    $hide_categories  = (bool)( $attributes['hideCategories'] ?? false );
+    $hide_date        = (bool)( $attributes['hideDate'] ?? false );
+    $hide_excerpt     = (bool)( $attributes['hideExcerpt'] ?? false );
+
+    $enable_pagination = (bool)( $attributes['enablePagination'] ?? false );
+
+    $query_attributes = normalize_posts_query( $attributes );
+
+    $args = build_posts_query( $query_attributes, [] );
+    $args['paged'] = max( 1, (int) $page );
+
+    if ( ! $enable_pagination ) {
+        $args['posts_per_page'] = $posts_per_column;
+    }
+
+    if ( isset( $args['order_by'] ) && ! isset( $args['orderby'] ) ) {
+        $args['orderby'] = $args['order_by'];
+        unset( $args['order_by'] );
+    }
+
+    $q = new \WP_Query( $args );
+
+    ob_start(); ?>
+    <div class="hacklabr-posts-grid-block" style="--grid-columns: <?= (int) $posts_per_row ?>">
+        <?php foreach ($q->posts as $post) :
+
+            if ( function_exists( __NAMESPACE__ . '\\mark_post_id_as_used' ) ) {
+                mark_post_id_as_used( $post->ID );
+            }
+
+            get_template_part(
+                'template-parts/post-card',
+                $card_model ?: null,
+                [
+                    'hide_author'     => $hide_author,
+                    'hide_categories' => $hide_categories,
+                    'hide_date'       => $hide_date,
+                    'hide_excerpt'    => $hide_excerpt,
+                    'modifiers'       => $card_modifiers,
+                    'post'            => $post,
+                    'show_taxonomies' => $attributes['showTaxonomies'] ?? [],
+                ]
+            );
         endforeach; ?>
     </div>
-
     <?php
-    $output = ob_get_clean();
+    wp_reset_postdata();
 
-    return $output;
+    return ob_get_clean();
 }
+
+register_rest_route( 'hacklabr/v1', '/posts-grid', [
+    'methods'  => 'POST',
+    'callback' => function(\WP_REST_Request $req) {
+        $attributes = (array) $req->get_param( 'attributes' );
+        $page       = max(1, (int) $req->get_param( 'page') );
+
+        $qa = normalize_posts_query( $attributes );
+
+        $args = build_posts_query( $qa, [] );
+        $args['paged'] = $page;
+
+        if ( isset( $args['order_by'] ) && ! isset( $args['orderby'] ) ) {
+            $args['orderby'] = $args['order_by'];
+            unset($args['order_by']);
+        }
+
+        $q = new \WP_Query( $args );
+
+        ob_start(); ?>
+        <div class="hacklabr-posts-grid-block" style="--grid-columns: <?= (int) ( $attributes['postsPerRow'] ?? 1 ) ?>">
+        <?php foreach ( $q->posts as $post ) {
+            get_template_part('template-parts/post-card', ( $attributes['cardModel'] ?? '' ) ?: null, [
+                'hide_author'     => (bool)( $attributes['hideAuthor'] ?? false ),
+                'hide_categories' => (bool)( $attributes['hideCategories'] ?? false ),
+                'hide_date'       => (bool)( $attributes['hideDate'] ?? false ),
+                'hide_excerpt'    => (bool)( $attributes['hideExcerpt'] ?? false ),
+                'modifiers'       => $attributes['cardModifiers'] ?? [],
+                'post'            => $post,
+                'show_taxonomies' => $attributes['showTaxonomies'] ?? [],
+            ]);
+        } ?>
+        </div>
+        <?php
+        $html = ob_get_clean();
+        $resp = ['html' => $html, 'page' => $page, 'totalPages' => (int) $q->max_num_pages, 'total' => (int) $q->found_posts];
+        wp_reset_postdata();
+        return $resp;
+    },
+    'permission_callback' => '__return_true'
+]);

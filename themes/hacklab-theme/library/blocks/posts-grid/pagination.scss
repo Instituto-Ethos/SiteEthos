@@ -1,0 +1,28 @@
+.hacklabr-posts-grid__pagination {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 5rem;
+
+    button {
+        align-items: center;
+        background-color: transparent;
+        cursor: pointer;
+        display: flex;
+        height: var(--wp--preset--font-size--xx-large);
+        justify-content: center;
+        min-width: var(--wp--preset--font-size--xx-large);
+        padding: 0.5rem;
+
+        &:disabled {
+            background-color: var(--wp--preset--color--primary-light);
+            border-radius: 32px;
+        }
+
+        &.hacklabr-posts-grid__pagination__next,
+        &.hacklabr-posts-grid__pagination__prev {
+            background-color: transparent;
+        }
+    }
+}

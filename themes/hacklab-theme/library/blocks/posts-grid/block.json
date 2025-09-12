@@ -6,6 +6,7 @@
     "description": "Display post cards on a grid",
     "category": "text",
     "icon": "grid-view",
+    "version": "2.0.0",
     "supports": {
         "align": ["center", "wide", "full"],
         "html": false
@@ -22,6 +23,10 @@
         "compare": {
             "type": "string",
             "default": "OR"
+        },
+        "enablePagination": {
+            "type": "boolean",
+            "default": false
         },
         "gridGap": {
             "type": "string",
@@ -42,6 +47,10 @@
         "hideExcerpt": {
             "type": "boolean",
             "default": false
+        },
+        "instanceId": {
+            "type": "string",
+            "default": ""
         },
         "noCompare": {
             "type": "string",
@@ -75,6 +84,10 @@
             "type": "number",
             "default": 1
         },
+        "postsPerPage": {
+            "type": "number",
+            "default": 0
+        },
         "postsPerRow": {
             "type": "number",
             "default": 1
@@ -103,5 +116,6 @@
     "textdomain": "hacklabr",
     "editorScript": ["file:../../../dist/blocks/posts-grid/editor.js"],
     "editorStyle": ["file:../../../dist/blocks/posts-grid/editor.css"],
-    "style": ["file:../../../dist/blocks/posts-grid/style.css"]
+    "style": ["file:../../../dist/blocks/posts-grid/style.css"],
+    "viewScript": ["file:../../../dist/blocks/posts-grid/view.js"]
 }
