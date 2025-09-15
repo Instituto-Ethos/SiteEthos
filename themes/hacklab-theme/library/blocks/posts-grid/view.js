@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import Pagination from './components/Pagination'
 
@@ -28,39 +28,62 @@ function PostsGrid({ element }) {
     const [html, setHtml] = useState(element.querySelector('.hacklabr-posts-grid-block')?.outerHTML || '')
     const [totalPages, setTotalPages] = useState(1)
     const [loading, setLoading] = useState(false)
+    const [placeholderHeight, setPlaceholderHeight] = useState(0)
+
+    const contentRef = useRef(null)
 
     const paginationEnabled = (config?.attributes?.enablePagination ?? true) === true
 
     useEffect(() => {
-        let cancel = false;
+        let cancel = false
+
+        const measure = () => {
+            const contentEl = contentRef.current
+            if (!contentEl) return 0
+            const grid = contentEl.querySelector('.hacklabr-posts-grid-block')
+            const h = (grid?.offsetHeight || contentEl.offsetHeight || 0)
+            return h > 0 ? h : 160
+        }
+        setPlaceholderHeight(measure())
+        setLoading(true);
 
         (async () => {
-            setLoading(true)
-
-            try {
-                const data = await fetchPage({
-                    root: config.rest.root,
-                    nonce: config.rest.nonce,
-                    page,
-                    attributes: config.attributes
-                })
-
-                if (cancel) return
-
-                setHtml(data.html)
-                setTotalPages(data.totalPages || 1)
-            } finally {
-                !cancel && setLoading(false)
-            }
-        })()
+                try {
+                    const data = await fetchPage({
+                        root: config.rest.root,
+                        nonce: config.rest.nonce,
+                        page,
+                        attributes: config.attributes
+                    })
+                    if (cancel) return
+                    setHtml(data.html)
+                    setTotalPages(data.totalPages || 1)
+                } finally {
+                    if (!cancel) {
+                        setLoading(false)
+                        setPlaceholderHeight(0)
+                    }
+                }
+            })()
 
         return () => { cancel = true }
     }, [page])
 
     return (
         <div className="hacklabr-posts-grid__app">
-            {loading && <div className="hacklabr-posts-grid__loading" aria-live="polite">Carregando…</div>}
-            <div className="hacklabr-posts-grid__content" dangerouslySetInnerHTML={{ __html: html }} />
+            <div className="hacklabr-posts-grid__viewport">
+                <div
+                    ref={contentRef}
+                    className={`${loading ? 'hacklabr-posts-grid__content hacklabr-posts-grid__content__loading' : 'hacklabr-posts-grid__content'}`}
+                    style={loading && placeholderHeight ? { height: `${placeholderHeight}px` } : undefined}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                />
+                {loading && (
+                    <div className="hacklabr-posts-grid__overlay">
+                        <div className="loading-spinner" />
+                    </div>
+                )}
+            </div>
 
             {paginationEnabled && totalPages > 1 && (
                 <Pagination

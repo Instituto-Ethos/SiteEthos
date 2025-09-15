@@ -1,6 +1,32 @@
 @import '../../../assets/scss/includes';
 @import './pagination.scss';
 
+.hacklabr-posts-grid {
+    &__viewport {
+        position: relative;
+    }
+
+    &__content {
+        &__loading {
+            border-radius: 2px;
+            filter: blur(2px);
+            filter: opacity(0.6);
+            overflow: hidden;
+        }
+    }
+
+    &__overlay {
+        align-items: center;
+        background: rgba(0,0,0,.06);
+        display: flex;
+        inset: 0;
+        justify-content: center;
+        pointer-events: all;
+        position: absolute;
+        z-index: 1;
+    }
+}
+
 .hacklabr-posts-grid-block {
     display: grid;
     gap: $gap--large !important;
@@ -21,7 +47,6 @@
         img {
             border-radius: 0;
         }
-
     }
 
     &.-gap-small {
@@ -35,9 +60,20 @@
 
 .home .hacklabr-posts-grid-block {
     @include mobile {
-
         .post-card__excerpt {
             display: none;
         }
     }
 }
+
+.loading-spinner {
+    animation: loading-spin .8s linear infinite;
+    border-radius: 9999px;
+    border-right-color: currentColor;
+    border-top-color: currentColor;
+    border: 3px solid transparent;
+    height: 28px;
+    width: 28px;
+}
+
+@keyframes loading-spin { to { transform: rotate(360deg); } }
