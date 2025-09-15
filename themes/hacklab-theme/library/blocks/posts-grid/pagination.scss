@@ -10,19 +10,30 @@
         background-color: transparent;
         cursor: pointer;
         display: flex;
-        height: var(--wp--preset--font-size--xx-large);
+        height: 30px;
         justify-content: center;
-        min-width: var(--wp--preset--font-size--xx-large);
+        min-width: 30px;
         padding: 0.5rem;
 
         &:disabled {
-            background-color: var(--wp--preset--color--primary-light);
+            background-color: #A8DFF4;
             border-radius: 32px;
+            color: #111111;
         }
 
         &.hacklabr-posts-grid__pagination__next,
         &.hacklabr-posts-grid__pagination__prev {
             background-color: transparent;
+            padding: 0;
+
+            svg {
+                height: 28px;
+                width: 28px;
+
+                path {
+                    stroke: #0075AD;
+                }
+            }
         }
     }
 }
