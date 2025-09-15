@@ -254,7 +254,10 @@ function sanitize_request_attributes( array $attributes ): array {
 
     $sanitized_attributes['cardModel']        = (string) ( $attributes['cardModel'] ?? '' );
     $sanitized_attributes['cardModifiers']    = array_values( $attributes['cardModifiers'] ?? [] );
-    $sanitized_attributes['gridGap']          = (string) ( $attributes['gridGap'] ?? 'medium' );
+
+    $allowed_gaps                    = ['none','small','medium','large'];
+    $gap                             = (string) ( $attributes['gridGap'] ?? 'medium' );
+    $sanitized_attributes['gridGap'] = in_array( $gap, $allowed_gaps, true ) ? $gap : 'medium';
 
     $sanitized_attributes['enablePagination'] = ! empty( $attributes['enablePagination'] );
     $sanitized_attributes['hideAuthor']       = ! empty( $attributes['hideAuthor'] );
@@ -267,7 +270,12 @@ function sanitize_request_attributes( array $attributes ): array {
     $sanitized_attributes['postsPerColumn']   = max( 1, (int)($attributes['postsPerColumn'] ?? 1 ) );
     $sanitized_attributes['postsPerRow']      = max( 1, (int)( $attributes['postsPerRow'] ?? 1 ) );
 
-    $sanitized_attributes['postsPerPage']     = (int) ( $attributes['postsPerPage'] ?? 0 );
+    $posts_per_page = (int) ( $attributes['postsPerPage'] ?? 0 );
+    if ( $posts_per_page <= 0 ) {
+        $sanitized_attributes['postsPerPage'] = 0;
+    } else {
+        $sanitized_attributes['postsPerPage'] = max( 1, min( $posts_per_page, get_max_items_per_page() ) );
+    }
 
     $allowed_post_types = get_allowed_post_types();
     $post_type = (string)( $attributes['postType'] ?? 'post' );
@@ -277,14 +285,38 @@ function sanitize_request_attributes( array $attributes ): array {
     $order_by = (string)( $attributes['orderBy'] ?? 'date' );
     $sanitized_attributes['orderBy'] = in_array( $order_by, $allowed_orderby, true ) ? $order_by : 'date';
 
+    $order = strtolower( (string) ( $attributes['order'] ?? 'desc' ) );
+    $sanitized_attributes['order'] = ( $order === 'asc' ) ? 'asc' : 'desc';
+
+    $compare = strtoupper( (string) ( $attributes['compare'] ?? 'OR' ) );
+    $sanitized_attributes['compare'] = in_array( $compare, ['OR', 'AND'], true) ? $compare : 'OR';
+
     $taxonomy = sanitize_key( $attributes['taxonomy'] ?? '' );
     if ( $taxonomy && taxonomy_exists( $taxonomy ) && is_object_in_taxonomy( $sanitized_attributes['postType'], $taxonomy ) ) {
-        $out['taxonomy']   = $taxonomy;
-        $out['queryTerms'] = array_map( 'sanitize_title', $attributes['queryTerms'] ?? [] );
+        $sanitized_attributes['taxonomy']   = $taxonomy;
+        $sanitized_attributes['queryTerms'] = array_map( 'sanitize_title', $attributes['queryTerms'] ?? [] );
     } else {
-        $out['taxonomy']   = '';
-        $out['queryTerms'] = [];
+        $sanitized_attributes['taxonomy']   = '';
+        $sanitized_attributes['queryTerms'] = [];
     }
+
+    // "NO *"
+    $no_post_type = (string) ( $attributes['noPostType'] ?? '' );
+    $sanitized_attributes['noPostType'] = $no_post_type && in_array( $no_post_type, $allowed_post_types, true ) ? $no_post_type : '';
+
+    $no_taxonomy = sanitize_key($attributes['noTaxonomy'] ?? '');
+    if ( $no_taxonomy && taxonomy_exists( $no_taxonomy ) && ( ! $sanitized_attributes['noPostType'] || is_object_in_taxonomy( $sanitized_attributes['noPostType'], $no_taxonomy ) ) ) {
+        $sanitized_attributes['noTaxonomy']   = $no_taxonomy;
+        $sanitized_attributes['noQueryTerms'] = array_map( 'sanitize_title', $attributes['noQueryTerms'] ?? [] );
+    } else {
+        $sanitized_attributes['noTaxonomy']   = '';
+        $sanitized_attributes['noQueryTerms'] = [];
+    }
+
+    $no_compare = strtoupper( (string) ( $attributes['noCompare'] ?? 'OR' ) );
+    $sanitized_attributes['noCompare'] = in_array( $no_compare, ['OR', 'AND'], true) ? $no_compare : 'OR';
+
+    $sanitized_attributes['preventRepeatPosts'] = ! empty( $attributes['preventRepeatPosts'] );
 
     $sanitized_attributes['post_status'] = 'publish';
     $sanitized_attributes['has_password'] = false;
