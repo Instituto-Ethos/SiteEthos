@@ -105,8 +105,8 @@ function render_posts_grid_inner( array $attributes, int $page = 1 ): string {
 
 register_rest_route( 'hacklabr/v1', '/posts-grid', [
     'methods'  => 'POST',
-    'callback' => function(\WP_REST_Request $req) {
-        $attributes = (array) $req->get_param( 'attributes' );
+    'callback' => function( \WP_REST_Request $req ) {
+        $attributes = sanitize_request_attributes( (array) $req->get_param( 'attributes' ) );
         $page       = max(1, (int) $req->get_param( 'page') );
 
         $qa = normalize_posts_query( $attributes );

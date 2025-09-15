@@ -236,3 +236,107 @@ function normalize_posts_query ($attributes) {
 function set_block_transient ( string $namespace, array $attributes, $value, int $expiration = HOUR_IN_SECONDS ) {
     return set_transient( compute_block_transient_key( $namespace, $attributes ), $value, $expiration );
 }
+
+/**
+ * Sanitizes and normalizes the attributes for a posts query request.
+ *
+ * This function ensures that all expected attributes are present, properly typed,
+ * and safe for use in queries. It applies default values, type casting, and validation
+ * for specific keys such as post type, order by, taxonomy, and others.
+ *
+ * @param array $attributes The raw attributes to sanitize.
+ * @return array The sanitized and normalized attributes ready for use in a posts query.
+ *
+ * @version 1.0.0
+ */
+function sanitize_request_attributes( array $attributes ): array {
+    $sanitized_attributes = [];
+
+    $sanitized_attributes['cardModel']        = (string) ( $attributes['cardModel'] ?? '' );
+    $sanitized_attributes['cardModifiers']    = array_values( $attributes['cardModifiers'] ?? [] );
+    $sanitized_attributes['gridGap']          = (string) ( $attributes['gridGap'] ?? 'medium' );
+
+    $sanitized_attributes['enablePagination'] = ! empty( $attributes['enablePagination'] );
+    $sanitized_attributes['hideAuthor']       = ! empty( $attributes['hideAuthor'] );
+    $sanitized_attributes['hideCategories']   = ! empty( $attributes['hideCategories'] );
+    $sanitized_attributes['hideDate']         = ! empty( $attributes['hideDate'] );
+    $sanitized_attributes['hideExcerpt']      = ! empty( $attributes['hideExcerpt'] );
+    $sanitized_attributes['showChildren']     = ! empty( $attributes['showChildren'] );
+    $sanitized_attributes['showTaxonomies']   = array_map( 'sanitize_key', $attributes['showTaxonomies'] ?? [] );
+
+    $sanitized_attributes['postsPerColumn']   = max( 1, (int)($attributes['postsPerColumn'] ?? 1 ) );
+    $sanitized_attributes['postsPerRow']      = max( 1, (int)( $attributes['postsPerRow'] ?? 1 ) );
+
+    $sanitized_attributes['postsPerPage']     = (int) ( $attributes['postsPerPage'] ?? 0 );
+
+    $allowed_post_types = get_allowed_post_types();
+    $post_type = (string)( $attributes['postType'] ?? 'post' );
+    $sanitized_attributes['postType'] = in_array( $post_type, $allowed_post_types, true ) ? $post_type : 'post';
+
+    $allowed_orderby = get_allowed_orderby();
+    $order_by = (string)( $attributes['orderBy'] ?? 'date' );
+    $sanitized_attributes['orderBy'] = in_array( $order_by, $allowed_orderby, true ) ? $order_by : 'date';
+
+    $taxonomy = sanitize_key( $attributes['taxonomy'] ?? '' );
+    if ( $taxonomy && taxonomy_exists( $taxonomy ) && is_object_in_taxonomy( $sanitized_attributes['postType'], $taxonomy ) ) {
+        $out['taxonomy']   = $taxonomy;
+        $out['queryTerms'] = array_map( 'sanitize_title', $attributes['queryTerms'] ?? [] );
+    } else {
+        $out['taxonomy']   = '';
+        $out['queryTerms'] = [];
+    }
+
+    $sanitized_attributes['post_status'] = 'publish';
+    $sanitized_attributes['has_password'] = false;
+
+    return (array) apply_filters( 'hacklabr/sanitize_request_attributes', $sanitized_attributes );
+}
+
+/**
+ * Retrieves an array of allowed public post types.
+ *
+ * This function returns the names of all public post types,
+ * allowing customization via the 'hacklabr/get_allowed_post_types' filter.
+ *
+ * @return array List of allowed public post type names.
+ *
+ * @since 1.0.0
+ */
+function get_allowed_post_types(): array {
+    return (array) apply_filters( 'hacklabr/get_allowed_post_types', array_values( get_post_types( ['public' => true], 'names' ) ?: [] ) );
+}
+
+/**
+ * Retrieves an array of allowed values for the 'orderby' parameter in queries.
+ *
+ * This function returns a list of valid 'orderby' options that can be used to sort query results.
+ * The list can be modified using the 'hacklabr/get_allowed_orderby' filter.
+ *
+ * @return array List of allowed 'orderby' values.
+ *
+ * @since 1.0.0
+ */
+function get_allowed_orderby(): array {
+    return (array) apply_filters( 'hacklabr/get_allowed_orderby', [
+        'date',
+        'title',
+        'modified',
+        'menu_order',
+        'rand',
+        'ID'
+    ] );
+}
+
+/**
+ * Retrieves the maximum number of items allowed per page.
+ *
+ * This function returns the maximum number of items that can be displayed per page.
+ * The value can be modified using the 'hacklabr/get_max_items_per_page' filter.
+ *
+ * @return int The maximum number of items per page.
+ *
+ * @since 1.0.0
+ */
+function get_max_items_per_page(): int {
+    return (int) apply_filters( 'hacklabr/get_max_items_per_page', 99 );
+}
