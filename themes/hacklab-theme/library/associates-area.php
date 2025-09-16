@@ -4,6 +4,37 @@ namespace hacklabr;
 
 use WP_Query;
 
+
+/**
+ * Registers a custom role 'manager_associates' with specific capabilities.
+ *
+ * This function adds a new user role called 'Manager associates' with the following capabilities:
+ * - 'read': Allows reading posts.
+ * - 'edit_others_posts': Disallowed, cannot edit others' posts.
+ * - 'edit_others_associates': Allowed, can edit others' associates (custom capability).
+ *
+ * Uses the WordPress native function {@see add_role()}.
+ * @link https://developer.wordpress.org/reference/functions/add_role/
+ *
+ * Hooked to the 'after_switch_theme' action to ensure the role is added when the theme is activated.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function add_associates_manager_role() {
+    add_role(
+        'manager_associates',
+        __( 'Manager associates', 'hacklabr' ),
+        [
+            'read' => true,
+            'edit_others_posts' => false,
+            'edit_others_associates' => true,
+        ]
+    );
+}
+add_action( 'after_switch_theme', __NAMESPACE__ . '\\add_associates_manager_role' );
+
 function add_associates_rewrite_rule() {
     add_rewrite_rule(
         '^associados/([^/]*)/?',
