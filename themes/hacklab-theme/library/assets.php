@@ -457,6 +457,19 @@ class Assets
                 'global' => true,
             ],
 
+            'event-registration' => [
+                'file' => 'event-registration.js',
+                'pre-load' => false,
+                'preload_callback' => function () {
+                    return is_singular( 'tribe_events' );
+                },
+                'localize_callback' => function () {
+                    return [
+                        'baseUrl' => rest_url( 'hacklabr/v2/' ),
+                    ];
+                }
+            ],
+
             'sync-crm' => [
                 'file' => 'sync-crm.js',
                 'pre-load' => false,

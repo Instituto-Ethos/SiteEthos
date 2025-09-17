@@ -187,12 +187,16 @@ if( isset($recurrence['rules']) ) {
 
 
     <?php
-    if ($id = get_post_meta(get_the_ID(), '_ethos_crm:fut_pf_id', true)) {
-        if(isset($_GET['certificado'])) {
+    if ($id = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true)) {
+        if (isset($_GET['certificado'])) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
             echo do_shortcode('[ethosDadosEvento menu_order=""]');
-            echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
+            if (hacklabr\is_paid_event($post_id)) {
+                echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
+            } else {
+                echo do_shortcode('[event-registration]');
+            }
         }
     }
     ?>

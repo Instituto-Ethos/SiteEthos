@@ -133,7 +133,6 @@ function map_lead_attributes( int $post_id ) {
         'fut_address1_logradouro'    => get_meta( $post_meta, 'end_logradouro' ),
         'fut_address1_nro'           => get_meta( $post_meta, 'end_numero' ),
         'fut_st_cnpj'                => \hacklabr\format_cnpj( get_meta( $post_meta, 'cnpj' ) ),
-        'fut_st_cnpjsemmascara'      => get_meta( $post_meta, 'cnpj' ),
         'fut_st_complementoorigem'   => get_meta( $post_meta, 'segmento' ),
         'fut_st_inscricaoestadual'   => get_meta( $post_meta, 'inscricao_estadual' ),
         'fut_st_inscricaomunicipal'  => get_meta( $post_meta, 'inscricao_municipal' ),

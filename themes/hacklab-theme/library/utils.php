@@ -429,7 +429,7 @@ function get_doifd_form_submit( object $get_form ) {
 
             if ( ! $check_recaptcha ) {
                 $get_form->setValidDownload( false );
-                $get_form->setErrorMessage( __( 'A verificação do reCAPTCHA falhou. Tente novamente!', 'hacklabr' ) );
+                $get_form->setErrorMessage( __( 'The reCAPTCHA verification failed. Try again!', 'hacklabr' ) );
                 return;
             } else {
                 $get_form->setMessage( 'doifd_success_msg:recaptcha verification successful' );
@@ -437,7 +437,7 @@ function get_doifd_form_submit( object $get_form ) {
             }
         } else {
             $get_form->setValidDownload( false );
-            $get_form->setErrorMessage( __( 'A verificação do reCAPTCHA falhou. Tente novamente!', 'hacklabr' ) );
+            $get_form->setErrorMessage( __( 'The reCAPTCHA verification failed. Try again!', 'hacklabr' ) );
             return;
         }
     }
