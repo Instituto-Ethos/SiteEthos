@@ -41,6 +41,15 @@
         grid-template-columns: 1fr;
     }
 
+    .post-card {
+        &__image {
+            .wp-post-image {
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }
+
     .post-card--vertical-thumbnail {
         grid-template-columns: 0.7fr 1fr;
 
