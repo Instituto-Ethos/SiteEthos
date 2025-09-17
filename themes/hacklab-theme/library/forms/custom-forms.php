@@ -159,8 +159,22 @@ function wrap_edit_contacts_form ($form_html, $form) {
         return $form_html;
     }
 
-    $current_user = get_current_user_id();
-    $group_id = (int) get_user_meta($current_user, '_pmpro_group', true);
+    $user_id = get_current_user_id();
+
+    /**
+     * Checks if the current user has permission to edit other associates.
+     * If so, retrieves the organization ID from the GET request and validates its post type.
+     * If the organization is valid, fetches the user ID of the organization author.
+     */
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+            $user_id = get_post_field( 'post_author', $organization_id );
+        }
+    }
+
+    $group_id = (int) get_user_meta( $user_id, '_pmpro_group', true );
 
     if (empty($group_id)) {
         return $form_html;
@@ -330,7 +344,7 @@ function wrap_edit_contacts_form ($form_html, $form) {
                             <input type="checkbox"<?php checked('1', get_user_meta($contact->ID, '_ethos_approver', true)) ?> @click="toggleApprover($el, user)">
                         </td>
                         <td>
-                            <input type="checkbox"<?php checked('1', get_user_meta($contact->ID, '_ethos_admin', true)) ?> <?= ($contact->ID === $current_user || $contact->ID === $original_user) ? ' disabled' : '' ?> @click="toggleAdmin($el, user)">
+                            <input type="checkbox"<?php checked('1', get_user_meta($contact->ID, '_ethos_admin', true)) ?> <?= ($contact->ID === $user_id || $contact->ID === $original_user) ? ' disabled' : '' ?> @click="toggleAdmin($el, user)">
                         </td>
                         <td>
                             <button type="button" class="contacts-list__edit" title="<?php _e('Edit', 'hacklabr') ?>" @click="editUser(user)">
@@ -338,7 +352,7 @@ function wrap_edit_contacts_form ($form_html, $form) {
                             </button>
                         </td>
                         <td>
-                            <button type="button" class="contacts-list__remove"<?= ($contact->ID === $current_user || $is_admin || $is_approver) ? ' disabled' : '' ?> title="<?php _e('Delete', 'hacklabr') ?>" @click="deleteUser(<?= $contact->ID ?>)">
+                            <button type="button" class="contacts-list__remove"<?= ($contact->ID === $user_id || $is_admin || $is_approver) ? ' disabled' : '' ?> title="<?php _e('Delete', 'hacklabr') ?>" @click="deleteUser(<?= $contact->ID ?>)">
                                 <iconify-icon icon="material-symbols:delete-outline"></iconify-icon>
                             </button>
                         </td>

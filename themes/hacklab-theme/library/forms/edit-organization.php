@@ -305,7 +305,7 @@ function notify_user_deactivation($user_id) {
 }
 
 function validate_edit_organization_form($form_id, $form, $params) {
-    $user_id = get_current_user_id();
+    $current_user = get_current_user_id();
 
     /**
      * Checks if the current user has permission to edit other associates.
@@ -316,11 +316,11 @@ function validate_edit_organization_form($form_id, $form, $params) {
         $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
 
         if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
-            $user_id = get_post_field( 'post_author', $organization_id );
+            $current_user = get_post_field( 'post_author', $organization_id );
         }
     }
 
-    $is_ethos_admin = get_user_meta( $user_id, '_ethos_admin', true );
+    $is_ethos_admin = get_user_meta( $current_user, '_ethos_admin', true );
 
     if (empty($is_ethos_admin)) {
         return;
