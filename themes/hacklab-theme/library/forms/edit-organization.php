@@ -79,6 +79,19 @@ function get_organization_params($form_id, $fields) {
     return function () use ($form_id, $fields) {
         $user_id = get_current_user_id();
 
+        /**
+         * Checks if the current user has permission to edit other associates.
+         * If so, retrieves the organization ID from the GET request and validates its post type.
+         * If the organization is valid, fetches the user ID of the organization author.
+         */
+        if ( current_user_can( 'edit_others_associates' ) ) {
+            $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+            if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+                $user_id = get_post_field( 'post_author', $organization_id );
+            }
+        }
+
         $organization = get_organization_by_user($user_id);
 
         if (!empty($organization)) {
@@ -292,9 +305,22 @@ function notify_user_deactivation($user_id) {
 }
 
 function validate_edit_organization_form($form_id, $form, $params) {
-    $current_user = get_current_user_id();
+    $user_id = get_current_user_id();
 
-    $is_ethos_admin = get_user_meta($current_user, '_ethos_admin', true);
+    /**
+     * Checks if the current user has permission to edit other associates.
+     * If so, retrieves the organization ID from the GET request and validates its post type.
+     * If the organization is valid, fetches the user ID of the organization author.
+     */
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+            $user_id = get_post_field( 'post_author', $organization_id );
+        }
+    }
+
+    $is_ethos_admin = get_user_meta( $user_id, '_ethos_admin', true );
 
     if (empty($is_ethos_admin)) {
         return;

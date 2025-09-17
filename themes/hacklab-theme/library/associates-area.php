@@ -95,6 +95,16 @@ function show_associated_page($page) {
 
     if(in_array($page->post_name, $admin_pages)){
         $user_id = get_current_user_id();
+
+        /**
+         * Checks if the current user has the capability to edit other associates.
+         *
+         * @return bool True if the user can edit other associates, false otherwise.
+         */
+        if ( current_user_can( 'edit_others_associates' ) ) {
+            return true;
+        }
+
         return (bool) get_user_meta($user_id, '_ethos_admin', true);
     }
     return true;

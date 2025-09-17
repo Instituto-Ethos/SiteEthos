@@ -9,6 +9,16 @@ function get_my_data_fields () {
 }
 
 function get_my_data_params ($form) {
+    /**
+     * Determines the appropriate user ID based on the current user's capabilities and request parameters.
+     *
+     * - If the current user has the 'edit_others_associates' capability, attempts to retrieve the 'organization' ID
+     *   from the GET parameters. If a valid organization ID is provided and its post type is 'organizacao',
+     *   sets $user_id to the author of that organization post.
+     * - Otherwise, sets $user_id to the ID of the currently logged-in user.
+     *
+     * @global int $user_id The user ID determined by the logic.
+     */
     $user_id = 0;
     if ( current_user_can( 'edit_others_associates' ) ) {
         $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
