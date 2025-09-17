@@ -25,7 +25,7 @@ use WP_Query;
 function add_associates_manager_role() {
     add_role(
         'manager_associates',
-        __( 'Manager associates', 'hacklabr' ),
+        __( 'Admin-Relacionamento', 'hacklabr' ),
         [
             'read' => true,
             'edit_others_posts' => false,
