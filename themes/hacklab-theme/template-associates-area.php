@@ -18,12 +18,40 @@ $current_post_id = get_the_ID();
             <?php
             $associates_areas = \get_pages_by_template( 'template-associates-area.php' );
 
-            if ( $associates_areas ) {
+            if ( is_array( $associates_areas ) && ! empty( $associates_areas ) ) {
                 echo '<ul class="content-sidebar__list">';
+
+                $query_string = $_SERVER['QUERY_STRING'] ?? '';
+                $get_params = [];
+
+                if ( $query_string ) {
+                    parse_str( $query_string, $get_params );
+
+                    $allowed_params = ['organization'];
+
+                    foreach ( $get_params as $key => $value ) {
+                        if ( ! in_array( $key, $allowed_params, true ) ) {
+                            unset( $get_params[$key] );
+                        } else {
+                            $get_params[$key] = sanitize_text_field( $value );
+                        }
+                    }
+                }
+
                 foreach ( $associates_areas as $associates_area ) {
                     if ( show_associated_page( $associates_area ) && $associates_area->post_name !== 'solicitacao-enviada' ) {
-                        $css_class = $current_post_id === $associates_area->ID ? 'content-sidebar__list-item content-sidebar__list-item--active' : 'content-sidebar__list-item';
-                        echo '<li class="' . $css_class . '"><a href="' . esc_url( get_permalink( $associates_area ) ) . '">' . wp_kses_post( get_the_title( $associates_area ) ) . '</a></li>';
+                        $css_class = $current_post_id === $associates_area->ID
+                            ? 'content-sidebar__list-item content-sidebar__list-item--active'
+                            : 'content-sidebar__list-item';
+
+                        $url = get_permalink( $associates_area );
+                        if ( ! empty( $get_params ) ) {
+                            $url = add_query_arg( $get_params, $url );
+                        }
+
+                        echo '<li class="' . esc_attr( $css_class ) . '">';
+                        echo '<a href="' . esc_url( $url ) . '">' . wp_kses_post( get_the_title( $associates_area ) ) . '</a>';
+                        echo '</li>';
                     }
                 }
                 echo '</ul>';

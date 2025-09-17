@@ -9,7 +9,15 @@ function get_my_data_fields () {
 }
 
 function get_my_data_params ($form) {
-    $user_id = get_current_user_id();
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+            $user_id = get_post_field( 'post_author', $organization_id );
+        }
+    } else {
+        $user_id = get_current_user_id();
+    }
 
     $params = sanitize_form_params();
 
@@ -41,7 +49,7 @@ function register_my_data_form () {
 add_action('init', 'hacklabr\\register_my_data_form');
 
 function validate_my_data_form ($form_id, $form, $params) {
-    $user_id = get_current_user_id();
+    $user_id = ! empty( $params['_user_id'] ) ? $params['_user_id'] : get_current_user_id();
 
     if ($form_id === 'edit-my-data' && !empty($user_id)) {
         $validation = validate_form($form['fields'], $params);
