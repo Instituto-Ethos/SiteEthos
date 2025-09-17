@@ -136,7 +136,7 @@ function register_edit_organization_form() {
     register_form('edit-organization-contacts', __('Edit contacts', 'hacklabr'), [
         'disabled' => true,
         'fields' => $fields_contacts,
-        'submit_label' => __('Save'),
+        'submit_label' => __('Save', 'hacklabr'),
     ]);
 
     register_form('edit-organization-contacts__hidden', __('Edit contacts', 'hacklabr') . ' ' . __('(hidden)', 'hacklabr'), [
