@@ -2,6 +2,8 @@
 
 namespace hacklabr;
 
+use WP_Query;
+
 function add_associates_rewrite_rule() {
     add_rewrite_rule(
         '^associados/([^/]*)/?',
@@ -97,3 +99,21 @@ function add_recaptcha_to_password_recovery(){
     pmpro_recaptcha_get_html();
 }
 add_action( 'pmpro_lost_password_before_submit_button', 'hacklabr\\add_recaptcha_to_password_recovery' );
+
+/**
+ * Filters the main query on the 'curadoria' category archive page to only include posts of type 'publicacao'.
+ *
+ * @param WP_Query $query The WP_Query instance.
+ */
+function filter_curadoria_category_archive_query( WP_Query $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) {
+        return;
+    }
+
+    if ( $query->is_category( 'curadoria' ) ) {
+        $query->set( 'post_type', ['publicacao'] );
+        $query->set( 'ignore_sticky_posts', true );
+    }
+}
+
+add_action( 'pre_get_posts', __NAMESPACE__ . '\\filter_curadoria_category_archive_query' );

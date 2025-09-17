@@ -1,4 +1,5 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 import { registerBlockType } from '@wordpress/blocks';
 import { Disabled, PanelBody, PanelRow, ToggleControl } from '@wordpress/components';
 import { __experimentalNumberControl as NumberControl } from '@wordpress/components';
@@ -13,8 +14,14 @@ import { SelectTaxonomies } from '../shared/SelectTaxonomies';
 
 import metadata from './block.json';
 
-function Edit ({ attributes, setAttributes }) {
-    const { cardModel, cardModifiers, gridGap, hideAuthor, hideCategories, hideDate, hideExcerpt, postsPerColumn, postsPerRow, postType, preventRepeatPosts, showTaxonomies } = attributes;
+function Edit ({ clientId, attributes, setAttributes }) {
+    const { instanceId } = attributes;
+
+    useEffect(() => {
+        if (!instanceId) setAttributes({ instanceId: clientId });
+    }, [clientId]);
+
+    const { cardModel, cardModifiers, enablePagination, gridGap, hideAuthor, hideCategories, hideDate, hideExcerpt, postsPerColumn, postsPerPage, postsPerRow, postType, preventRepeatPosts, showTaxonomies } = attributes;
 
     const blockProps = useBlockProps();
 
@@ -36,6 +43,29 @@ function Edit ({ attributes, setAttributes }) {
                 </PanelRow>
 
                 <PanelRow>
+                    <ToggleControl
+                        label={__('Enable pagination?', 'hacklabr')}
+                        checked={enablePagination}
+                        onChange={(enablePagination) => setAttributes({ enablePagination })}
+                    />
+                </PanelRow>
+
+                { enablePagination &&
+                    <PanelRow>
+                        <NumberControl
+                            label={__('Posts per page', 'hacklabr')}
+                            min={0}
+                            max={99}
+                            value={postsPerPage || 0}
+                            onChange={(raw) => {
+                                const n = parseInt(raw, 10);
+                                setAttributes({ postsPerPage: Number.isFinite(n) ? Math.max(0, n) : 0 });
+                            }}
+                        />
+                    </PanelRow>
+                }
+
+                <PanelRow>
                     <NumberControl
                         label={__('Grid columns', 'hacklabr')}
                         min={1}
@@ -44,14 +74,16 @@ function Edit ({ attributes, setAttributes }) {
                     />
                 </PanelRow>
 
-                <PanelRow>
-                    <NumberControl
-                        label={__('Grid rows', 'hacklabr')}
-                        min={1}
-                        value={postsPerColumn}
-                        onChange={(raw) => setAttributes({ postsPerColumn: parseInt(raw) })}
-                    />
-                </PanelRow>
+                { !enablePagination &&
+                    <PanelRow>
+                        <NumberControl
+                            label={__('Grid rows', 'hacklabr')}
+                            min={1}
+                            value={postsPerColumn}
+                            onChange={(raw) => setAttributes({ postsPerColumn: parseInt(raw) })}
+                        />
+                    </PanelRow>
+                }
 
                 <PanelRow>
                     <SelectSize
