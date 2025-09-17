@@ -9,6 +9,7 @@ function get_my_data_fields () {
 }
 
 function get_my_data_params ($form) {
+    $user_id = 0;
     if ( current_user_can( 'edit_others_associates' ) ) {
         $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
 
