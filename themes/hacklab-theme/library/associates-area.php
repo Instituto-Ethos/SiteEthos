@@ -85,6 +85,15 @@ function redirect_associates_template() {
 }
 add_action( 'template_redirect', 'hacklabr\\redirect_associates_template' );
 
+function redirect_manager_associates_on_login( $user_login, $user ) {
+    if ( in_array( 'manager_associates', (array) $user->roles, true ) ) {
+        wp_safe_redirect( home_url( '/selecionar-organizacao/' ) );
+        exit;
+    }
+}
+
+add_action( 'wp_login', 'hacklabr\\redirect_manager_associates_on_login', 10, 2 );
+
 function show_associated_page($page) {
     $admin_pages = [
         'meu-plano',
