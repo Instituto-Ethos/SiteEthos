@@ -167,3 +167,11 @@ function filter_curadoria_category_archive_query( WP_Query $query ) {
 }
 
 add_action( 'pre_get_posts', __NAMESPACE__ . '\\filter_curadoria_category_archive_query' );
+
+function add_link_select_organization( $associates_areas, $get_params ) {
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        echo '<li class="content-sidebar__list-item"><a href="/selecionar-organizacao">Selecionar organização</a></li>';
+    }
+}
+
+add_action( 'hacklabr\\before_associates_area_list_items', __NAMESPACE__ . '\\add_link_select_organization', 10, 2 );
