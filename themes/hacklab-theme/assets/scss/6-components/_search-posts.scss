@@ -1,0 +1,40 @@
+.search-posts {
+    &__input-wrapper {
+        position: relative;
+        width: 100%;
+
+        input {
+            border-radius: $border-radius--round;
+            border: 2px solid $color--secondary-dark;
+            padding: 0.5rem 1rem 0.5rem 1rem;
+            width: 100%;
+        }
+    }
+
+    &__list-wrapper {
+        background-color: $color--high-dark;
+        border-radius: $border-radius--small;
+        margin-top: $margin--medium;
+        overflow: hidden;
+
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            li {
+                a {
+                    color: $color--low-pure;
+                    display: block;
+                    font-weight: $font-weight--semi-bold;
+                    padding: $padding--small $padding--medium;
+                    text-decoration: none;
+
+                    &:hover {
+                        background-color: $color--primary-light;
+                    }
+                }
+            }
+        }
+    }
+}
