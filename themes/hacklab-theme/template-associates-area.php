@@ -38,6 +38,11 @@ $current_post_id = get_the_ID();
                     }
                 }
 
+                /**
+                 * Hook to allow adding custom <li> items at the beginning of the associates area list.
+                 */
+                do_action( 'hacklabr\\before_associates_area_list_items', $associates_areas, $get_params );
+
                 foreach ( $associates_areas as $associates_area ) {
                     if ( show_associated_page( $associates_area ) && $associates_area->post_name !== 'solicitacao-enviada' ) {
                         $css_class = $current_post_id === $associates_area->ID
