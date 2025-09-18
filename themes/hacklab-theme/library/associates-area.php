@@ -175,3 +175,23 @@ function add_link_select_organization( $associates_areas, $get_params ) {
 }
 
 add_action( 'hacklabr\\before_associates_area_list_items', __NAMESPACE__ . '\\add_link_select_organization', 10, 2 );
+
+/**
+ * Filters the display of the WordPress admin bar based on user capability.
+ *
+ * If the current user has the 'edit_others_associates' capability, the admin bar will be hidden.
+ * Otherwise, the default behavior for displaying the admin bar is preserved.
+ *
+ * @since 1.0.0
+ *
+ * @param bool $show_admin_bar Whether the admin bar should be shown for the current user.
+ * @return bool Modified value indicating whether the admin bar should be shown.
+ *
+ * @see https://developer.wordpress.org/reference/functions/current_user_can/
+ * @see https://developer.wordpress.org/reference/hooks/show_admin_bar/
+ */
+function remove_admin_bar_to_edit_others_associates( $show_admin_bar ) {
+    return ( current_user_can( 'edit_others_associates' ) ) ? false : $show_admin_bar;
+}
+
+add_filter( 'show_admin_bar' , __NAMESPACE__ . '\\remove_admin_bar_to_edit_others_associates' );
