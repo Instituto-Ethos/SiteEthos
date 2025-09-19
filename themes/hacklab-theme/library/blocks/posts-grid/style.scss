@@ -41,6 +41,14 @@
         grid-template-columns: 1fr;
     }
 
+    .post-card {
+        &__image {
+            .wp-post-image {
+                contain-intrinsic-size: none;
+            }
+        }
+    }
+
     .post-card--vertical-thumbnail {
         grid-template-columns: 0.7fr 1fr;
 

@@ -78,6 +78,17 @@ class API {
             ],
             'permission_callback' => 'hacklabr\API::rest_permission_to_edit_posts',
         ]);
+
+        register_rest_route( 'hacklabr/v2', '/organizations', [
+            'methods' => 'GET',
+            'callback' => 'hacklabr\API::rest_organizations_callback',
+            'args' => [
+                's' => [
+                    'required' => true,
+                ],
+            ],
+            'permission_callback' => 'hacklabr\API::rest_permission_to_edit_others_associates',
+        ]);
     }
 
     static function send_html ($html) {
@@ -229,6 +240,43 @@ class API {
 
         return new \WP_REST_Response($response, 200);
     }
+
+    static function rest_organizations_callback (\WP_REST_Request $request) {
+        $s = sanitize_text_field( $request->get_param( 's' ) );
+
+        $args = [
+            'post_type'      => 'organizacao',
+            'posts_per_page' => 99,
+            'orderby'        => 'relevance',
+            's'              => $s,
+        ];
+
+        $organizations = get_posts( $args );
+
+        $response = [];
+
+        if ( $organizations && is_array( $organizations ) ) {
+            foreach ( $organizations as $organization ) {
+                $item = [
+                    'id' => $organization->ID,
+                    'title' => $organization->post_title,
+                ];
+
+                $response[] = $item;
+            }
+        }
+
+        return rest_ensure_response( $response );
+    }
+
+    static function rest_permission_to_edit_others_associates () {
+        if ( ! is_user_logged_in() ) {
+            return false;
+        }
+
+        return (bool) current_user_can( 'edit_others_associates' );
+    }
 }
+
 
 API::init();

@@ -49,6 +49,20 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
         }
 
         $current_user = get_current_user_id();
+
+        /**
+         * Checks if the current user has permission to edit other associates.
+         * If so, retrieves the organization ID from the GET request and validates its post type.
+         * If the organization is valid, fetches the user ID of the organization author.
+         */
+        if ( current_user_can( 'edit_others_associates' ) ) {
+            $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+            if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+                $current_user = get_post_field( 'post_author', $organization_id );
+            }
+        }
+
         $account_id = get_user_meta($current_user, '_ethos_crm_account_id', true);
         $contact_id = get_user_meta($current_user, '_ethos_crm_contact_id', true);
 

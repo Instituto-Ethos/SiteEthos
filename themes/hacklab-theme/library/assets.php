@@ -514,6 +514,20 @@ class Assets
                 'global' => true,
             ],
 
+            'search-organizations' => [
+                'pre-load'         => false,
+                'file'             => 'search-organizations.js',
+                'preload_callback' => function () {
+                    return is_page_template( 'template-list-organizations.php' );
+                },
+                'localize_callback' => function () {
+                    return [
+                        'baseUrl' => rest_url( 'hacklabr/v2/' ),
+                        'nonce'   => wp_create_nonce( 'wp_rest' )
+                    ];
+                }
+            ],
+
             'copy-url' => [
                 'pre-load' => false,
                 'file' => 'copy-url.js',
