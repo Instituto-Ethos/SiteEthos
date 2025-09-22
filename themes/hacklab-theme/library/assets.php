@@ -477,7 +477,7 @@ class Assets
                 'preload_callback' => function () {
                     $screen = get_current_screen();
                     if ($screen && $screen->is_block_editor()) {
-                        return $screen->base === 'post' && $screen->post_type === 'tribe_events';
+                        return $screen->base === 'post' && ($screen->post_type === 'tribe_events' || $screen->post_type === 'organizacao');
                     }
                     return false;
                 },
@@ -491,6 +491,17 @@ class Assets
                             return [
                                 'entityName' => 'fut_projeto',
                                 'entityId' => $project_id,
+                            ];
+                        }
+                    }
+
+                    if ($screen->post_type === 'organizacao') {
+                        $account_id = get_post_meta(get_the_ID(), '_ethos_crm:accountid', true);
+
+                        if (!empty($account_id)) {
+                            return [
+                                'entityName' => 'account',
+                                'entityId' => $account_id,
                             ];
                         }
                     }

@@ -176,7 +176,7 @@ function register_organization_cpt () {
         'public' => true,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-building',
-        'supports' => ['author', 'custom-fields', 'thumbnail', 'title'],
+        'supports' => ['author', 'custom-fields', 'editor', 'thumbnail', 'title'],
     ]);
 }
 add_action('init', 'hacklabr\\register_organization_cpt');
