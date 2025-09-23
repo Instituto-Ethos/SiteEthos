@@ -44,3 +44,13 @@ Exemplos:
 
 <!-- Exibe o nome da organização com ID = 10 -->
 [nome-da-empresa postid="10"]
+```
+
+## `[porte-das-organizacoes]`
+
+Exemplo:
+
+```html
+<!-- Exibe uma lista com a contagem de empresas de acordo com o porte: Micro e pequenas, Médias e Grandes empresa -->
+[porte-das-organizacoes]
+```
