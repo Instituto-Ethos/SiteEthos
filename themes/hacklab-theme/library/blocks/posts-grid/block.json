@@ -6,7 +6,7 @@
     "description": "Display post cards on a grid",
     "category": "text",
     "icon": "grid-view",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "supports": {
         "align": ["center", "wide", "full"],
         "html": false
