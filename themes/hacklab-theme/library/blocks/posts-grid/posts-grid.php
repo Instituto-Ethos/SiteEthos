@@ -23,17 +23,16 @@ function render_posts_grid_callback( $attributes ) {
         $attributes['postsPerPage'] = (int) ( $attributes['postsPerColumn'] ?? 1 ) * (int) ( $attributes['postsPerRow'] ?? 1 );
     }
 
-    $html_inner = render_posts_grid_inner( $attributes, 1 );
-
-
     /**
      * Checks if the 'preventRepeatPosts' attribute is set and not empty.
      * If true, assigns the result of get_used_post_ids() to the 'postNotIn' attribute,
      * which is used to exclude previously displayed posts from the current query.
      */
-    if ( ! empty( $attributes['preventRepeatPosts'] ) && ! empty( $attributes['preventRepeatPosts'] ) ) {
+    if ( ! empty( $attributes['preventRepeatPosts'] ) ) {
         $attributes['postNotIn'] = get_used_post_ids();
     }
+
+    $html_inner = render_posts_grid_inner( $attributes, 1 );
 
     $config = [
         'attributes' => $attributes,
@@ -132,7 +131,17 @@ function register_posts_grid_rest_route() {
 
             $qa = normalize_posts_query( $attributes );
 
-            $args = build_posts_query( $qa, [] );
+            /**
+             * If the 'preventRepeatPosts' attribute is set and the 'postNotIn' attribute contains post IDs,
+             * assigns those IDs to $post__not_in. This helps prevent displaying duplicate posts in the grid.
+             */
+            $post__not_in = [];
+
+            if ( ! empty( $attributes['preventRepeatPosts'] ) && ! empty( $attributes['postNotIn'] ) ) {
+                $post__not_in = $attributes['postNotIn'];
+            }
+
+            $args = build_posts_query( $qa, $post__not_in );
             $args['paged'] = $page;
 
             if ( isset( $args['order_by'] ) && ! isset( $args['orderby'] ) ) {

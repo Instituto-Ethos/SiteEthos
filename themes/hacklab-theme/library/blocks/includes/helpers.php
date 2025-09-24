@@ -205,6 +205,7 @@ function normalize_posts_query ($attributes) {
         'orderBy' => 'date',
         'postsPerPage' => 3,
         'postType' => 'post',
+        'postNotIn' => [],
         'preventRepeatPosts' => true,
         'queryTerms' => [],
         'showChildren' => true,
@@ -269,6 +270,7 @@ function sanitize_request_attributes( array $attributes ): array {
 
     $sanitized_attributes['postsPerColumn']   = max( 1, (int)($attributes['postsPerColumn'] ?? 1 ) );
     $sanitized_attributes['postsPerRow']      = max( 1, (int)( $attributes['postsPerRow'] ?? 1 ) );
+    $sanitized_attributes['postNotIn']        = $attributes['postNotIn'] ?? [];
 
     $posts_per_page = (int) ( $attributes['postsPerPage'] ?? 0 );
     if ( $posts_per_page <= 0 ) {
