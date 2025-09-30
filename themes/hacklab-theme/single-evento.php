@@ -182,7 +182,7 @@ if( isset($recurrence['rules']) ) {
             if ( $inscrever["link"] ) : ?>
                 <a class="button button--solid" href="<?= $inscrever["link"];?>"><?php _e($inscrever["botao"], 'hacklabr');?></a>
             <?php endif;
-        };?>
+        } ?>
     </div>
 
 
@@ -192,11 +192,14 @@ if( isset($recurrence['rules']) ) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
             echo do_shortcode('[ethosDadosEvento menu_order=""]');
+            echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
+            /*
             if (hacklabr\is_paid_event($post_id)) {
                 echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
             } else {
                 echo do_shortcode('[event-registration]');
             }
+            */
         }
     }
     ?>
