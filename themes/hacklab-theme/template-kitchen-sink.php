@@ -374,8 +374,25 @@ get_header();
         </div>
     </main>
 
+    <hr/>
 
-
+    <code>Lista de porte das empresas</code>
+    <div class="company-size">
+        <div class="company-size__grid">
+            <div class="company-size__item">
+                <div class="company-size__percent">41%</div>
+                <div class="company-size__label">Micro e pequenas empresas</div>
+            </div>
+            <div class="company-size__item">
+                <div class="company-size__percent">20%</div>
+                <div class="company-size__label">Médias empresas</div>
+            </div>
+            <div class="company-size__item">
+                <div class="company-size__percent">38%</div>
+                <div class="company-size__label">Grandes empresas</div>
+            </div>
+        </div>
+    </div>
 
 </div>
 

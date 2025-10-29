@@ -23,6 +23,15 @@ function render_posts_grid_callback( $attributes ) {
         $attributes['postsPerPage'] = (int) ( $attributes['postsPerColumn'] ?? 1 ) * (int) ( $attributes['postsPerRow'] ?? 1 );
     }
 
+    /**
+     * Checks if the 'preventRepeatPosts' attribute is set and not empty.
+     * If true, assigns the result of get_used_post_ids() to the 'postNotIn' attribute,
+     * which is used to exclude previously displayed posts from the current query.
+     */
+    if ( ! empty( $attributes['preventRepeatPosts'] ) ) {
+        $attributes['postNotIn'] = get_used_post_ids();
+    }
+
     $html_inner = render_posts_grid_inner( $attributes, 1 );
 
     $config = [
@@ -60,7 +69,17 @@ function render_posts_grid_inner( array $attributes, int $page = 1 ): string {
 
     $query_attributes = normalize_posts_query( $attributes );
 
-    $args = build_posts_query( $query_attributes, [] );
+    /**
+     * If the 'preventRepeatPosts' attribute is set and the 'postNotIn' attribute contains post IDs,
+     * assigns those IDs to $post__not_in. This helps prevent displaying duplicate posts in the grid.
+     */
+    $post__not_in = [];
+
+    if ( ! empty( $attributes['preventRepeatPosts'] ) && ! empty( $attributes['postNotIn'] ) ) {
+        $post__not_in = $attributes['postNotIn'];
+    }
+
+    $args = build_posts_query( $query_attributes, $post__not_in );
     $args['paged'] = max( 1, (int) $page );
 
     if ( ! $enable_pagination ) {
@@ -103,43 +122,57 @@ function render_posts_grid_inner( array $attributes, int $page = 1 ): string {
     return ob_get_clean();
 }
 
-register_rest_route( 'hacklabr/v1', '/posts-grid', [
-    'methods'  => 'POST',
-    'callback' => function( \WP_REST_Request $req ) {
-        $attributes = sanitize_request_attributes( (array) $req->get_param( 'attributes' ) );
-        $page       = max(1, (int) $req->get_param( 'page') );
+function register_posts_grid_rest_route() {
+    register_rest_route( 'hacklabr/v1', '/posts-grid', [
+        'methods'  => 'POST',
+        'callback' => function( \WP_REST_Request $req ) {
+            $attributes = sanitize_request_attributes( (array) $req->get_param( 'attributes' ) );
+            $page       = max(1, (int) $req->get_param( 'page') );
 
-        $qa = normalize_posts_query( $attributes );
+            $qa = normalize_posts_query( $attributes );
 
-        $args = build_posts_query( $qa, [] );
-        $args['paged'] = $page;
+            /**
+             * If the 'preventRepeatPosts' attribute is set and the 'postNotIn' attribute contains post IDs,
+             * assigns those IDs to $post__not_in. This helps prevent displaying duplicate posts in the grid.
+             */
+            $post__not_in = [];
 
-        if ( isset( $args['order_by'] ) && ! isset( $args['orderby'] ) ) {
-            $args['orderby'] = $args['order_by'];
-            unset($args['order_by']);
-        }
+            if ( ! empty( $attributes['preventRepeatPosts'] ) && ! empty( $attributes['postNotIn'] ) ) {
+                $post__not_in = $attributes['postNotIn'];
+            }
 
-        $q = new \WP_Query( $args );
+            $args = build_posts_query( $qa, $post__not_in );
+            $args['paged'] = $page;
 
-        ob_start(); ?>
-        <div class="hacklabr-posts-grid-block" style="--grid-columns: <?= (int) ( $attributes['postsPerRow'] ?? 1 ) ?>">
-        <?php foreach ( $q->posts as $post ) {
-            get_template_part('template-parts/post-card', ( $attributes['cardModel'] ?? '' ) ?: null, [
-                'hide_author'     => (bool)( $attributes['hideAuthor'] ?? false ),
-                'hide_categories' => (bool)( $attributes['hideCategories'] ?? false ),
-                'hide_date'       => (bool)( $attributes['hideDate'] ?? false ),
-                'hide_excerpt'    => (bool)( $attributes['hideExcerpt'] ?? false ),
-                'modifiers'       => $attributes['cardModifiers'] ?? [],
-                'post'            => $post,
-                'show_taxonomies' => $attributes['showTaxonomies'] ?? [],
-            ]);
-        } ?>
-        </div>
-        <?php
-        $html = ob_get_clean();
-        $resp = ['html' => $html, 'page' => $page, 'totalPages' => (int) $q->max_num_pages, 'total' => (int) $q->found_posts];
-        wp_reset_postdata();
-        return $resp;
-    },
-    'permission_callback' => '__return_true'
-]);
+            if ( isset( $args['order_by'] ) && ! isset( $args['orderby'] ) ) {
+                $args['orderby'] = $args['order_by'];
+                unset($args['order_by']);
+            }
+
+            $q = new \WP_Query( $args );
+
+            ob_start(); ?>
+            <div class="hacklabr-posts-grid-block" style="--grid-columns: <?= (int) ( $attributes['postsPerRow'] ?? 1 ) ?>">
+            <?php foreach ( $q->posts as $post ) {
+                get_template_part('template-parts/post-card', ( $attributes['cardModel'] ?? '' ) ?: null, [
+                    'hide_author'     => (bool)( $attributes['hideAuthor'] ?? false ),
+                    'hide_categories' => (bool)( $attributes['hideCategories'] ?? false ),
+                    'hide_date'       => (bool)( $attributes['hideDate'] ?? false ),
+                    'hide_excerpt'    => (bool)( $attributes['hideExcerpt'] ?? false ),
+                    'modifiers'       => $attributes['cardModifiers'] ?? [],
+                    'post'            => $post,
+                    'show_taxonomies' => $attributes['showTaxonomies'] ?? [],
+                ]);
+            } ?>
+            </div>
+            <?php
+            $html = ob_get_clean();
+            $resp = ['html' => $html, 'page' => $page, 'totalPages' => (int) $q->max_num_pages, 'total' => (int) $q->found_posts];
+            wp_reset_postdata();
+            return $resp;
+        },
+        'permission_callback' => '__return_true'
+    ]);
+}
+
+add_action('rest_api_init', 'hacklabr\\register_posts_grid_rest_route');

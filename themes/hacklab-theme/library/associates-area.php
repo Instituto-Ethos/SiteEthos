@@ -4,6 +4,37 @@ namespace hacklabr;
 
 use WP_Query;
 
+
+/**
+ * Registers a custom role 'manager_associates' with specific capabilities.
+ *
+ * This function adds a new user role called 'Manager associates' with the following capabilities:
+ * - 'read': Allows reading posts.
+ * - 'edit_others_posts': Disallowed, cannot edit others' posts.
+ * - 'edit_others_associates': Allowed, can edit others' associates (custom capability).
+ *
+ * Uses the WordPress native function {@see add_role()}.
+ * @link https://developer.wordpress.org/reference/functions/add_role/
+ *
+ * Hooked to the 'after_switch_theme' action to ensure the role is added when the theme is activated.
+ *
+ * @since 1.0.0
+ *
+ * @return void
+ */
+function add_associates_manager_role() {
+    add_role(
+        'manager_associates',
+        __( 'Admin-Relacionamento', 'hacklabr' ),
+        [
+            'read' => true,
+            'edit_others_posts' => false,
+            'edit_others_associates' => true,
+        ]
+    );
+}
+add_action( 'after_switch_theme', __NAMESPACE__ . '\\add_associates_manager_role' );
+
 function add_associates_rewrite_rule() {
     add_rewrite_rule(
         '^associados/([^/]*)/?',
@@ -54,6 +85,15 @@ function redirect_associates_template() {
 }
 add_action( 'template_redirect', 'hacklabr\\redirect_associates_template' );
 
+function redirect_manager_associates_on_login( $user_login, $user ) {
+    if ( in_array( 'manager_associates', (array) $user->roles, true ) ) {
+        wp_safe_redirect( home_url( '/selecionar-organizacao/' ) );
+        exit;
+    }
+}
+
+add_action( 'wp_login', 'hacklabr\\redirect_manager_associates_on_login', 10, 2 );
+
 function show_associated_page($page) {
     $admin_pages = [
         'meu-plano',
@@ -64,6 +104,16 @@ function show_associated_page($page) {
 
     if(in_array($page->post_name, $admin_pages)){
         $user_id = get_current_user_id();
+
+        /**
+         * Checks if the current user has the capability to edit other associates.
+         *
+         * @return bool True if the user can edit other associates, false otherwise.
+         */
+        if ( current_user_can( 'edit_others_associates' ) ) {
+            return true;
+        }
+
         return (bool) get_user_meta($user_id, '_ethos_admin', true);
     }
     return true;
@@ -117,3 +167,31 @@ function filter_curadoria_category_archive_query( WP_Query $query ) {
 }
 
 add_action( 'pre_get_posts', __NAMESPACE__ . '\\filter_curadoria_category_archive_query' );
+
+function add_link_select_organization( $associates_areas, $get_params ) {
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        echo '<li class="content-sidebar__list-item"><a href="/selecionar-organizacao">Selecionar organização</a></li>';
+    }
+}
+
+add_action( 'hacklabr\\before_associates_area_list_items', __NAMESPACE__ . '\\add_link_select_organization', 10, 2 );
+
+/**
+ * Filters the display of the WordPress admin bar based on user capability.
+ *
+ * If the current user has the 'edit_others_associates' capability, the admin bar will be hidden.
+ * Otherwise, the default behavior for displaying the admin bar is preserved.
+ *
+ * @since 1.0.0
+ *
+ * @param bool $show_admin_bar Whether the admin bar should be shown for the current user.
+ * @return bool Modified value indicating whether the admin bar should be shown.
+ *
+ * @see https://developer.wordpress.org/reference/functions/current_user_can/
+ * @see https://developer.wordpress.org/reference/hooks/show_admin_bar/
+ */
+function remove_admin_bar_to_edit_others_associates( $show_admin_bar ) {
+    return ( current_user_can( 'edit_others_associates' ) ) ? false : $show_admin_bar;
+}
+
+add_filter( 'show_admin_bar' , __NAMESPACE__ . '\\remove_admin_bar_to_edit_others_associates' );

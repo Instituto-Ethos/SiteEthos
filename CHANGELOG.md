@@ -5,17 +5,28 @@ Todas as mudanças desse projeto serão documentadas neste arquivo.
 O formato é baseado em [Keep a Changelog](https://keepachangelog.com/pt-BR/1.0.0/)
 
 ## [Unreleased]
+
 ### Added
+- Add role `manager_associates`
 
 ### Changed
 
-- Remove margem negativa do topo da página de login
-- Ajustes CSS no formulário de login
-
 ### Fixed
+
 ### Removed
 
 ## [Releases]
+
+## [v1.2.0] - 2025-09-17
+
+### Added
+
+- Adiciona novo formulário de inscrição para eventos não pagos
+
+### Fixed
+
+- Remove margem negativa do topo da página de login
+- Ajustes CSS no formulário de login
 
 ## [v1.1.17] - 2025-06-06
 
