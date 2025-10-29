@@ -158,3 +158,11 @@ O conteúdo de `wp-content` está excluído do versionamento por padrão. Para a
 ## Traduções
 
 Quando utilizar o comando `wp i18n make-json languages/` para gerar as traduções de arquivos `.js` e as traduções não funcionarem, uma das possíveis soluções pode ser renomear o arquivo gerado de `{locale}-{hash}.json` para `{domain}-{locale}-{script-handle}.json`.
+
+## Sincronização com CRM
+
+Para importar manualmente uma entidade do CRM, existe os seguintes atalhos dentro do `/wp-admin` (apenas para usuários administradores):
+
+- `/wp-admin?import_account=<ID da entidade>` (conta)
+- `/wp-admin?import_contact=<ID da entidade>` (contato)
+- `/wp-admin?import_fut_projeto=<ID da entidade>` (evento)
