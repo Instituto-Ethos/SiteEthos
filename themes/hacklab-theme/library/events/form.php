@@ -20,9 +20,6 @@ function is_paid_event (int $post_id) {
 function get_event_registration_fields () {
     $post_id = get_the_ID();
 
-    $a11y_options = [
-    ];
-
     $area_options = [
         '969830000' => _x('Administration', 'area', 'hacklabr'),
 		'969830001' => _x('Commercial', 'area', 'hacklabr'),
@@ -185,17 +182,11 @@ function get_event_registration_fields () {
             },
         ],
         'acessibilidade' => [
-            'type' => 'select',
+            'type' => 'text',
             'class' => '-colspan-12',
             'label' =>__('Accessibility', 'hacklabr'),
-            'options' => $a11y_options,
+            'placeholder' => __('Describe your special needs', 'hacklabr'),
             'required' => false,
-            'validate' => function ($value) use ($a11y_options) {
-                if (!array_key_exists($value, $a11y_options)) {
-                    return __('Invalid accessibility option', 'hacklabr');
-                }
-                return true;
-            },
         ],
     ];
 
