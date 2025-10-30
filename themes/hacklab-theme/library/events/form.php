@@ -13,7 +13,7 @@ function is_paid_event (int $post_id) {
     }
     */
 
-    $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago'));
+    $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago', true));
     return $is_paid;
 }
 
