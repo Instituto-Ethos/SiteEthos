@@ -144,10 +144,10 @@ function parse_account_into_post_meta( Entity $account ) {
     ];
 
     foreach ( $attributes as $key => $value ) {
-        if ( is_array( $value ) || is_object( $value ) ) {
-            $post_meta['_ethos_crm:' . $key ] = json_encode( $value );
-        } elseif ( ! empty( $value ) || is_numeric( $value ) ) {
-            $post_meta['_ethos_crm:' . $key ] = $value;
+        $meta_key = '_ethos_crm:' . $key;
+        $meta_value = \hacklabr\format_meta_value( $value );
+        if ( $meta_value !== null ) {
+            $post_meta[ $meta_key ] = $meta_value;
         }
     }
 
@@ -187,10 +187,10 @@ function parse_contact_into_user_meta( Entity $contact, Entity|null $account ) {
     ];
 
     foreach ( $attributes as $key => $value ) {
-        if ( is_array( $value ) || is_object( $value ) ) {
-            $user_meta['_ethos_crm:' . $key ] = json_encode( $value );
-        } elseif ( ! empty( $value ) || is_numeric( $value ) ) {
-            $user_meta['_ethos_crm:' . $key ] = $value;
+        $meta_key = '_ethos_crm:' . $key;
+        $meta_value = \hacklabr\format_meta_value( $value );
+        if ( $meta_value !== null ) {
+            $user_meta[ $meta_key ] = $meta_value;
         }
     }
 
