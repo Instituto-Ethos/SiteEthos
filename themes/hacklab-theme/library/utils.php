@@ -948,113 +948,56 @@ function fix_attachments_on_wp_mail( $atts ) {
 
 
 /**
- * Verifica se o usuário é membro ativo do PMPro (ou logado, como fallback)
+ * Oculta posts da categoria "curadoria" para visitantes não logados
+ * ou sem plano ativo do PMPro.
  */
-function theme_is_user_member_active() {
-    if ( function_exists( 'pmpro_hasMembershipLevel' ) ) {
-        return pmpro_hasMembershipLevel();
-    }
-    return is_user_logged_in();
-}
-
-/**
- * Esconde posts da categoria 'curadoria' de quem não é membro ativo
- * e redireciona visitantes que tentarem acessar diretamente a categoria.
- */
-function theme_hide_curadoria_for_non_members( WP_Query $query ) {
-    if ( is_admin() || ! $query->is_main_query() ) {
+function theme_hide_curadoria_for_non_members( $query ) {
+    // Não afeta o painel admin ou REST API
+    if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
         return;
     }
 
-    $curadoria = get_term_by( 'slug', 'curadoria', 'category' );
-    if ( ! $curadoria ) {
+    // Ignora chamadas de WP_CLI
+    if ( defined( 'WP_CLI' ) && WP_CLI ) {
         return;
     }
 
-    if ( ! theme_is_user_member_active() ) {
-
-        if ( $query->is_category() ) {
-            $queried = get_queried_object();
-            if ( $queried && isset( $queried->slug ) && $queried->slug === 'curadoria' ) {
-                wp_safe_redirect( wp_login_url() );
-                exit;
-            }
+    // Só roda no front-end
+    if ( ! is_user_logged_in() || ! function_exists( 'pmpro_hasMembershipLevel' ) || ! pmpro_hasMembershipLevel( null, get_current_user_id() ) ) {
+        $curadoria = get_category_by_slug( 'curadoria' );
+        if ( $curadoria ) {
+            $tax_query = (array) $query->get( 'tax_query' );
+            $tax_query[] = array(
+                'taxonomy' => 'category',
+                'field'    => 'slug',
+                'terms'    => array( 'curadoria' ),
+                'operator' => 'NOT IN',
+            );
+            $query->set( 'tax_query', $tax_query );
         }
 
-        $tax_query = (array) $query->get( 'tax_query', [] );
-        $tax_query[] = [
-            'taxonomy' => 'category',
-            'field'    => 'term_id',
-            'terms'    => [ (int) $curadoria->term_id ],
-            'operator' => 'NOT IN',
-        ];
-        $query->set( 'tax_query', $tax_query );
-        $query->set( 'ignore_sticky_posts', true );
+        // Bloqueia acesso direto à categoria curadoria
+        if ( is_category( 'curadoria' ) ) {
+            wp_safe_redirect( home_url() ); // ou wp_login_url()
+            exit;
+        }
     }
 }
-add_action( 'pre_get_posts', 'theme_hide_curadoria_for_non_members' );
+add_action( 'pre_get_posts', 'theme_hide_curadoria_for_non_members', 5 );
+
 
 /**
- * Remove a categoria 'curadoria' das listagens retornadas por get_terms,
- * evitando warnings e sem tentar converter objetos em string.
+ * Remove a categoria "curadoria" da listagem de categorias e widgets
+ * quando o usuário não está logado ou não é membro.
  */
-function theme_hide_curadoria_terms_for_non_members( $terms, $taxonomies, $args, $term_query ) {
-    // Só mexe em category e só pra não-membros
-    if ( ! in_array( 'category', (array) $taxonomies, true ) || theme_is_user_member_active() ) {
-        return $terms;
-    }
-
-    $curadoria = get_term_by( 'slug', 'curadoria', 'category' );
-    if ( ! $curadoria ) {
-        return $terms;
-    }
-
-    $filtered = [];
-
-    foreach ( (array) $terms as $term ) {
-        // Caso venha como ID inteiro
-        if ( is_int( $term ) ) {
-            // pula se for o ID de curadoria
-            if ( (int) $term === (int) $curadoria->term_id ) {
-                continue;
-            }
-            $filtered[] = $term;
-            continue;
+function theme_hide_curadoria_term_for_non_members( $terms, $taxonomies, $args, $term_query ) {
+    if ( ! is_user_logged_in() || ! function_exists( 'pmpro_hasMembershipLevel' ) || ! pmpro_hasMembershipLevel( null, get_current_user_id() ) ) {
+        if ( in_array( 'category', (array) $taxonomies, true ) ) {
+            $terms = array_filter( (array) $terms, function( $term ) {
+                return is_object( $term ) && $term->slug !== 'curadoria';
+            });
         }
-
-        // Caso venha como string (ex.: slug ou nome), checamos sem castar objetos
-        if ( is_string( $term ) ) {
-            // se for dígitos apenas (IDs em string) converte e compara
-            if ( ctype_digit( $term ) ) {
-                if ( (int) $term === (int) $curadoria->term_id ) {
-                    continue;
-                }
-                $filtered[] = $term;
-                continue;
-            }
-
-            // se for slug ou nome em string, verifica contra slug do termo curadoria
-            if ( $term === $curadoria->slug || $term === $curadoria->name ) {
-                continue;
-            }
-
-            $filtered[] = $term;
-            continue;
-        }
-
-        // Caso venha como objeto WP_Term
-        if ( is_object( $term ) && isset( $term->term_id, $term->slug ) ) {
-            if ( (int) $term->term_id === (int) $curadoria->term_id || $term->slug === $curadoria->slug ) {
-                continue;
-            }
-            $filtered[] = $term;
-            continue;
-        }
-
-        // Fallback: mantém o item
-        $filtered[] = $term;
     }
-
-    return $filtered;
+    return $terms;
 }
-add_filter( 'get_terms', 'theme_hide_curadoria_terms_for_non_members', 10, 4 );
+add_filter( 'get_terms', 'theme_hide_curadoria_term_for_non_members', 10, 4 );
