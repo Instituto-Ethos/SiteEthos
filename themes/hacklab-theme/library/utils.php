@@ -945,3 +945,51 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
+
+
+/**
+ * Oculta posts da categoria "curadoria" para quem não tem associação ativa no PMPro.
+ */
+function hacklabr_hide_curadoria_for_non_members( $query ) {
+    if ( is_admin() || ! $query->is_main_query() ) {
+        return;
+    }
+
+    // Verifica se o usuário tem uma assinatura ativa
+    $has_active_membership = function_exists( 'pmpro_hasMembershipLevel' ) && pmpro_hasMembershipLevel();
+
+    if ( ! $has_active_membership ) {
+        $curadoria = get_category_by_slug( 'curadoria' );
+
+        if ( $curadoria ) {
+            // Remove posts com a categoria curadoria
+            $query->set( 'cat', '-' . $curadoria->term_id );
+        }
+
+        // Redireciona se o usuário tentar acessar diretamente a categoria
+        if ( $query->is_category( 'curadoria' ) ) {
+            wp_safe_redirect( pmpro_login_url() );
+            exit;
+        }
+    }
+}
+add_action( 'pre_get_posts', 'hacklabr_hide_curadoria_for_non_members' );
+
+
+/**
+ * Remove a categoria "curadoria" da listagem de categorias públicas
+ * quando o usuário não tem associação ativa.
+ */
+function hacklabr_hide_curadoria_term_for_non_members( $terms, $taxonomies, $args, $term_query ) {
+    if ( in_array( 'category', $taxonomies, true ) ) {
+        $has_active_membership = function_exists( 'pmpro_hasMembershipLevel' ) && pmpro_hasMembershipLevel();
+
+        if ( ! $has_active_membership ) {
+            $terms = array_filter( $terms, function ( $term ) {
+                return $term->slug !== 'curadoria';
+            } );
+        }
+    }
+    return $terms;
+}
+add_filter( 'get_terms', 'hacklabr_hide_curadoria_term_for_non_members', 10, 4 );
