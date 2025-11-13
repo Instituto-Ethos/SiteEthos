@@ -948,48 +948,98 @@ function fix_attachments_on_wp_mail( $atts ) {
 
 
 /**
- * Oculta posts da categoria "curadoria" para quem não tem associação ativa no PMPro.
+ * Verifica se o usuário é membro ativo do PMPro (ou logado, como fallback)
  */
-function hacklabr_hide_curadoria_for_non_members( $query ) {
+function theme_is_user_member_active() {
+    // Se o PMPro estiver ativo, checa por associação válida
+    if ( function_exists( 'pmpro_hasMembershipLevel' ) ) {
+        return pmpro_hasMembershipLevel();
+    }
+    // Caso contrário, considera o usuário logado como "membro"
+    return is_user_logged_in();
+}
+
+/**
+ * Esconde posts da categoria 'curadoria' de quem não é membro ativo
+ * e redireciona visitantes que tentarem acessar diretamente a categoria.
+ */
+function theme_hide_curadoria_for_non_members( WP_Query $query ) {
     if ( is_admin() || ! $query->is_main_query() ) {
         return;
     }
 
-    // Verifica se o usuário tem uma assinatura ativa
-    $has_active_membership = function_exists( 'pmpro_hasMembershipLevel' ) && pmpro_hasMembershipLevel();
+    // Obtém o termo da categoria 'curadoria'
+    $curadoria = get_term_by( 'slug', 'curadoria', 'category' );
+    if ( ! $curadoria ) {
+        return;
+    }
 
-    if ( ! $has_active_membership ) {
-        $curadoria = get_category_by_slug( 'curadoria' );
+    // Só aplica se o usuário não tiver plano ativo
+    if ( ! theme_is_user_member_active() ) {
 
-        if ( $curadoria ) {
-            // Remove posts com a categoria curadoria
-            $query->set( 'cat', '-' . $curadoria->term_id );
+        // Se estiver tentando acessar diretamente a categoria
+        if ( $query->is_category() ) {
+            $queried = get_queried_object();
+            if ( $queried && isset( $queried->slug ) && $queried->slug === 'curadoria' ) {
+                // Redireciona para a página de login (altere se quiser)
+                wp_safe_redirect( wp_login_url() );
+                exit;
+            }
         }
 
-        // Redireciona se o usuário tentar acessar diretamente a categoria
-        if ( $query->is_category( 'curadoria' ) ) {
-            wp_safe_redirect( pmpro_login_url() );
-            exit;
-        }
+        // Exclui posts da categoria 'curadoria' de todas as consultas
+        $tax_query = (array) $query->get( 'tax_query', [] );
+        $tax_query[] = [
+            'taxonomy' => 'category',
+            'field'    => 'term_id',
+            'terms'    => [ (int) $curadoria->term_id ],
+            'operator' => 'NOT IN',
+        ];
+        $query->set( 'tax_query', $tax_query );
+
+        // Evita posts fixos (sticky) aparecerem
+        $query->set( 'ignore_sticky_posts', true );
     }
 }
-add_action( 'pre_get_posts', 'hacklabr_hide_curadoria_for_non_members' );
-
+add_action( 'pre_get_posts', 'theme_hide_curadoria_for_non_members' );
 
 /**
- * Remove a categoria "curadoria" da listagem de categorias públicas
- * quando o usuário não tem associação ativa.
+ * Remove a categoria 'curadoria' das listagens retornadas por get_terms,
+ * evitando warnings quando get_terms retorna IDs ao invés de objetos.
  */
-function hacklabr_hide_curadoria_term_for_non_members( $terms, $taxonomies, $args, $term_query ) {
-    if ( in_array( 'category', $taxonomies, true ) ) {
-        $has_active_membership = function_exists( 'pmpro_hasMembershipLevel' ) && pmpro_hasMembershipLevel();
+function theme_hide_curadoria_terms_for_non_members( $terms, $taxonomies, $args, $term_query ) {
+    // Só altera para taxonomia 'category' e se o usuário não for membro ativo
+    if ( in_array( 'category', (array) $taxonomies, true ) && ! theme_is_user_member_active() ) {
 
-        if ( ! $has_active_membership ) {
-            $terms = array_filter( $terms, function ( $term ) {
-                return $term->slug !== 'curadoria';
-            } );
+        $filtered = [];
+
+        foreach ( (array) $terms as $term ) {
+            // Caso venha apenas o ID
+            if ( is_int( $term ) || ctype_digit( (string) $term ) ) {
+                $term_obj = get_term( (int) $term, 'category' );
+                if ( $term_obj && $term_obj->slug === 'curadoria' ) {
+                    continue;
+                }
+                $filtered[] = $term;
+                continue;
+            }
+
+            // Caso venha como objeto WP_Term
+            if ( is_object( $term ) && isset( $term->slug ) ) {
+                if ( $term->slug === 'curadoria' ) {
+                    continue;
+                }
+                $filtered[] = $term;
+                continue;
+            }
+
+            // Fallback: mantém se não for possível identificar
+            $filtered[] = $term;
         }
+
+        return $filtered;
     }
+
     return $terms;
 }
-add_filter( 'get_terms', 'hacklabr_hide_curadoria_term_for_non_members', 10, 4 );
+add_filter( 'get_terms', 'theme_hide_curadoria_terms_for_non_members', 10, 4 );
