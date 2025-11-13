@@ -951,11 +951,9 @@ function fix_attachments_on_wp_mail( $atts ) {
  * Verifica se o usuário é membro ativo do PMPro (ou logado, como fallback)
  */
 function theme_is_user_member_active() {
-    // Se o PMPro estiver ativo, checa por associação válida
     if ( function_exists( 'pmpro_hasMembershipLevel' ) ) {
         return pmpro_hasMembershipLevel();
     }
-    // Caso contrário, considera o usuário logado como "membro"
     return is_user_logged_in();
 }
 
@@ -968,26 +966,21 @@ function theme_hide_curadoria_for_non_members( WP_Query $query ) {
         return;
     }
 
-    // Obtém o termo da categoria 'curadoria'
     $curadoria = get_term_by( 'slug', 'curadoria', 'category' );
     if ( ! $curadoria ) {
         return;
     }
 
-    // Só aplica se o usuário não tiver plano ativo
     if ( ! theme_is_user_member_active() ) {
 
-        // Se estiver tentando acessar diretamente a categoria
         if ( $query->is_category() ) {
             $queried = get_queried_object();
             if ( $queried && isset( $queried->slug ) && $queried->slug === 'curadoria' ) {
-                // Redireciona para a página de login (altere se quiser)
                 wp_safe_redirect( wp_login_url() );
                 exit;
             }
         }
 
-        // Exclui posts da categoria 'curadoria' de todas as consultas
         $tax_query = (array) $query->get( 'tax_query', [] );
         $tax_query[] = [
             'taxonomy' => 'category',
@@ -996,8 +989,6 @@ function theme_hide_curadoria_for_non_members( WP_Query $query ) {
             'operator' => 'NOT IN',
         ];
         $query->set( 'tax_query', $tax_query );
-
-        // Evita posts fixos (sticky) aparecerem
         $query->set( 'ignore_sticky_posts', true );
     }
 }
@@ -1005,41 +996,65 @@ add_action( 'pre_get_posts', 'theme_hide_curadoria_for_non_members' );
 
 /**
  * Remove a categoria 'curadoria' das listagens retornadas por get_terms,
- * evitando warnings quando get_terms retorna IDs ao invés de objetos.
+ * evitando warnings e sem tentar converter objetos em string.
  */
 function theme_hide_curadoria_terms_for_non_members( $terms, $taxonomies, $args, $term_query ) {
-    // Só altera para taxonomia 'category' e se o usuário não for membro ativo
-    if ( in_array( 'category', (array) $taxonomies, true ) && ! theme_is_user_member_active() ) {
-
-        $filtered = [];
-
-        foreach ( (array) $terms as $term ) {
-            // Caso venha apenas o ID
-            if ( is_int( $term ) || ctype_digit( (string) $term ) ) {
-                $term_obj = get_term( (int) $term, 'category' );
-                if ( $term_obj && $term_obj->slug === 'curadoria' ) {
-                    continue;
-                }
-                $filtered[] = $term;
-                continue;
-            }
-
-            // Caso venha como objeto WP_Term
-            if ( is_object( $term ) && isset( $term->slug ) ) {
-                if ( $term->slug === 'curadoria' ) {
-                    continue;
-                }
-                $filtered[] = $term;
-                continue;
-            }
-
-            // Fallback: mantém se não for possível identificar
-            $filtered[] = $term;
-        }
-
-        return $filtered;
+    // Só mexe em category e só pra não-membros
+    if ( ! in_array( 'category', (array) $taxonomies, true ) || theme_is_user_member_active() ) {
+        return $terms;
     }
 
-    return $terms;
+    $curadoria = get_term_by( 'slug', 'curadoria', 'category' );
+    if ( ! $curadoria ) {
+        return $terms;
+    }
+
+    $filtered = [];
+
+    foreach ( (array) $terms as $term ) {
+        // Caso venha como ID inteiro
+        if ( is_int( $term ) ) {
+            // pula se for o ID de curadoria
+            if ( (int) $term === (int) $curadoria->term_id ) {
+                continue;
+            }
+            $filtered[] = $term;
+            continue;
+        }
+
+        // Caso venha como string (ex.: slug ou nome), checamos sem castar objetos
+        if ( is_string( $term ) ) {
+            // se for dígitos apenas (IDs em string) converte e compara
+            if ( ctype_digit( $term ) ) {
+                if ( (int) $term === (int) $curadoria->term_id ) {
+                    continue;
+                }
+                $filtered[] = $term;
+                continue;
+            }
+
+            // se for slug ou nome em string, verifica contra slug do termo curadoria
+            if ( $term === $curadoria->slug || $term === $curadoria->name ) {
+                continue;
+            }
+
+            $filtered[] = $term;
+            continue;
+        }
+
+        // Caso venha como objeto WP_Term
+        if ( is_object( $term ) && isset( $term->term_id, $term->slug ) ) {
+            if ( (int) $term->term_id === (int) $curadoria->term_id || $term->slug === $curadoria->slug ) {
+                continue;
+            }
+            $filtered[] = $term;
+            continue;
+        }
+
+        // Fallback: mantém o item
+        $filtered[] = $term;
+    }
+
+    return $filtered;
 }
 add_filter( 'get_terms', 'theme_hide_curadoria_terms_for_non_members', 10, 4 );
