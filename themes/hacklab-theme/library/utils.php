@@ -945,59 +945,35 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
-
-
-/**
- * Oculta posts da categoria "curadoria" para visitantes não logados
- * ou sem plano ativo do PMPro.
- */
-function theme_hide_curadoria_for_non_members( $query ) {
-    // Não afeta o painel admin ou REST API
-    if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+add_action('pre_get_posts', function ($query) {
+    if (is_admin() || !$query->is_main_query()) {
         return;
     }
 
-    // Ignora chamadas de WP_CLI
-    if ( defined( 'WP_CLI' ) && WP_CLI ) {
-        return;
-    }
-
-    // Só roda no front-end
-    if ( ! is_user_logged_in() || ! function_exists( 'pmpro_hasMembershipLevel' ) || ! pmpro_hasMembershipLevel( null, get_current_user_id() ) ) {
-        $curadoria = get_category_by_slug( 'curadoria' );
-        if ( $curadoria ) {
-            $tax_query = (array) $query->get( 'tax_query' );
-            $tax_query[] = array(
-                'taxonomy' => 'category',
-                'field'    => 'slug',
-                'terms'    => array( 'curadoria' ),
-                'operator' => 'NOT IN',
-            );
-            $query->set( 'tax_query', $tax_query );
-        }
-
-        // Bloqueia acesso direto à categoria curadoria
-        if ( is_category( 'curadoria' ) ) {
-            wp_safe_redirect( home_url() ); // ou wp_login_url()
-            exit;
+    if (!is_user_logged_in()) {
+        $curadoria_id = get_cat_ID('curadoria');
+        if ($curadoria_id) {
+            $query->set('category__not_in', [$curadoria_id]);
         }
     }
-}
-add_action( 'pre_get_posts', 'theme_hide_curadoria_for_non_members', 5 );
+});
 
-
-/**
- * Remove a categoria "curadoria" da listagem de categorias e widgets
- * quando o usuário não está logado ou não é membro.
- */
-function theme_hide_curadoria_term_for_non_members( $terms, $taxonomies, $args, $term_query ) {
-    if ( ! is_user_logged_in() || ! function_exists( 'pmpro_hasMembershipLevel' ) || ! pmpro_hasMembershipLevel( null, get_current_user_id() ) ) {
-        if ( in_array( 'category', (array) $taxonomies, true ) ) {
-            $terms = array_filter( (array) $terms, function( $term ) {
-                return is_object( $term ) && $term->slug !== 'curadoria';
-            });
-        }
+add_filter('posts_results', function ($posts, $query) {
+    // Não afeta admin
+    if (is_admin()) {
+        return $posts;
     }
-    return $terms;
-}
-add_filter( 'get_terms', 'theme_hide_curadoria_term_for_non_members', 10, 4 );
+
+    // Se não estiver logado, remove manualmente posts da categoria 'curadoria'
+    if (!is_user_logged_in()) {
+        foreach ($posts as $i => $post) {
+            if (has_category('curadoria', $post)) {
+                unset($posts[$i]);
+            }
+        }
+        // Reindexa o array (importante!)
+        $posts = array_values($posts);
+    }
+
+    return $posts;
+}, 10, 2);
