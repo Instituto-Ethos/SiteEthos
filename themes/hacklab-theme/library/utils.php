@@ -945,3 +945,35 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
+add_action('pre_get_posts', function ($query) {
+    if (is_admin() || !$query->is_main_query()) {
+        return;
+    }
+
+    if (!is_user_logged_in()) {
+        $curadoria_id = get_cat_ID('curadoria');
+        if ($curadoria_id) {
+            $query->set('category__not_in', [$curadoria_id]);
+        }
+    }
+});
+
+add_filter('posts_results', function ($posts, $query) {
+    // Não afeta admin
+    if (is_admin()) {
+        return $posts;
+    }
+
+    // Se não estiver logado, remove manualmente posts da categoria 'curadoria'
+    if (!is_user_logged_in()) {
+        foreach ($posts as $i => $post) {
+            if (has_category('curadoria', $post)) {
+                unset($posts[$i]);
+            }
+        }
+        // Reindexa o array (importante!)
+        $posts = array_values($posts);
+    }
+
+    return $posts;
+}, 10, 2);
