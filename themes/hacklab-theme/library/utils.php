@@ -945,18 +945,7 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
-add_action('pre_get_posts', function ($query) {
-    if (is_admin() || !$query->is_main_query()) {
-        return;
-    }
 
-    if (!is_user_logged_in()) {
-        $curadoria_id = get_cat_ID('curadoria');
-        if ($curadoria_id) {
-            $query->set('category__not_in', [$curadoria_id]);
-        }
-    }
-});
 
 add_filter('posts_results', function ($posts, $query) {
     // Não afeta admin
