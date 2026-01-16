@@ -551,6 +551,40 @@ function wp1482371_custom_post_type_args( $args, $post_type ) {
 add_filter( 'register_post_type_args', 'wp1482371_custom_post_type_args', 20, 2 );
 
 /**
+ * Redirect recurring event occurrences to the main event.
+ */
+function redirect_recurring_events_to_parent() {
+    if ( is_admin() || ! is_singular( 'tribe_events' ) ) {
+        return;
+    }
+
+    if ( ! function_exists( 'tribe_get_event' ) ) {
+        return;
+    }
+
+    $event     = tribe_get_event( get_queried_object_id() );
+    $parent_id = 0;
+
+    if ( isset( $event->_tec_occurrence ) && $event->_tec_occurrence instanceof \TEC\Events\Custom_Tables\V1\Models\Occurrence ) {
+        $parent_id = (int) $event->_tec_occurrence->post_id;
+    } elseif ( ! empty( $event->post_parent ) ) {
+        $parent_id = (int) $event->post_parent;
+    }
+
+    if ( ! $parent_id || $parent_id === (int) $event->ID ) {
+        return;
+    }
+
+    $parent_permalink = get_permalink( $parent_id );
+    if ( $parent_permalink && $parent_permalink !== get_permalink( $event->ID ) ) {
+        wp_safe_redirect( $parent_permalink, 301 );
+        exit;
+    }
+
+}
+add_action( 'template_redirect', 'redirect_recurring_events_to_parent', 5 );
+
+/**
  * Get the primary term of a given taxonomy
  * @param int $post_id Post ID
  * @param string $taxonomy Taxonomy slug
