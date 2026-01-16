@@ -18,6 +18,36 @@ $pdf = get_field( 'pdf', $post_id );
 $inscrever = get_field( 'inscrever', $post_id );
 
 
+$event = tribe_get_event( get_the_ID() );
+
+if ( isset( $event->_tec_occurrence ) && $event->_tec_occurrence instanceof \TEC\Events\Custom_Tables\V1\Models\Occurrence ) {
+    $series_id = (int) $event->_tec_occurrence->post_id;
+} elseif ( ! empty( $event->post_parent ) ) {
+    $series_id = (int) $event->post_parent;
+} else {
+    $series_id = (int) $event->ID;
+}
+
+$next = tribe_get_events( [
+    'posts_per_page'       => 1,
+    'eventDisplay'         => 'custom',
+    'starts_after'         => 'now',
+    'orderby'              => 'event_date',
+    'order'                => 'ASC',
+    'tribeHideRecurrence'  => false,
+    'in_series'            => $series_id,
+    'post_parent'          => $series_id,
+] );
+
+do_action( 'logger', $next );
+
+$display_event = ! empty( $next ) ? $next[0] : $event;
+$display_id    = $display_event->ID;
+
+$start = tribe_get_start_date( $display_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+$end   = tribe_get_end_date( $display_id, true, Tribe__Date_Utils::DBDATETIMEFORMAT );
+
+
 if( isset($recurrence['rules']) ) {
 
     foreach ($recurrence['rules'] as $rule) {
