@@ -10,7 +10,17 @@ function add_user_to_pmpro_group (int $user_id, int $group_id) {
     $parent_level_id = $group->group_parent_level_id;
     $child_level_id = get_pmpro_child_level($parent_level_id);
 
-    $membership = \PMProGroupAcct_Group_Member::create($user_id, $child_level_id, $group->id);
+    $existing_member = \PMProGroupAcct_Group_Member::get_group_members([
+		'group_child_user_id'  => $user_id,
+		'group_child_level_id' => $child_level_id,
+		'group_id'             => $group_id,
+    ]);
+
+    if (!empty($existing_member)) {
+        $membership = $existing_member[0];
+    } else {
+        $membership = \PMProGroupAcct_Group_Member::create($user_id, $child_level_id, $group->id);
+    }
 
     assert($membership instanceof \PMProGroupAcct_Group_Member);
 
