@@ -11,6 +11,10 @@
             padding-right: $padding--small;
         }
 
+        th:nth-child(3) {
+            display: none;
+        }
+
         td {
             padding-right: $padding--small;
 
@@ -18,6 +22,10 @@
             &:has(input[type="checkbox"]) {
                 text-align: center;
             }
+        }
+
+        td:nth-child(3) {
+            display: none;
         }
 
         button {
