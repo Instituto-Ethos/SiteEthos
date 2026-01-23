@@ -582,7 +582,7 @@ function redirect_recurring_events_to_parent() {
     }
 
 }
-add_action( 'template_redirect', 'redirect_recurring_events_to_parent', 5 );
+// add_action( 'template_redirect', 'redirect_recurring_events_to_parent', 5 );
 
 /**
  * Get the primary term of a given taxonomy
