@@ -39,8 +39,6 @@ $next = tribe_get_events( [
     'post_parent'          => $series_id,
 ] );
 
-do_action( 'logger', $next );
-
 $display_event = ! empty( $next ) ? $next[0] : $event;
 $display_id    = $display_event->ID;
 
