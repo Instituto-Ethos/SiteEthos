@@ -83,19 +83,30 @@ add_action( 'admin_init', function() {
     add_filter( 'posts_search', function( $search, $query ) {
         global $wpdb;
 
-        if ( current_user_can( 'manage_options' ) && $query->is_main_query() && ! empty( $query->query['s'] ) ) {
-            $meta_key = 'entity_fut_projeto';
-            $like = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
-
-            $search .= $wpdb->prepare("
-                OR EXISTS (
-                    SELECT * FROM {$wpdb->postmeta}
-                    WHERE post_id = {$wpdb->posts}.ID
-                    AND meta_key = %s
-                    AND meta_value LIKE %s
-                )
-            ", $meta_key, $like);
+        if ( ! is_admin() || ! $query->is_main_query() || empty( $query->query['s'] ) || ! current_user_can( 'manage_options' ) ) {
+            return $search;
         }
+
+        $meta_key = 'entity_fut_projeto';
+        $like = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
+
+        $search = preg_replace(
+            '/^\s*AND\s*/',
+            ' AND (',
+            $search
+        );
+
+        $search .= $wpdb->prepare(
+            " OR EXISTS (
+                SELECT 1
+                FROM {$wpdb->postmeta}
+                WHERE post_id = {$wpdb->posts}.ID
+                AND meta_key = %s
+                AND meta_value LIKE %s
+            ))",
+            $meta_key,
+            $like
+        );
 
         return $search;
     }, 10, 2 );
