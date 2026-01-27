@@ -550,17 +550,16 @@ function wp1482371_custom_post_type_args( $args, $post_type ) {
 }
 add_filter( 'register_post_type_args', 'wp1482371_custom_post_type_args', 20, 2 );
 
-function redirect_single_tribe_events_template( $original_template ) {
+function redirect_single_tribe_events_template() {
 	if ( is_singular( 'tribe_events' ) ) {
-		$new_template = locate_template( 'single-evento.php' );
-		if ( $new_template ) {
-			return $new_template ;
+		$new_template = locate_template('single-evento.php');
+		if ($new_template) {
+			include($new_template);
+			exit;
 		}
-	} else {
-        return $original_template;
-    }
+	}
 }
-add_action( 'template_include', 'redirect_single_tribe_events_template' );
+add_action( 'template_redirect', 'redirect_single_tribe_events_template' );
 
 /**
  * Redirect recurring event occurrences to the main event.
