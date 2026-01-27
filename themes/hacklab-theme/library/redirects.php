@@ -31,6 +31,11 @@ function prevent_admin_access() {
 
     $user = wp_get_current_user();
 
+    if ( user_can( $user, 'edit_others_associates' ) ) {
+        wp_safe_redirect( home_url( '/associados/boas-vindas' ) );
+        exit;
+    }
+
     if ( in_array( 'subscriber', (array) $user->roles, true ) ) {
         wp_safe_redirect( home_url( '/associados/boas-vindas' ) );
         exit;
