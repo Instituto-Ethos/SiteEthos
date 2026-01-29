@@ -2,6 +2,16 @@
 
 namespace hacklabr;
 
+function hide_admin_bar( bool $show ): bool {
+    if ( current_user_can( 'manage_options' ) || current_user_can( 'edit_posts' ) ) {
+        return $show;
+    }
+
+    return false;
+}
+
+add_filter( 'show_admin_bar', 'hacklabr\\hide_admin_bar' );
+
 function redirect_after_login( $redirect_to, $requested_redirect_to, $user ) {
     if ( ! $user || is_wp_error( $user ) ) {
         return $redirect_to;
@@ -13,6 +23,14 @@ function redirect_after_login( $redirect_to, $requested_redirect_to, $user ) {
 
     if ( user_can( $user, 'manage_options' ) || user_can( $user, 'edit_posts' ) ) {
         return admin_url();
+    }
+
+    if ( get_user_meta( $user->ID, '_ethos_from_crm', true ) == '1' ) {
+        $welcome_page = get_page_by_path( 'boas-vindas' );
+
+        if ( $welcome_page && is_associates_area_page( $welcome_page ) ) {
+            return get_permalink( $welcome_page->ID );
+        }
     }
 
     return home_url( '/' );
