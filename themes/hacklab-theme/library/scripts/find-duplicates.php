@@ -13,7 +13,7 @@ function cli_find_duplicates () {
     $users_map = [];
 
     foreach ($users as $user) {
-        $company_id = get_user_meta($user->ID, '_ethos_crm_account_id', true);
+        $account_id = get_user_meta($user->ID, '_ethos_crm_account_id', true);
 
         $email = get_user_meta($user->ID, '_ethos_crm:emailaddress1', true);
         if (empty($email)) {
@@ -29,37 +29,43 @@ function cli_find_duplicates () {
         $email_user_parts = explode('+', $email_parts[0]);
         $normalized_email = $email_user_parts[0] . '@' . $email_parts[1];
 
-        if (!isset($users_map[$company_id][$normalized_email])) {
-            if (!isset($users_map[$company_id])) {
-                $users_map[$company_id] = [];
+        if (!isset($users_map[$account_id][$normalized_email])) {
+            if (!isset($users_map[$account_id])) {
+                $users_map[$account_id] = [];
             }
-            $users_map[$company_id][$normalized_email] = [];
+            $users_map[$account_id][$normalized_email] = [];
         }
-        $users_map[$company_id][$normalized_email][] = $user->ID;
+        $users_map[$account_id][$normalized_email][] = $user->ID;
     }
 
-    foreach ($users_map as $company_id => $users_by_company) {
-        foreach ($users_by_company as $email => $user_ids) {
+    foreach ($users_map as $account_id => $users_by_account) {
+        foreach ($users_by_account as $email => $user_ids) {
             $count = count($user_ids);
             if ($count > 1) {
-                $company_post_id = \ethos\crm\get_post_id_by_account($company_id);
-                $company_name = get_the_title($company_post_id);
+                $account_post_id = \ethos\crm\get_post_id_by_account($account_id);
+                $account_name = get_the_title($account_post_id);
 
-                \WP_CLI::log("Found $count users with email = \"$email\" on company \"$company_name\" ($company_id)\n");
+                \WP_CLI::log("Found $count contacts with email = \"$email\" on account \"$account_name\" ($account_id)\n");
 
                 foreach ($user_ids as $user_id) {
                     $user = get_user_by('ID', $user_id);
                     $user_meta = get_user_meta($user_id);
                     $user_slug = $user->user_login;
+                    $contact_id = $user_meta['_ethos_crm_contact_id'][0] ?? '';
 
                     ksort($user_meta);
 
                     \WP_CLI::log("User ID: $user_id");
                     \WP_CLI::log("User slug: $user_slug");
-                    \WP_CLI::log("User data:");
-                    foreach ($user_meta as $meta_key => $meta_values) {
-                        $meta_value = implode(' | ', $meta_values);
-                        \WP_CLI::log("    [$meta_key] => $meta_value");
+                    \WP_CLI::log("Contact ID: $contact_id");
+                    \WP_CLI::log("Contact data:");
+                    foreach ($user_meta as $meta_key => $meta_value) {
+                        if (!str_starts_with($meta_key, '_ethos_crm:')) {
+                            continue;
+                        }
+                        $attr_key = substr($meta_key, 11);
+                        $attr_value = str_replace(["\n", "\r"], ["\\n", "\\r"], implode(' | ', $meta_value));
+                        \WP_CLI::log("    [$attr_key] => $attr_value");
                     }
                     \WP_CLI::log("");
                 }
