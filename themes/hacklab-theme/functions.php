@@ -27,6 +27,7 @@ require __DIR__ . '/library/blocks/index.php';
 require __DIR__ . '/library/associates-area.php';
 require __DIR__ . '/library/remove-thumbnail-and-excerpt.php';
 require __DIR__ . '/library/shortcodes/shortcodes.php';
+require __DIR__ . '/library/scripts/index.php';
 
 require __DIR__ . '/library/forms/helpers.php';
 require __DIR__ . '/library/forms/custom-fields.php';
