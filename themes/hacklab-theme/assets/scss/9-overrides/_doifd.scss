@@ -47,7 +47,7 @@
                     color: $color--low-dark;
 
                 }
-                input[type=text]{
+                input[type=text], input[type=email], select {
                     width: 100%;
                     background-color: transparent;
                     border: $border-width--small solid $color--high-dark;
