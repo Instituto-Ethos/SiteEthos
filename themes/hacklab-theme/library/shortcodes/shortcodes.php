@@ -2,6 +2,21 @@
 
 namespace hacklabr;
 
+function nome_do_contato_shortcode ($attributes) {
+    $attrs = shortcode_atts([
+        'fallback' => '',
+        'postid' => null,
+    ], $attributes);
+
+    if (!empty($attrs['postid'])) {
+        $post_id = intval($attrs['postid']);
+    } else {
+        $post_id = null;
+    }
+
+    return get_primary_contact_name($post_id) ?: $attrs['fallback'];
+}
+
 function nome_do_gerente_shortcode ($attributes) {
     $attrs = shortcode_atts([
         'fallback' => '',
@@ -67,6 +82,7 @@ function render_company_size_shortcode() : string {
 }
 
 function register_shortcodes() {
+    add_shortcode( 'nome-do-contato', 'hacklabr\\nome_do_contato_shortcode' );
     add_shortcode( 'nome-do-gerente', 'hacklabr\\nome_do_gerente_shortcode' );
     add_shortcode( 'nome-da-empresa', 'hacklabr\\nome_da_empresa_shortcode' );
     add_shortcode( 'porte-das-organizacoes', 'hacklabr\\render_company_size_shortcode' );

@@ -1,8 +1,8 @@
 # Shortcodes
 
-## `[nome-do-gerente]`
+## `[nome-do-contato]`
 
-Exibe o nome do contato responsável por uma organização
+Exibe o nome do contato primário de uma organização
 
 Parâmetros:
 
@@ -16,10 +16,33 @@ Parâmetros:
 Exemplos:
 
 ```html
-<!-- Exibe o nome do gerente associado à organização do usuário logado, ou "(Nome do gerente)" se o usuário não estiver logado ou não tiver organização -->
+<!-- Exibe o nome do contato primário associado à organização do usuário logado, ou "(Nome do contato)" se o usuário não estiver logado ou não tiver organização -->
+[nome-do-contato fallback="(Nome do contato)"]
+
+<!-- Exibe o nome do contato primário associado à organização com ID = 10 -->
+[nome-do-contato postid="10"]
+```
+
+## `[nome-do-gerente]`
+
+Exibe o nome do gerente de conta associado a uma organização
+
+Parâmetros:
+
+- `postid`: ID da organização
+    - Tipo: `int`
+    - Default: ID da organização associada ao usuário logado
+- `fallback`: Texto caso nenhuma organização for encontrada
+    - Tipo: `string`
+    - Default: `''`
+
+Exemplos:
+
+```html
+<!-- Exibe o nome do gerente de conta associado à organização do usuário logado, ou "(Nome do gerente)" se o usuário não estiver logado ou não tiver organização -->
 [nome-do-gerente fallback="(Nome do gerente)"]
 
-<!-- Exibe o nome do gerente associado à organização com ID = 10 -->
+<!-- Exibe o nome do gerente de conta associado à organização com ID = 10 -->
 [nome-do-gerente postid="10"]
 ```
 

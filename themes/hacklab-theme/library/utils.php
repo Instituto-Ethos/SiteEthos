@@ -791,12 +791,14 @@ function get_manager_name($post_id = null) {
         return null;
     }
 
-    $organization = get_post( $post_id );
+    $owner_json = get_post_meta( $post_id, '_ethos_crm:ownerid', true );
 
-    $author_id = $organization->post_author;
-    $author = get_user_by( 'ID', $author_id );
+    if ( empty( $owner_json ) ) {
+        return null;
+    }
 
-    return $author->display_name ?? null;
+    $owner_data = json_decode( $owner_json, false );
+    return $owner_data->Name ?? null;
 }
 
 /**
@@ -825,6 +827,35 @@ function get_organization_name( $post_id = null ) {
 
     return $organization->post_title ?? null;
 }
+
+/**
+ * Retrieves the name of the primary contact associated with an organization.
+ * @param int|null $post_id The organization ID (default to current user's organization).
+ * @return string|null The display name of the contact, or null if no contact is found.
+ */
+function get_primary_contact_name($post_id = null) {
+    if ( empty( $post_id ) ) {
+        $current_user = get_current_user_id();
+
+        $organization = hacklabr\get_organization_by_user( $current_user );
+
+        if ( ! empty( $organization ) ) {
+            $post_id = $organization->ID;
+        }
+    }
+
+    if ( empty( $post_id ) ) {
+        return null;
+    }
+
+    $organization = get_post( $post_id );
+
+    $author_id = $organization->post_author;
+    $author = get_user_by( 'ID', $author_id );
+
+    return $author->display_name ?? null;
+}
+
 // Adiciona o reCAPTCHA ao formulário de redefinição de senha
 function my_custom_recaptcha_for_reset_pass() {
     if (isset($_GET['action']) && $_GET['action'] == 'reset_pass') {
