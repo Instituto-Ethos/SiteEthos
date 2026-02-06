@@ -38,14 +38,20 @@ function cli_find_duplicates () {
         $users_map[$account_id][$normalized_email][] = $user->ID;
     }
 
+    $duplicate_cases = 0;
+    $duplicate_emails = 0;
+
     foreach ($users_map as $account_id => $users_by_account) {
         foreach ($users_by_account as $email => $user_ids) {
-            $count = count($user_ids);
-            if ($count > 1) {
+            $num_contacts = count($user_ids);
+            if ($num_contacts > 1) {
+                $duplicate_cases += 1;
+                $duplicate_emails += $num_contacts;
+
                 $account_post_id = \ethos\crm\get_post_id_by_account($account_id);
                 $account_name = get_the_title($account_post_id);
 
-                \WP_CLI::log("Found $count contacts with email = \"$email\" on account \"$account_name\" ($account_id)\n");
+                \WP_CLI::log("Found $num_contacts contacts with email = \"$email\" on account \"$account_name\" ($account_id)\n");
 
                 foreach ($user_ids as $user_id) {
                     $user = get_user_by('ID', $user_id);
@@ -72,6 +78,8 @@ function cli_find_duplicates () {
             }
         }
     }
+
+    \WP_CLI::log("Found $duplicate_cases cases of duplication, consisting of $duplicate_emails contacts");
 }
 
 add_action('init', function () {
