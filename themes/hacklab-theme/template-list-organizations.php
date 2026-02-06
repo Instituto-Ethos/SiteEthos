@@ -34,7 +34,10 @@ get_header();
                         'post_type'      => 'organizacao',
                         'posts_per_page' => 10,
                         'orderby'        => 'date',
-                        'order'          => 'DESC'
+                        'order'          => 'DESC',
+                        'meta_query'     => [
+                            [ 'key' => '_ethos_crm_account_id', 'compare' => 'EXISTS', 'value' => true ],
+                        ],
                     ] );
 
                     if ( $organizations && is_array( $organizations ) ) : ?>
