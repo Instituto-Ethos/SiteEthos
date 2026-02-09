@@ -5,7 +5,22 @@ namespace hacklabr;
 function get_request_occurrence_fields () {
     $privacy_policy_url =  get_privacy_policy_url();
 
+    $subject_options = [];
+
     $fields = [
+        'assunto' => [
+            'type' => 'select',
+            'class' => '-colspan-12',
+            'label' =>__('Subject', 'hacklabr'),
+            'options' => $subject_options,
+            'required' => true,
+            'validate' => function ($value, $context) use ($subject_options) {
+                if (!array_key_exists($value, $subject_options)) {
+                    return __('Invalid subject', 'hacklabr');
+                }
+                return true;
+            },
+        ],
         'titulo' => [
             'type' => 'text',
             'class' => '-colspan-12',
@@ -31,11 +46,22 @@ function get_request_occurrence_fields () {
     return $fields;
 }
 
+function get_request_occurrence_params () {
+    $params = sanitize_form_params();
+
+    if (empty($params['assunto']) & !empty($_GET['subject'])) {
+        $params['assunto'] = filter_input(INPUT_GET, 'subject');
+    }
+
+    return $params;
+}
+
 function register_request_occurrence_form () {
     $fields = get_request_occurrence_fields();
 
     register_form('request-occurrence', __('Requests', 'hacklabr'), [
         'fields' => $fields,
+        'get_params' => 'hackalbr\\get_request_occurrence_params',
     ]);
 }
 add_action('init', 'hacklabr\\register_request_occurrence_form');
@@ -68,7 +94,7 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
 
         $attributes = [
             'caseorigincode'   => 3 /* website */,
-         // '_contactid_value' => create_crm_reference('contact', $contact_id),
+            'contactid'        => create_crm_reference('contact', $contact_id),
             'customerid'       => create_crm_reference('account', $account_id),
             'description'      => $params['descricao'],
             'title'            => $params['titulo'],
