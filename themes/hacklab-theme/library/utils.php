@@ -772,6 +772,39 @@ function list_registered_blocks() {
 // add_action('admin_notices', 'list_registered_blocks');
 
 /**
+ * Sometimes, mis-unescaped Unicode from CRM is saved on database.
+ * This function tries to fix this.
+ */
+function fix_crm_broken_unicode( string $text ): string {
+    $matches = [];
+    preg_match_all( '/u00[0-9a-fA-F]{2}/', $text, $matches );
+
+    if ( ! empty( $matches ) ) {
+        $searches = [];
+        $replaces = [];
+
+        foreach ( $matches as $match ) {
+            $search = $match[0];
+
+            if ( ! in_array( $search, $searches ) ) {
+                $replace = json_decode( '"\\' . $search . '"' );
+
+                if ( $replace ) {
+                    $searches[] = $search;
+                    $replaces[] = $replace;
+                }
+            }
+        }
+
+        if ( ! empty( $searches ) ) {
+            return str_replace( $searches, $replaces, $text );
+        }
+    }
+
+    return $text;
+}
+
+/**
  * Retrieves the name of the manager associated with an organization.
  * @param int|null $post_id The organization ID (default to current user's organization).
  * @return string|null The display name of the manager, or null if no manager is found.
@@ -798,7 +831,8 @@ function get_manager_name($post_id = null) {
     }
 
     $owner_data = json_decode( $owner_json, false );
-    return $owner_data->Name ?? null;
+    $owner_name = $owner_data->Name ?? null;
+    return $owner_name ? fix_crm_broken_unicode( $owner_name ) : null;
 }
 
 /**
