@@ -61,7 +61,7 @@ function register_request_occurrence_form () {
 
     register_form('request-occurrence', __('Requests', 'hacklabr'), [
         'fields' => $fields,
-        'get_params' => 'hackalbr\\get_request_occurrence_params',
+        'get_params' => 'hacklabr\\get_request_occurrence_params',
     ]);
 }
 add_action('init', 'hacklabr\\register_request_occurrence_form');
