@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-02-13T15:03:41+00:00\n"
-"PO-Revision-Date: 2026-02-13 12:05-0300\n"
+"POT-Creation-Date: 2026-02-13T17:47:09+00:00\n"
+"PO-Revision-Date: 2026-02-13 14:51-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -138,7 +138,7 @@ msgid "Date"
 msgstr "Data"
 
 #: library/blocks/subscription/subscription.php:59
-#: library/forms/requests.php:53
+#: library/forms/requests.php:117
 msgid "Title"
 msgstr "Título"
 
@@ -956,102 +956,82 @@ msgstr "Registro de membro - Etapa 5"
 msgid "Membership to Ethos Institute"
 msgstr "Inscrição no Instituto Ethos"
 
-#: library/forms/requests.php:9
-msgctxt "incident"
-msgid "Association"
-msgstr "Associação"
+#: library/forms/requests.php:77
+msgctxt "subject"
+msgid "Plan change"
+msgstr "Alteração de Plano"
 
-#: library/forms/requests.php:10
-msgctxt "incident"
-msgid "Denunciations"
-msgstr "Denúncia"
+#: library/forms/requests.php:78
+msgctxt "subject"
+msgid "Statement of association"
+msgstr "Declaração de Associação"
 
-#: library/forms/requests.php:11
-msgctxt "incident"
-msgid "Questions about content"
-msgstr "Perguntas sobre Conteúdos"
+#: library/forms/requests.php:79
+msgctxt "subject"
+msgid "Financial"
+msgstr "Financeiro"
 
-#: library/forms/requests.php:12
-msgctxt "incident"
-msgid "Compliments"
-msgstr "Elogios"
+#: library/forms/requests.php:80
+msgctxt "subject"
+msgid "Talk to us"
+msgstr "Fale Conosco"
 
-#: library/forms/requests.php:13
-msgctxt "incident"
-msgid "Press"
-msgstr "Imprensa"
-
-#: library/forms/requests.php:14
-msgctxt "incident"
+#: library/forms/requests.php:81
+msgctxt "subject"
 msgid "Ethos Indicators"
 msgstr "Indicadores Ethos"
 
-#: library/forms/requests.php:15
-msgctxt "incident"
-msgid "Registrations"
-msgstr "Inscrições"
+#: library/forms/requests.php:82
+msgctxt "subject"
+msgid "Courses"
+msgstr "Cursos"
 
-#: library/forms/requests.php:16
-msgctxt "incident"
-msgid "LGPD"
-msgstr "LGPD"
+#: library/forms/requests.php:83
+msgctxt "subject"
+msgid "Events"
+msgstr "Eventos"
 
-#: library/forms/requests.php:17
-msgctxt "incident"
-msgid "Pacts and Compromises"
-msgstr "Pactos e Compromissos"
+#: library/forms/requests.php:84
+msgctxt "subject"
+msgid "Lectures"
+msgstr "Palestras"
 
-#: library/forms/requests.php:18
-msgctxt "incident"
-msgid "Complaints"
-msgstr "Reclamações"
+#: library/forms/requests.php:85
+msgctxt "subject"
+msgid "Pacts"
+msgstr "Pactos"
 
-#: library/forms/requests.php:19
-msgctxt "incident"
-msgid "Suggestions"
-msgstr "Sugestões"
+#: library/forms/requests.php:86
+msgctxt "subject"
+msgid "Conference"
+msgstr "Conferência"
 
-#: library/forms/requests.php:20
-msgctxt "incident"
-msgid "Ethos Services Offerings"
-msgstr "Ofertas de Serviços Ethos"
-
-#: library/forms/requests.php:21
-msgctxt "incident"
-msgid "Work with Us"
-msgstr "Trabalhe Conosco"
-
-#: library/forms/requests.php:22
-msgctxt "incident"
+#: library/forms/requests.php:87
+msgctxt "subject"
 msgid "Other"
-msgstr "Outro"
+msgstr "Outros"
 
-#: library/forms/requests.php:23
-msgctxt "incident"
-msgid "Joint Initiatives"
-msgstr "Iniciativas Conjuntas"
-
-#: library/forms/requests.php:30
+#: library/forms/requests.php:94
 msgid "Subject"
 msgstr "Assunto"
 
-#: library/forms/requests.php:35
+#: library/forms/requests.php:99
 msgid "Invalid subject"
 msgstr "Assunto inválido"
 
-#: library/forms/requests.php:54
+#: library/forms/requests.php:118
 msgid "Request title"
 msgstr "Título da solicitação"
 
-#: library/forms/requests.php:60
+#: library/forms/requests.php:124
 msgid "Describe your requirements"
 msgstr "Descreva suas necessidades"
 
-#: library/forms/requests.php:61
+#: library/forms/requests.php:125
 msgid "Describe briefly your demand"
 msgstr "Descreva brevemente sua demanda"
 
-#: library/forms/requests.php:67
+#: library/forms/requests.php:131
 msgid ""
 "I have read and agreed with the <a href=\"%s\" target=\"_blank\">Privacy "
 "Policy</a>"
@@ -1059,7 +1039,7 @@ msgstr ""
 "Li e concordo com a <a href=\"%s\" target=\"_blank\">Política de "
 "Privacidade</a>"
 
-#: library/forms/requests.php:96
+#: library/forms/requests.php:156
 msgid "Requests"
 msgstr "Solicitações"
 

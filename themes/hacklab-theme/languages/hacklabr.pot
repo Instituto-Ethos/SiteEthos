@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-02-13T15:03:41+00:00\n"
+"POT-Creation-Date: 2026-02-13T17:47:09+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -139,7 +139,7 @@ msgid "Date"
 msgstr ""
 
 #: library/blocks/subscription/subscription.php:59
-#: library/forms/requests.php:53
+#: library/forms/requests.php:117
 msgid "Title"
 msgstr ""
 
@@ -975,106 +975,86 @@ msgstr ""
 msgid "Membership to Ethos Institute"
 msgstr ""
 
-#: library/forms/requests.php:9
-msgctxt "incident"
-msgid "Association"
+#: library/forms/requests.php:77
+msgctxt "subject"
+msgid "Plan change"
 msgstr ""
 
-#: library/forms/requests.php:10
-msgctxt "incident"
-msgid "Denunciations"
+#: library/forms/requests.php:78
+msgctxt "subject"
+msgid "Statement of association"
 msgstr ""
 
-#: library/forms/requests.php:11
-msgctxt "incident"
-msgid "Questions about content"
+#: library/forms/requests.php:79
+msgctxt "subject"
+msgid "Financial"
 msgstr ""
 
-#: library/forms/requests.php:12
-msgctxt "incident"
-msgid "Compliments"
+#: library/forms/requests.php:80
+msgctxt "subject"
+msgid "Talk to us"
 msgstr ""
 
-#: library/forms/requests.php:13
-msgctxt "incident"
-msgid "Press"
-msgstr ""
-
-#: library/forms/requests.php:14
-msgctxt "incident"
+#: library/forms/requests.php:81
+msgctxt "subject"
 msgid "Ethos Indicators"
 msgstr ""
 
-#: library/forms/requests.php:15
-msgctxt "incident"
-msgid "Registrations"
+#: library/forms/requests.php:82
+msgctxt "subject"
+msgid "Courses"
 msgstr ""
 
-#: library/forms/requests.php:16
-msgctxt "incident"
-msgid "LGPD"
+#: library/forms/requests.php:83
+msgctxt "subject"
+msgid "Events"
 msgstr ""
 
-#: library/forms/requests.php:17
-msgctxt "incident"
-msgid "Pacts and Compromises"
+#: library/forms/requests.php:84
+msgctxt "subject"
+msgid "Lectures"
 msgstr ""
 
-#: library/forms/requests.php:18
-msgctxt "incident"
-msgid "Complaints"
+#: library/forms/requests.php:85
+msgctxt "subject"
+msgid "Pacts"
 msgstr ""
 
-#: library/forms/requests.php:19
-msgctxt "incident"
-msgid "Suggestions"
+#: library/forms/requests.php:86
+msgctxt "subject"
+msgid "Conference"
 msgstr ""
 
-#: library/forms/requests.php:20
-msgctxt "incident"
-msgid "Ethos Services Offerings"
-msgstr ""
-
-#: library/forms/requests.php:21
-msgctxt "incident"
-msgid "Work with Us"
-msgstr ""
-
-#: library/forms/requests.php:22
-msgctxt "incident"
+#: library/forms/requests.php:87
+msgctxt "subject"
 msgid "Other"
 msgstr ""
 
-#: library/forms/requests.php:23
-msgctxt "incident"
-msgid "Joint Initiatives"
-msgstr ""
-
-#: library/forms/requests.php:30
+#: library/forms/requests.php:94
 msgid "Subject"
 msgstr ""
 
-#: library/forms/requests.php:35
+#: library/forms/requests.php:99
 msgid "Invalid subject"
 msgstr ""
 
-#: library/forms/requests.php:54
+#: library/forms/requests.php:118
 msgid "Request title"
 msgstr ""
 
-#: library/forms/requests.php:60
+#: library/forms/requests.php:124
 msgid "Describe your requirements"
 msgstr ""
 
-#: library/forms/requests.php:61
+#: library/forms/requests.php:125
 msgid "Describe briefly your demand"
 msgstr ""
 
-#: library/forms/requests.php:67
+#: library/forms/requests.php:131
 msgid "I have read and agreed with the <a href=\"%s\" target=\"_blank\">Privacy Policy</a>"
 msgstr ""
 
-#: library/forms/requests.php:96
+#: library/forms/requests.php:156
 msgid "Requests"
 msgstr ""
 
