@@ -562,6 +562,40 @@ function redirect_single_tribe_events_template() {
 add_action( 'template_redirect', 'redirect_single_tribe_events_template' );
 
 /**
+ * Redirect recurring event occurrences to the main event.
+ */
+function redirect_recurring_events_to_parent() {
+    if ( is_admin() || ! is_singular( 'tribe_events' ) ) {
+        return;
+    }
+
+    if ( ! function_exists( 'tribe_get_event' ) ) {
+        return;
+    }
+
+    $event     = tribe_get_event( get_queried_object_id() );
+    $parent_id = 0;
+
+    if ( isset( $event->_tec_occurrence ) && $event->_tec_occurrence instanceof \TEC\Events\Custom_Tables\V1\Models\Occurrence ) {
+        $parent_id = (int) $event->_tec_occurrence->post_id;
+    } elseif ( ! empty( $event->post_parent ) ) {
+        $parent_id = (int) $event->post_parent;
+    }
+
+    if ( ! $parent_id || $parent_id === (int) $event->ID ) {
+        return;
+    }
+
+    $parent_permalink = get_permalink( $parent_id );
+    if ( $parent_permalink && $parent_permalink !== get_permalink( $event->ID ) ) {
+        wp_safe_redirect( $parent_permalink, 301 );
+        exit;
+    }
+
+}
+add_action( 'template_redirect', 'redirect_recurring_events_to_parent', 5 );
+
+/**
  * Get the primary term of a given taxonomy
  * @param int $post_id Post ID
  * @param string $taxonomy Taxonomy slug
@@ -738,6 +772,39 @@ function list_registered_blocks() {
 // add_action('admin_notices', 'list_registered_blocks');
 
 /**
+ * Sometimes, mis-unescaped Unicode from CRM is saved on database.
+ * This function tries to fix this.
+ */
+function fix_crm_broken_unicode( string $text ): string {
+    $matches = [];
+    preg_match_all( '/u00[0-9a-fA-F]{2}/', $text, $matches );
+
+    if ( ! empty( $matches ) ) {
+        $searches = [];
+        $replaces = [];
+
+        foreach ( $matches as $match ) {
+            $search = $match[0];
+
+            if ( ! in_array( $search, $searches ) ) {
+                $replace = json_decode( '"\\' . $search . '"' );
+
+                if ( $replace ) {
+                    $searches[] = $search;
+                    $replaces[] = $replace;
+                }
+            }
+        }
+
+        if ( ! empty( $searches ) ) {
+            return str_replace( $searches, $replaces, $text );
+        }
+    }
+
+    return $text;
+}
+
+/**
  * Retrieves the name of the manager associated with an organization.
  * @param int|null $post_id The organization ID (default to current user's organization).
  * @return string|null The display name of the manager, or null if no manager is found.
@@ -757,12 +824,15 @@ function get_manager_name($post_id = null) {
         return null;
     }
 
-    $organization = get_post( $post_id );
+    $owner_json = get_post_meta( $post_id, '_ethos_crm:ownerid', true );
 
-    $author_id = $organization->post_author;
-    $author = get_user_by( 'ID', $author_id );
+    if ( empty( $owner_json ) ) {
+        return null;
+    }
 
-    return $author->display_name ?? null;
+    $owner_data = json_decode( $owner_json, false );
+    $owner_name = $owner_data->Name ?? null;
+    return $owner_name ? fix_crm_broken_unicode( $owner_name ) : null;
 }
 
 /**
@@ -791,6 +861,35 @@ function get_organization_name( $post_id = null ) {
 
     return $organization->post_title ?? null;
 }
+
+/**
+ * Retrieves the name of the primary contact associated with an organization.
+ * @param int|null $post_id The organization ID (default to current user's organization).
+ * @return string|null The display name of the contact, or null if no contact is found.
+ */
+function get_primary_contact_name($post_id = null) {
+    if ( empty( $post_id ) ) {
+        $current_user = get_current_user_id();
+
+        $organization = hacklabr\get_organization_by_user( $current_user );
+
+        if ( ! empty( $organization ) ) {
+            $post_id = $organization->ID;
+        }
+    }
+
+    if ( empty( $post_id ) ) {
+        return null;
+    }
+
+    $organization = get_post( $post_id );
+
+    $author_id = $organization->post_author;
+    $author = get_user_by( 'ID', $author_id );
+
+    return $author->display_name ?? null;
+}
+
 // Adiciona o reCAPTCHA ao formulário de redefinição de senha
 function my_custom_recaptcha_for_reset_pass() {
     if (isset($_GET['action']) && $_GET['action'] == 'reset_pass') {
@@ -945,18 +1044,7 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
-add_action('pre_get_posts', function ($query) {
-    if (is_admin() || !$query->is_main_query()) {
-        return;
-    }
 
-    if (!is_user_logged_in()) {
-        $curadoria_id = get_cat_ID('curadoria');
-        if ($curadoria_id) {
-            $query->set('category__not_in', [$curadoria_id]);
-        }
-    }
-});
 
 add_filter('posts_results', function ($posts, $query) {
     // Não afeta admin

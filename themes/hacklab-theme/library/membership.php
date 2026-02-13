@@ -10,7 +10,17 @@ function add_user_to_pmpro_group (int $user_id, int $group_id) {
     $parent_level_id = $group->group_parent_level_id;
     $child_level_id = get_pmpro_child_level($parent_level_id);
 
-    $membership = \PMProGroupAcct_Group_Member::create($user_id, $child_level_id, $group->id);
+    $existing_member = \PMProGroupAcct_Group_Member::get_group_members([
+		'group_child_user_id'  => $user_id,
+		'group_child_level_id' => $child_level_id,
+		'group_id'             => $group_id,
+    ]);
+
+    if (!empty($existing_member)) {
+        $membership = $existing_member[0];
+    } else {
+        $membership = \PMProGroupAcct_Group_Member::create($user_id, $child_level_id, $group->id);
+    }
 
     assert($membership instanceof \PMProGroupAcct_Group_Member);
 
@@ -52,7 +62,11 @@ function calculate_membership_price (int $group_id) {
 }
 
 function create_pmpro_group (int $user_id, int $level_id = 11) {
-    $group = \PMProGroupAcct_Group::create($user_id, $level_id, 100);
+    $group = \PMProGroupAcct_Group::get_group_by_parent_user_id_and_parent_level_id($user_id, $level_id);
+
+    if (empty($group)) {
+        $group = \PMProGroupAcct_Group::create($user_id, $level_id, 100);
+    }
 
     assert($group instanceof \PMProGroupAcct_Group);
 

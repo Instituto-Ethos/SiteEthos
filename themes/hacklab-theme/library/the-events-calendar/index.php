@@ -6,6 +6,26 @@ require_once get_theme_file_path( 'library/the-events-calendar/Meta_Save.php' );
 
 add_action( 'init', 'hacklabr\replace_events_meta_save_class' );
 
+// Keep past occurrences accessible: avoid TEC Pro recurrence redirect.
+add_filter( 'tribe_events_pro_detect_recurrence_redirect', '__return_false', 10, 2 );
+add_filter( 'tribe_events_pro_recurrence_redirect_url', function( $url ) {
+    $wp_query = tribe_get_global_query_object();
+
+    if ( empty( $url ) || is_null( $wp_query ) ) {
+        return $url;
+    }
+
+    $event_date = $wp_query->get( 'eventDate' );
+    $event_ts   = $event_date ? strtotime( $event_date ) : false;
+
+    // If the requested occurrence is in the past, skip redirect.
+    if ( $event_ts && $event_ts < current_time( 'timestamp' ) ) {
+        return null;
+    }
+
+    return $url;
+}, 10 );
+
 function replace_events_meta_save_class() {
     remove_action( 'save_post', [ 'Tribe__Events__Main', 'addEventMeta' ], 15 );
     add_action( 'save_post', 'hacklabr\ethos_events_save_meta', 10, 2 );

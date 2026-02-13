@@ -5,7 +5,7 @@ namespace hacklabr;
 load_theme_textdomain('hacklabr');
 
 require __DIR__ . '/library/ethos-associados-redirects.php';
-
+require __DIR__ . '/library/redirects.php';
 require __DIR__ . '/library/layout-parts/layout-parts.php';
 require __DIR__ . '/library/supports.php';
 require __DIR__ . '/library/sidebars.php';
@@ -27,6 +27,7 @@ require __DIR__ . '/library/blocks/index.php';
 require __DIR__ . '/library/associates-area.php';
 require __DIR__ . '/library/remove-thumbnail-and-excerpt.php';
 require __DIR__ . '/library/shortcodes/shortcodes.php';
+require __DIR__ . '/library/scripts/index.php';
 
 require __DIR__ . '/library/forms/helpers.php';
 require __DIR__ . '/library/forms/custom-fields.php';
@@ -83,19 +84,30 @@ add_action( 'admin_init', function() {
     add_filter( 'posts_search', function( $search, $query ) {
         global $wpdb;
 
-        if ( current_user_can( 'manage_options' ) && $query->is_main_query() && ! empty( $query->query['s'] ) ) {
-            $meta_key = 'entity_fut_projeto';
-            $like = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
-
-            $search .= $wpdb->prepare("
-                OR EXISTS (
-                    SELECT * FROM {$wpdb->postmeta}
-                    WHERE post_id = {$wpdb->posts}.ID
-                    AND meta_key = %s
-                    AND meta_value LIKE %s
-                )
-            ", $meta_key, $like);
+        if ( ! is_admin() || ! $query->is_main_query() || empty( $query->query['s'] ) || ! current_user_can( 'manage_options' ) ) {
+            return $search;
         }
+
+        $meta_key = 'entity_fut_projeto';
+        $like = '%' . $wpdb->esc_like( $query->query['s'] ) . '%';
+
+        $search = preg_replace(
+            '/^\s*AND\s*/',
+            ' AND (',
+            $search
+        );
+
+        $search .= $wpdb->prepare(
+            " OR EXISTS (
+                SELECT 1
+                FROM {$wpdb->postmeta}
+                WHERE post_id = {$wpdb->posts}.ID
+                AND meta_key = %s
+                AND meta_value LIKE %s
+            ))",
+            $meta_key,
+            $like
+        );
 
         return $search;
     }, 10, 2 );
