@@ -5,7 +5,23 @@ namespace hacklabr;
 function get_request_occurrence_fields () {
     $privacy_policy_url =  get_privacy_policy_url();
 
-    $subject_options = [];
+    $subject_options = [
+        '969830000' => _x('Association', 'incident', 'hacklabr'),
+        '969830001' => _x('Denunciations', 'incident', 'hacklabr'),
+        '969830002' => _x('Questions about content', 'incident', 'hacklabr'),
+        '969830003' => _x('Compliments', 'incident', 'hacklabr'),
+        '969830004' => _x('Press', 'incident', 'hacklabr'),
+        '969830005' => _x('Ethos Indicators', 'incident', 'hacklabr'),
+        '969830006' => _x('Registrations', 'incident', 'hacklabr'),
+        '969830007' => _x('LGPD', 'incident', 'hacklabr'),
+        '969830008' => _x('Pacts and Compromises', 'incident', 'hacklabr'),
+        '969830009' => _x('Complaints', 'incident', 'hacklabr'),
+        '969830010' => _x('Suggestions', 'incident', 'hacklabr'),
+        '490750001' => _x('Ethos Services Offerings', 'incident', 'hacklabr'),
+        '490750002' => _x('Work with Us', 'incident', 'hacklabr'),
+        '969830011' => _x('Other', 'incident', 'hacklabr'),
+        '490750000' => _x('Joint Initiatives', 'incident', 'hacklabr'),
+    ];
 
     $fields = [
         'assunto' => [
@@ -20,6 +36,16 @@ function get_request_occurrence_fields () {
                 }
                 return true;
             },
+        ],
+        'financeiro' => [
+            'type' => 'hidden',
+            'class' => '-hidden',
+            'required' => false,
+        ],
+        'relacionamento' => [
+            'type' => 'hidden',
+            'class' => '-hidden',
+            'required' => false,
         ],
         'titulo' => [
             'type' => 'text',
@@ -49,8 +75,18 @@ function get_request_occurrence_fields () {
 function get_request_occurrence_params () {
     $params = sanitize_form_params();
 
-    if (empty($params['assunto']) & !empty($_GET['subject'])) {
-        $params['assunto'] = filter_input(INPUT_GET, 'subject');
+    if (empty($params['financeiro']) & !empty($_GET['financeiro'])) {
+        $params['assunto'] = '969830011';
+        $params['financeiro'] = filter_input(INPUT_GET, 'financeiro');
+    }
+
+    if (empty($params['relacionamento']) & !empty($_GET['relacionamento'])) {
+        $params['assunto'] = '969830000';
+        $params['relacionamento'] = filter_input(INPUT_GET, 'relacionamento');
+    }
+
+    if (empty($params['assunto']) & !empty($_GET['assunto'])) {
+        $params['assunto'] = filter_input(INPUT_GET, 'assunto');
     }
 
     return $params;
@@ -93,12 +129,21 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
         $contact_id = get_user_meta($current_user, '_ethos_crm_contact_id', true);
 
         $attributes = [
-            'caseorigincode'   => 3 /* website */,
-            'contactid'        => create_crm_reference('contact', $contact_id),
-            'customerid'       => create_crm_reference('account', $account_id),
-            'description'      => $params['descricao'],
-            'title'            => $params['titulo'],
+            'caseorigincode'             => 3, // Site
+            'contactid'                  => create_crm_reference('contact', $contact_id),
+            'customerid'                 => create_crm_reference('account', $account_id),
+            'description'                => $params['descricao'],
+            'fut_pl_tipo_de_atendimento' => $params['assunto'],
+            'title'                      => $params['titulo'],
         ];
+
+        if ($params['financeiro']) {
+            $attributes['fut_pl_area'] = '969830004'; // Financeiro
+        }
+
+        if ($params['relacionamento']) {
+            $attributes['fut_pl_area'] = '969830005'; // Relacionamento e Captação
+        }
 
         try {
             $incident_id = create_crm_entity('incident', $attributes);
