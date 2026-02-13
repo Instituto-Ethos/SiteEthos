@@ -62,7 +62,11 @@ function calculate_membership_price (int $group_id) {
 }
 
 function create_pmpro_group (int $user_id, int $level_id = 11) {
-    $group = \PMProGroupAcct_Group::create($user_id, $level_id, 100);
+    $group = \PMProGroupAcct_Group::get_group_by_parent_user_id_and_parent_level_id($user_id, $level_id);
+
+    if (empty($group)) {
+        $group = \PMProGroupAcct_Group::create($user_id, $level_id, 100);
+    }
 
     assert($group instanceof \PMProGroupAcct_Group);
 
