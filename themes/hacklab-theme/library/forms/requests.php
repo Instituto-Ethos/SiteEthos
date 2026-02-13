@@ -2,10 +2,94 @@
 
 namespace hacklabr;
 
+function get_request_crm_area (string $subject): string|null {
+    switch ($subject) {
+        case 'alteracao-plano':
+        case 'declaracao-associacao':
+            return '969830005'; // Relacionamento e Captação
+        case 'eventos':
+            return '969830002'; // Eventos
+        case 'financeiro':
+            return '969830004'; // Financeiro
+        default:
+            return null;
+    }
+}
+
+function get_request_crm_project (string $subject): string|null {
+    switch ($subject) {
+        case 'conferencia':
+            return '969830008'; // Conferência Ethos
+        case 'cursos':
+            return '969830014'; // Cursos
+        case 'indicadores':
+            return '969830001'; // Indicadores Ethos
+        case 'palestras':
+            return '969830013'; // Palestras
+        default:
+            return null;
+    }
+}
+
+function get_request_crm_type (string $subject): string|null {
+    switch ($subject) {
+        case 'alteracao-plano':
+        case 'declaracao-associacao':
+            return '969830000'; // Associação
+        case 'financeiro':
+            return '969830011'; // Outros
+        case 'indicadores':
+            return '969830005'; // Indicadores Ethos - Geral
+        case 'pactos':
+            return '969830008'; // Pactos e Compromissos
+        default:
+            return null;
+    }
+}
+
 function get_request_occurrence_fields () {
     $privacy_policy_url =  get_privacy_policy_url();
 
+    $subject_options = [
+        'alteracao-plano' => _x('Plan change', 'subject', 'hacklabr'),
+        'declaracao-associacao' => _x('Statement of association', 'subject', 'hacklabr'),
+        'financeiro' => _x('Financial', 'subject', 'hacklabr'),
+        /*
+        'fale-conosco' => _x('Talk to us', 'subject', 'hacklabr'),
+        'indicadores' => _x('Ethos Indicators', 'subject', 'hacklabr'),
+        'cursos' => _x('Courses', 'subject', 'hacklabr'),
+        'eventos' => _x('Events', 'subject', 'hacklabr'),
+        'palestras' => _x('Lectures', 'subject', 'hacklabr'),
+        'pactos' => _x('Pacts', 'subject', 'hacklabr'),
+        'conferencia' => _x('Conference', 'subject', 'hacklabr'),
+        'outros' => _x('Other', 'subject', 'hacklabr'),
+        */
+    ];
+
     $fields = [
+        'assunto' => [
+            'type' => 'select',
+            'class' => '-colspan-12',
+            'label' =>__('Subject', 'hacklabr'),
+            'options' => $subject_options,
+            'required' => true,
+            'validate' => function ($value, $context) use ($subject_options) {
+                if (!array_key_exists($value, $subject_options)) {
+                    return __('Invalid subject', 'hacklabr');
+                }
+                return true;
+            },
+        ],
+        'financeiro' => [
+            'type' => 'hidden',
+            'class' => '-hidden',
+            'required' => false,
+        ],
+        'relacionamento' => [
+            'type' => 'hidden',
+            'class' => '-hidden',
+            'required' => false,
+        ],
         'titulo' => [
             'type' => 'text',
             'class' => '-colspan-12',
@@ -31,11 +115,26 @@ function get_request_occurrence_fields () {
     return $fields;
 }
 
+function get_request_occurrence_params () {
+    $params = sanitize_form_params();
+
+    if (empty($params['financeiro']) & !empty($_GET['financeiro'])) {
+        $params['assunto'] = 'financeiro';
+    }
+
+    if (empty($params['assunto']) & !empty($_GET['assunto'])) {
+        $params['assunto'] = filter_input(INPUT_GET, 'assunto');
+    }
+
+    return $params;
+}
+
 function register_request_occurrence_form () {
     $fields = get_request_occurrence_fields();
 
     register_form('request-occurrence', __('Requests', 'hacklabr'), [
         'fields' => $fields,
+        'get_params' => 'hacklabr\\get_request_occurrence_params',
     ]);
 }
 add_action('init', 'hacklabr\\register_request_occurrence_form');
@@ -67,12 +166,29 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
         $contact_id = get_user_meta($current_user, '_ethos_crm_contact_id', true);
 
         $attributes = [
-            'caseorigincode'   => 3 /* website */,
-         // '_contactid_value' => create_crm_reference('contact', $contact_id),
-            'customerid'       => create_crm_reference('account', $account_id),
-            'description'      => $params['descricao'],
-            'title'            => $params['titulo'],
+            'caseorigincode' => 3, // Site
+            'contactid'      => create_crm_reference('contact', $contact_id),
+            'customerid'     => create_crm_reference('account', $account_id),
+            'description'    => $params['descricao'],
+            'title'          => $params['titulo'],
         ];
+
+        $subject = $params['assunto'];
+
+        $crm_area = get_request_crm_area($subject);
+        if (!empty($crm_area)) {
+            $attributes['fut_pl_area'] = $crm_area;
+        }
+
+        $crm_project = get_request_crm_project($subject);
+        if (!empty($crm_project)) {
+            $attributes['fut_pl_projeto'] = $crm_project;
+        }
+
+        $crm_type = get_request_crm_type($subject);
+        if (!empty($crm_type)) {
+            $attributes['fut_pl_tipo_de_atendimento'] = $crm_type;
+        }
 
         try {
             $incident_id = create_crm_entity('incident', $attributes);
