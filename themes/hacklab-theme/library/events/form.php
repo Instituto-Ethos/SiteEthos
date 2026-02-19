@@ -19,6 +19,7 @@ function is_paid_event (int $post_id) {
 
 function get_event_registration_fields () {
     $post_id = get_the_ID();
+    $paid_event = is_paid_event($post_id);
 
     $area_options = [
         '969830000' => _x('Administration', 'area', 'hacklabr'),
@@ -94,6 +95,9 @@ function get_event_registration_fields () {
                 return true;
             },
         ],
+
+        // ...($paid_event ? get_address_fields() : []),
+
         'email' => [
             'type' => 'email',
             'class' => '-colspan-12',
@@ -190,7 +194,7 @@ function get_event_registration_fields () {
         ],
     ];
 
-    if (is_paid_event($post_id)) {
+    if ($paid_event) {
         $fields['origem_lead'] = [
             'type' => 'select',
             'class' => '-colspan-12',
