@@ -168,6 +168,21 @@ function create_registration_lead (array $params) {
         $attributes['leadsourcecode'] = intval($params['origem_lead']);
     }
 
+    $address_map = [
+        'end_bairro'      => 'address1_line3',
+        'end_cep'         => 'address1_postalcode',
+        'end_complemento' => 'address1_line2',
+        'end_cidade'      => 'address1_city',
+        'end_logradouro'  => 'fut_address1_logradouro',
+        'end_numero'      => 'fut_address1_nro',
+    ];
+
+    foreach ($address_map as $param_key => $attr_key) {
+        if (!empty($params[$param_key])) {
+            $attributes[$attr_key] = $params[$param_key];
+        }
+    }
+
     return create_crm_entity('lead', $attributes);
 }
 

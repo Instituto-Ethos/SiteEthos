@@ -125,6 +125,8 @@ function map_lead_attributes( int $post_id ) {
     $attributes = [
         'ownerid'                    => \hacklabr\create_crm_reference( 'systemuser', $systemuser ),
         'address1_city'              => get_meta( $post_meta, 'end_cidade' ),
+        'address1_line2'             => get_meta( $post_meta, 'end_complemento' ),
+        'address1_line3'             => get_meta( $post_meta, 'end_bairro' ),
         'address1_postalcode'        => get_meta( $post_meta, 'end_cep' ),
         'companyname'                => $company_name,
         'entityimage_url'            => get_the_post_thumbnail_url( $post_id ),
