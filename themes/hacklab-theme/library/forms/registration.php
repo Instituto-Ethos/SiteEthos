@@ -63,36 +63,6 @@ function get_registration_step1_fields () {
         'large' => __('Large business', 'hacklabr'),
     ];
 
-    $states_options = [
-		'AC' => 'Acre',
-		'AL' => 'Alagoas',
-		'AP' => 'Amapá',
-		'AM' => 'Amazonas',
-		'BA' => 'Bahia',
-		'CE' => 'Ceará',
-		'DF' => 'Distrito Federal',
-		'ES' => 'Espírito Santo',
-		'GO' => 'Goiás',
-		'MA' => 'Maranhão',
-		'MT' => 'Mato Grosso',
-		'MS' => 'Mato Grosso do Sul',
-		'MG' => 'Minas Gerais',
-		'PA' => 'Pará',
-		'PB' => 'Paraíba',
-		'PR' => 'Paraná',
-		'PE' => 'Pernambuco',
-		'PI' => 'Piauí',
-		'RJ' => 'Rio de Janeiro',
-		'RN' => 'Rio Grande do Norte',
-		'RS' => 'Rio Grande do Sul',
-		'RO' => 'Rondônia',
-		'RR' => 'Roraima',
-		'SC' => 'Santa Catarina',
-		'SP' => 'São Paulo',
-		'SE' => 'Sergipe',
-		'TO' => 'Tocantins',
-	];
-
     $privacy_policy_url =  get_privacy_policy_url();
     $code_of_conduct_url = wp_get_upload_dir()['baseurl'] . '/2024/07/Codigo-de-Conduta_final.pdf';
 
@@ -226,67 +196,9 @@ function get_registration_step1_fields () {
                 return true;
             },
         ],
-        'end_logradouro' => [
-            'type' => 'text',
-            'class' => '-colspan-9',
-            'label' => __('Address (street)', 'hacklabr'),
-            'placeholder' => __('Enter the address street', 'hacklabr'),
-            'required' => true,
-        ],
-        'end_numero' => [
-            'type' => 'text',
-            'class' => '-colspan-3',
-            'label' => _x('Number', 'address', 'hacklabr'),
-            'required' => true,
-        ],
-        'end_complemento' => [
-            'type' => 'text',
-            'class' => '-colspan-6',
-            'label' => _x('Complement', 'address', 'hacklabr'),
-            'placeholder' => __('Enter the address complement', 'hacklabr'),
-            'required' => false,
-        ],
-        'end_bairro' => [
-            'type' => 'text',
-            'class' => '-colspan-6',
-            'label' => __('Neighborhood', 'hacklabr'),
-            'placeholder' => __('Enter the neighborhood', 'hacklabr'),
-            'required' => true,
-        ],
-        'end_cidade' => [
-            'type' => 'text',
-            'class' => '-colspan-12',
-            'label' => __('City', 'hacklabr'),
-            'placeholder' => __('Enter the city', 'hacklabr'),
-            'required' => true,
-        ],
-        'end_estado' => [
-            'type' => 'select',
-            'class' => '-colspan-6',
-            'label' => _x('State', 'address', 'hacklabr'),
-            'options' => $states_options,
-            'required' => true,
-            'validate' => function ($value, $context) use ($states_options) {
-                if (!array_key_exists($value, $states_options)) {
-                    return _x('Invalid state', 'address', 'hacklabr');
-                }
-                return true;
-            },
-        ],
-        'end_cep' => [
-            'type' => 'masked',
-            'class' => '-colspan-6',
-            'label' => __('CEP code', 'hacklabr'),
-            'mask' => '00000-000',
-            'placeholder' => __('Enter the CEP code', 'hacklabr'),
-            'required' => true,
-            'validate' => function ($value, $context) {
-                if (!is_numeric($value) || strlen($value) !== 8) {
-                    return __('Invalid CEP code', 'hacklabr');
-                }
-                return true;
-            },
-        ],
+
+        ...get_address_fields(),
+
         'termos_de_uso' => [
             'type' => 'checkbox',
             'class' => '-colspan-12',
