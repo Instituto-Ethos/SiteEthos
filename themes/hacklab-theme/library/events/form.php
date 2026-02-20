@@ -234,7 +234,13 @@ function get_event_registration_fields () {
 }
 
 function get_event_registration_params () {
-    $params = sanitize_form_params();
+    global $hl_event_registration;
+    // On redirect after event submission, don't fill the form
+    if (empty($hl_event_registration)) {
+        $params = sanitize_form_params();
+    } else {
+        $params = [];
+    }
 
     $user_id = get_current_user_id();
 
