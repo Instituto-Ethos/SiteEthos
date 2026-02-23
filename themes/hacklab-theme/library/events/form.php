@@ -235,8 +235,7 @@ function get_event_registration_fields () {
 
 function get_event_registration_params () {
     global $hl_event_registration;
-    // On redirect after event submission, don't fill the form
-    if (empty($hl_event_registration)) {
+    if (empty($hl_event_registration) || $hl_event_registration['clear'] === false) {
         $params = sanitize_form_params();
     } else {
         $params = [];
