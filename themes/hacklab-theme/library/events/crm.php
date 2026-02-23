@@ -69,6 +69,12 @@ function create_registration (int $post_id, array $params) {
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
 
+    if (is_paid_event($post_id)) {
+        $attibutes['fut_set_statusoperacao'] = 969830000; // Sem status
+    } else {
+        $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
+    }
+
     if (!empty($account_id)) {
         $attibutes['fut_lk_empresa']           = create_crm_reference('account', $account_id);
         $attibutes['fut_lk_empresa_associada'] = create_crm_reference('account', $account_id);
