@@ -338,11 +338,25 @@ function wrap_event_registration_form (string $form_html, array $form) {
 
     $message_template = "<div class='form__message form__message--%s'>%s</div>\n";
     $message = '';
+    $awaiting_payment = false;
+
     if (!empty($hl_event_registration)) {
         $message = sprintf($message_template, $hl_event_registration['status'], $hl_event_registration['message']);
+        $awaiting_payment = is_paid_event($post_id);
     } elseif (!registrations_are_open($post_id)) {
         $message = sprintf($message_template, 'error', __('Registrations are closed.', 'hacklabr'));
         return $heading . $message;
+    }
+
+    if ($awaiting_payment) {
+        $params = get_event_registration_params();
+        $checkout = render_event_checkout(
+            $post_id,
+            $params,
+            __('Pay', 'hacklabr'),
+            'getnet-payment-button'
+        );
+        return $heading . $message . $checkout;
     }
 
     $form_html = $heading . $message . $form_html;

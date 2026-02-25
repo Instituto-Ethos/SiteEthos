@@ -56,6 +56,8 @@ function create_registration (int $post_id, array $params) {
     $account_id = get_registration_account($params);
     $contact_id = get_registration_contact($params);
 
+    $paid_event = is_paid_event($post_id);
+
     $availability = check_event_availability($post_id, $project_id, $contact_id);
     if (!empty($availability['status'])) {
         return $availability;
@@ -69,7 +71,8 @@ function create_registration (int $post_id, array $params) {
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
 
-    if (is_paid_event($post_id)) {
+    if ($paid_event) {
+        $attibutes['fut_bl_exibecamposfinanceiros'] = true;
         $attibutes['fut_set_statusoperacao'] = 969830000; // Sem status
     } else {
         $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
@@ -88,10 +91,16 @@ function create_registration (int $post_id, array $params) {
     try {
         $entity_id = create_crm_entity('fut_participante', $attibutes);
 
+        if ($paid_event) {
+            $message = __('You are registered to this event, by payment is pending.', 'hacklabr');
+        } else {
+            $message = __('You are successfully registered to this event!', 'hacklabr');
+        }
+
         return [
-            'clear'     => true,
+            'clear'     => !$paid_event,
             'status'    => 'success',
-            'message'   => __('You are successfully registered to this event!', 'hacklabr'),
+            'message'   => $message,
             'entity_id' => $entity_id,
         ];
     } catch (\Exception $e) {
@@ -169,6 +178,18 @@ function create_registration_lead (array $params) {
         'yomifullname'               => $company_name,
         'yomilastname'               => $last_name,
     ];
+
+    $optional_fields = [
+        // 'fut_pl_area'             => 'area',
+        // 'fut_pl_nivelhierarquico' => 'nivel_hierarquico',
+        'jobtitle'                => 'cargo',
+        'telephone1'              => 'telefone',
+    ];
+    foreach ($optional_fields as $attribute_key => $param_key) {
+        if ($value = trim($params[$param_key] ?? '')) {
+            $attributes[$attribute_key] = $value;
+        }
+    }
 
     if (!empty($params['origem_lead'])) {
         $attributes['leadsourcecode'] = intval($params['origem_lead']);
@@ -290,19 +311,18 @@ function get_registration_lead (array $params): string|null {
         }
 
         // Case 3. Retrieve UUID directly from CRM leads
-        // $leads = get_crm_entities('lead', [
-        //     'filters' => [
-        //         'fut_st_cnpjsemmascara' => $params['cnpj'],
-        //     ],
-        // ]);
-        // if (!empty($leads->Entities)) {
-        //     return $leads->Entities[0]->Id;
-        // }
+        $leads = get_crm_entities('lead', [
+            'filters' => [
+                'fut_st_cnpjsemmascara' => $params['cnpj'],
+            ],
+        ]);
+        if (!empty($leads->Entities)) {
+            return $leads->Entities[0]->Id;
+        }
     }
 
     // Case 4. If lead does not exist, create it, and return its UUID
-    // return create_registration_lead($params);
-    return null;
+    return create_registration_lead($params);
 }
 
 function registrations_are_open (int $post_id): bool {
