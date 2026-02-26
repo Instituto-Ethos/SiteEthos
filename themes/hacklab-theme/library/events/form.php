@@ -209,6 +209,13 @@ function get_event_registration_fields () {
             },
         ];
 
+        $fields['estudante'] = [
+            'type' => 'checkbox',
+            'class' => '-colspan-12',
+            'label' => __('I am a student or a teacher', 'hacklabr'),
+            'required' => false,
+        ];
+
         $fields['voucher'] = [
             'type' => 'text',
             'class' => '-colspan-12',

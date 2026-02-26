@@ -66,7 +66,7 @@ function create_registration (int $post_id, array $params) {
     $attibutes = [
         'fut_lk_contato'        => create_crm_reference('contact', $contact_id),
         'fut_lk_fatura_pf'      => create_crm_reference('contact', $contact_id),
-        'fut_pl_cortesia'       => 969830000, // @TODO
+        'fut_pl_cortesia'       => get_courtesy_type($post_id, $contact_id, $account_id),
         'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
