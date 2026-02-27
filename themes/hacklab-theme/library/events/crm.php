@@ -282,7 +282,7 @@ function get_registration_contact (array $params): string {
     // Case 3. Retrieve UUID directly from CRM contacts
     $contacts = get_crm_entities('contact', [
         'filters' => [
-            'emailaddress1' => $params['email'],
+            'fut_st_cpf' => format_cpf(trim($params['cpf'])),
         ],
     ]);
     if (!empty($contacts->Entities)) {
