@@ -9,6 +9,10 @@
 	path = plugins/EthosDynamics365IntegrationPlugin
 	url = git@github.com:Ethos-ti/EthosDynamics365IntegrationPlugin.git
 	branch = main
+[submodule "plugins/EthosPaymentIntegrationPlugin"]
+	path = plugins/EthosPaymentIntegrationPlugin
+	url = git@github.com:Instituto-Ethos/EthosPaymentIntegrationPlugin.git
+	branch = main
 [submodule "plugins/ethos-associados"]
 	path = plugins/ethos-associados
 	url = git@github.com:Ethos-ti/EthosDynamics365IntegrationSOAPLegacyPlugin
