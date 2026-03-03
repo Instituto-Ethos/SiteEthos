@@ -44,6 +44,38 @@ function add_associates_rewrite_rule() {
 }
 add_action( 'init', 'hacklabr\\add_associates_rewrite_rule' );
 
+function persist_managed_organization(): void {
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+        $current_cookie = isset( $_COOKIE['organization_id'] ) ? intval( $_COOKIE['organization_id'] ) : 0;
+
+        if ( $organization_id && ( $organization_id !== $current_cookie ) && get_post_type( $organization_id ) === 'organizacao' ) {
+            setcookie( 'organization_id', (string) $organization_id, strtotime( '+8 hours' ) );
+        }
+    }
+}
+add_action( 'init', 'hacklabr\\persist_managed_organization', 10 );
+
+function clean_managed_organization_on_logout(): void {
+    if ( isset( $_COOKIE['organization_id'] ) ) {
+        setcookie( 'organization_id', $_COOKIE['organization_id'], 1 );
+    }
+}
+add_action( 'wp_logout', 'hacklabr\\clean_managed_organization_on_logout' );
+
+function get_managed_organization_id(): int|null {
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_COOKIE['organization_id'] ) ? intval( $_COOKIE['organization_id'] ) : 0;
+
+        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+            return $organization_id;
+        }
+    }
+
+    return null;
+}
+
 function is_associates_area_page( \WP_Post|int|null $post = null ): bool {
     return get_page_template_slug( $post ) == 'template-associates-area.php';
 }

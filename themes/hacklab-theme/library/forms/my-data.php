@@ -13,7 +13,7 @@ function get_my_data_params ($form) {
      * Determines the appropriate user ID based on the current user's capabilities and request parameters.
      *
      * - If the current user has the 'edit_others_associates' capability, attempts to retrieve the 'organization' ID
-     *   from the GET parameters. If a valid organization ID is provided and its post type is 'organizacao',
+     *   from the cookies. If a valid organization ID is provided and its post type is 'organizacao',
      *   sets $user_id to the author of that organization post.
      * - Otherwise, sets $user_id to the ID of the currently logged-in user.
      *
@@ -21,9 +21,9 @@ function get_my_data_params ($form) {
      */
     $user_id = 0;
     if ( current_user_can( 'edit_others_associates' ) ) {
-        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+        $organization_id = get_managed_organization_id();
 
-        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+        if ( $organization_id ) {
             $user_id = get_post_field( 'post_author', $organization_id );
         }
     } else {
