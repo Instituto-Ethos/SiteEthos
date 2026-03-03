@@ -784,6 +784,10 @@ function fix_crm_broken_unicode( string $text ): string {
         $replaces = [];
 
         foreach ( $matches as $match ) {
+            if ( empty ( $match ) ) {
+                continue;
+            }
+
             $search = $match[0];
 
             if ( ! in_array( $search, $searches ) ) {
