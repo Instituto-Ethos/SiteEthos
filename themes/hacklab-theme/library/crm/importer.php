@@ -351,7 +351,7 @@ function update_from_account( Entity $account, \WP_Post $post ) {
 
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
 
-    if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) ) {
+    if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) && ! empty( $attributes['fut_pl_tipo_associacao'] ) ) {
         $group_id = create_primary_contact( $post_id, $account );
     }
 
