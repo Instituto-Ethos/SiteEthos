@@ -918,7 +918,9 @@ function validate_registration_form ($form_id, $form, $params) {
             'meta_input' => $user_meta,
         ]);
 
-        add_user_to_pmpro_group($user_id, $group_id);
+        if (!empty($group_id)) {
+            add_user_to_pmpro_group($user_id, $group_id);
+        }
 
         \ethos\crm\create_contact($user_id, $post->ID);
 

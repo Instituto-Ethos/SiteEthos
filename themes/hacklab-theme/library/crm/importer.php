@@ -253,12 +253,14 @@ function create_from_account( Entity $account ) {
     if ( ! empty( $attributes['primarycontactid'] ) && ! empty( $attributes['fut_pl_tipo_associacao'] ) ) {
         $group_id = create_primary_contact( $post_id, $account );
 
-        if ( ! empty( $attributes['fut_lk_contato_alternativo'] ) || ! empty( $attributes['fut_lk_contato_alternativo2'] ) ) {
-            create_secondary_contacts( $account, $group_id );
-        }
+        if ( ! empty( $group_id ) ) {
+            if ( ! empty( $attributes['fut_lk_contato_alternativo'] ) || ! empty( $attributes['fut_lk_contato_alternativo2'] ) ) {
+                create_secondary_contacts( $account, $group_id );
+            }
 
-        if ( ! empty( $attributes['i4d_aprovador_cortesia'] ) ) {
-            create_approver( $account, $group_id );
+            if ( ! empty( $attributes['i4d_aprovador_cortesia'] ) ) {
+                create_approver( $account, $group_id );
+            }
         }
     }
 
@@ -551,7 +553,10 @@ function create_from_contact( Entity $contact, Entity $account ) {
 
     $post_id = get_post_id_by_account( $account->Id );
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
-    add_user_to_group( $user_id, $group_id );
+
+    if ( ! empty( $group_id ) ) {
+        add_user_to_group( $user_id, $group_id );
+    }
 
     if ( empty( $existing_user_by_email ) ) {
         do_action( 'ethos_crm:log', "Created user with ID = $user_id", 'debug' );
