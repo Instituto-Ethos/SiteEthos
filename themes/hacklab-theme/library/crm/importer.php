@@ -205,22 +205,24 @@ function delete_from_account( \WP_Post $post ) {
 
     $group_id = (int) get_post_meta( $post->ID, '_pmpro_group', true );
 
-    $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_group_members', [
-        'group_id' => $group_id,
-    ], [ '%d' ] );
+    if ( ! empty( $group_id ) ) {
+        $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_group_members', [
+            'group_id' => $group_id,
+        ], [ '%d' ] );
 
-    $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_group', [
-        'id' => $group_id,
-    ], [ '%d' ] );
+        $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_group', [
+            'id' => $group_id,
+        ], [ '%d' ] );
 
-    $users = get_users( [
-        'meta_query' => [
-            [ 'key' => '_pmpro_group', 'value' => $group_id ],
-        ],
-    ] );
+        $users = get_users( [
+            'meta_query' => [
+                [ 'key' => '_pmpro_group', 'value' => $group_id ],
+            ],
+        ] );
 
-    foreach ( $users as $user ) {
-        wp_delete_user( $user->ID, null );
+        foreach ( $users as $user ) {
+            wp_delete_user( $user->ID, null );
+        }
     }
 
     wp_delete_post( $post->ID, true );
@@ -337,6 +339,8 @@ function create_approver( Entity $account, int $group_id ) {
 }
 
 function update_from_account( Entity $account, \WP_Post $post ) {
+    $attributes = $account->Attributes;
+
     $post_meta = parse_account_into_post_meta( $account );
 
     $post_id = wp_update_post( [
@@ -346,9 +350,16 @@ function update_from_account( Entity $account, \WP_Post $post ) {
     ] );
 
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
-    $group = \hacklabr\get_pmpro_group( $group_id );
 
-    $attributes = $account->Attributes;
+    if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) ) {
+        $group_id = create_primary_contact( $post_id, $account );
+    }
+
+    if ( ! empty( $group_id ) ) {
+        $group = \hacklabr\get_pmpro_group( $group_id );
+    } else {
+        $group = null;
+    }
 
     /**
      * Updates the primary contact, secondary contacts, and approver for a PMPro group based on the provided account information.
@@ -449,7 +460,7 @@ function replace_approver( Entity $account, \PMProGroupAcct_Group $group ) {
     }
 }
 
-function import_account( Entity $account, bool $force_update = false ) {
+function import_account( Entity $account, bool $force_update = false ): int | null {
     $account_id = $account->Id;
 
     $account_name = $account->Attributes['name'] ?? '';
@@ -461,15 +472,18 @@ function import_account( Entity $account, bool $force_update = false ) {
         ],
     ] );
 
+    $post_id = null;
+
     if ( empty( $existing_post ) ) {
         if ( is_active_account( $account ) ) {
             do_action( 'ethos_crm:log', "Creating account $account_name - $account_id", 'debug' );
-            create_from_account( $account );
+            $post_id = create_from_account( $account );
         } else {
             do_action( 'ethos_crm:log', "Skipping account $account_name - $account_id", 'debug' );
         }
     } else {
         if ( is_active_account( $account ) ) {
+            $post_id = $existing_post->ID;
             if ( $force_update ) {
                 do_action( 'ethos_crm:log', "Updating account $account_name - $account_id", 'debug' );
                 update_from_account( $account, $existing_post );
@@ -480,6 +494,12 @@ function import_account( Entity $account, bool $force_update = false ) {
             do_action( 'ethos_crm:log', "Deleting account $account_name - $account_id", 'debug' );
             delete_from_account( $existing_post );
         }
+    }
+
+    if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
+        return null;
+    } else {
+        return $post_id;
     }
 }
 
@@ -555,7 +575,7 @@ function update_from_contact( Entity $contact, Entity $account, \WP_User $user )
     return $user_id;
 }
 
-function import_contact( Entity $contact, Entity|null $account = null, bool $force_update = false ) {
+function import_contact( Entity $contact, Entity|null $account = null, bool $force_update = false ): int | null {
     $contact_id = $contact->Id;
     $attributes = $contact->Attributes;
 
@@ -577,10 +597,12 @@ function import_contact( Entity $contact, Entity|null $account = null, bool $for
         ],
     ] );
 
+    $user_id = null;
+
     if ( empty( $existing_user ) ) {
         if ( is_active_contact( $contact ) ) {
             do_action( 'ethos_crm:log', "Creating contact $contact_name - $contact_id", 'debug' );
-            create_from_contact( $contact, $account );
+            $user_id = create_from_contact( $contact, $account );
         } else {
             do_action( 'ethos_crm:log', "Skipping contact $contact_name - $contact_id", 'debug' );
         }
@@ -592,19 +614,32 @@ function import_contact( Entity $contact, Entity|null $account = null, bool $for
             } else {
                 do_action( 'ethos_crm:log', "Skipping contact $contact_name - $contact_id", 'debug' );
             }
+            $user_id = $existing_user->ID;
         } else {
             do_action( 'ethos_crm:log', "Deleting contact $contact_name - $contact_id", 'debug' );
             delete_from_contact( $existing_user );
         }
     }
+
+    if ( empty( $user_id ) || is_wp_error( $user_id ) ) {
+        return null;
+    } else {
+        return $user_id;
+    }
 }
 
-function import_fut_projeto (Entity $entity) {
+function import_fut_projeto (Entity $entity): int | null {
     $post_id = \hacklabr\event_exists_on_wp( $entity->Id );
 
     if ( empty( $post_id ) ) {
-        \hacklabr\create_event_on_wp( $entity );
+        $post_id = \hacklabr\create_event_on_wp( $entity );
     } else {
         \hacklabr\update_event_on_wp( $post_id, $entity );
+    }
+
+    if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
+        return null;
+    } else {
+        return $post_id;
     }
 }
