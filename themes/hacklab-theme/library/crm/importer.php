@@ -281,6 +281,20 @@ function add_user_to_group( int $user_id, int $group_id ) {
     return $group_id;
 }
 
+function add_all_users_to_group( Entity $account, int $group_id ) {
+    $company_users = get_users( [
+        'meta_query' => [
+            [ 'key' => '_ethos_crm_account_id', 'value' => $account->Id ],
+        ],
+    ]);
+
+    foreach ( $company_users as $user ) {
+        add_user_to_group( $user->ID, $group_id );
+    }
+
+    return $group_id;
+}
+
 function create_primary_contact( int $post_id, Entity $account ) {
     $account_id = $account->Id;
     $attributes = $account->Attributes;
@@ -363,15 +377,6 @@ function update_from_account( Entity $account, \WP_Post $post ) {
         $group = null;
     }
 
-    /**
-     * Updates the primary contact, secondary contacts, and approver for a PMPro group based on the provided account information.
-     *
-     * This function is responsible for managing the user associations for a PMPro group based on the data from the provided account entity.
-     * It will update the primary contact, add or remove secondary contacts, and update the approver for the group as necessary.
-     *
-     * @param Entity $account The account entity containing the updated contact information.
-     * @param \PMProGroupAcct_Group $group The PMPro group to update.
-     */
     if ( ! empty( $group ) ) {
         if ( ! empty( $attributes['primarycontactid'] ) ) {
             replace_primary_contact( $account, $group );
@@ -384,6 +389,8 @@ function update_from_account( Entity $account, \WP_Post $post ) {
         if ( ! empty( $attributes['i4d_aprovador_cortesia'] ) ) {
             replace_approver( $account, $group );
         }
+
+        add_all_users_to_group( $account, $group_id );
     }
 
     return $post_id;
