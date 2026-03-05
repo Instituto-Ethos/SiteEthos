@@ -30,6 +30,11 @@ function sanitize_number( string $string ) {
 function generate_unique_email( string $email, Entity $account ) {
     $email_parts = explode( '@', $email );
     $folder = sanitize_title( $account->Attributes['name'] );
+
+    if ( empty( $email_parts[0] ) || empty( $folder ) || empty( $email_parts[1] ) ) {
+        return null;
+    }
+
     return $email_parts[0] . '+' . $folder . '@' . $email_parts[1];
 }
 
@@ -169,6 +174,10 @@ function parse_contact_into_user_meta( Entity $contact, Entity|null $account ) {
     $email = trim( $attributes['emailaddress1'] ?? '@' );
     if ( ! empty( $account ) && is_subsidiary_company( $account ) ) {
         $email = generate_unique_email( $email, $account );
+    }
+
+    if ( empty( $email ) ) {
+        return null;
     }
 
     $user_meta = [
@@ -529,6 +538,10 @@ function create_from_contact( Entity $contact, Entity $account ) {
     $user_meta = parse_contact_into_user_meta( $contact, $account );
     $user_meta['_ethos_from_crm'] = 1;
 
+    if ( empty( $user_meta['email'] ) ) {
+        return null;
+    }
+
     $existing_user_by_email = get_user_by( 'email', $user_meta['email'] );
 
     if ( empty( $existing_user_by_email ) ) {
@@ -576,6 +589,10 @@ function create_from_contact( Entity $contact, Entity $account ) {
 
 function update_from_contact( Entity $contact, Entity $account, \WP_User $user ) {
     $user_meta = parse_contact_into_user_meta( $contact, $account );
+
+    if ( empty( $user_meta['email'] ) ) {
+        return null;
+    }
 
     $user_id = wp_update_user( [
         'ID' => $user->ID,
