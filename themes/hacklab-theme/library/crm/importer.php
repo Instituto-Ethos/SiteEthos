@@ -342,15 +342,21 @@ function create_secondary_contacts( Entity $account, int $group_id ) {
     $attributes = $account->Attributes;
 
     if ( ! empty( $attributes['fut_lk_contato_alternativo'] ) ) {
-        $user_id = get_contact( $attributes['fut_lk_contato_alternativo']->Id, $account_id ) ?? 0;
-        add_user_to_group( $user_id, $group_id );
-        update_user_meta( $user_id, '_ethos_admin', 1 );
+        $user_id = get_contact( $attributes['fut_lk_contato_alternativo']->Id, $account_id );
+
+        if ( $user_id && ! is_wp_error( $user_id ) ) {
+            add_user_to_group( $user_id, $group_id );
+            update_user_meta( $user_id, '_ethos_admin', 1 );
+        }
     }
 
     if ( ! empty( $attributes['fut_lk_contato_alternativo2'] ) ) {
-        $user_id = get_contact( $attributes['fut_lk_contato_alternativo2']->Id, $account_id ) ?? 0;
-        add_user_to_group( $user_id, $group_id );
-        update_user_meta( $user_id, '_ethos_admin', 1 );
+        $user_id = get_contact( $attributes['fut_lk_contato_alternativo2']->Id, $account_id );
+
+        if ( $user_id && ! is_wp_error( $user_id ) ) {
+            add_user_to_group( $user_id, $group_id );
+            update_user_meta( $user_id, '_ethos_admin', 1 );
+        }
     }
 }
 
@@ -358,9 +364,12 @@ function create_approver( Entity $account, int $group_id ) {
     $account_id = $account->Id;
     $attributes = $account->Attributes;
 
-    $user_id = get_contact( $attributes['i4d_aprovador_cortesia']->Id, $account_id ) ?? 0;
-    add_user_to_group( $user_id, $group_id );
-    update_user_meta( $user_id, '_ethos_approver', 1 );
+    $user_id = get_contact( $attributes['i4d_aprovador_cortesia']->Id, $account_id );
+
+    if ( $user_id && ! is_wp_error( $user_id ) ) {
+        add_user_to_group( $user_id, $group_id );
+        update_user_meta( $user_id, '_ethos_approver', 1 );
+    }
 }
 
 function update_from_account( Entity $account, \WP_Post $post ) {
@@ -411,11 +420,14 @@ function replace_primary_contact( Entity $account, \PMProGroupAcct_Group $group 
 
     $current_parent = $group->group_parent_user_id;
 
-    $user_id = get_contact( $attributes['primarycontactid']->Id, $account_id ) ?? 0;
-    update_user_meta( $user_id, '_ethos_admin', 1 );
+    $user_id = get_contact( $attributes['primarycontactid']->Id, $account_id );
 
-    if ( $current_parent !== $user_id ) {
-        \hacklabr\update_group_parent( $group->id, $user_id );
+    if ( $user_id && ! is_wp_error( $user_id ) ) {
+        update_user_meta( $user_id, '_ethos_admin', 1 );
+
+        if ( $current_parent !== $user_id ) {
+            \hacklabr\update_group_parent( $group->id, $user_id );
+        }
     }
 }
 
@@ -435,8 +447,11 @@ function replace_secondary_contacts( Entity $account, \PMProGroupAcct_Group $gro
 
     foreach ( $new_contacts as $new_contact ) {
         $user_id = get_contact( $new_contact, $account_id );
-        add_user_to_group( $user_id, $group_id );
-        update_user_meta( $user_id, '_ethos_admin', 1 );
+
+        if ( $user_id && ! is_wp_error( $user_id ) ) {
+            add_user_to_group( $user_id, $group_id );
+            update_user_meta( $user_id, '_ethos_admin', 1 );
+        }
     }
 
     $new_contacts[] = $current_parent_contact;
