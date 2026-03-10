@@ -49,7 +49,7 @@ get_header();
                             <?php endforeach; ?>
                         </ul>
                     <?php else : ?>
-                            <p><?= __( 'No organizations found.', 'hacklabr' ) ?></p>
+                            <p style="display: none;"><?= __( 'No organizations found.', 'hacklabr' ) ?></p>
                     <?php endif; ?>
                 </div>
             </div>
