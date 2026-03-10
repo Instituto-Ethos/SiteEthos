@@ -775,7 +775,11 @@ function list_registered_blocks() {
  * Sometimes, mis-unescaped Unicode from CRM is saved on database.
  * This function tries to fix this.
  */
-function fix_crm_broken_unicode( string $text ): string {
+function fix_crm_broken_unicode( string|null $text ): string|null {
+    if ( is_null( $text ) ) {
+        return null;
+    }
+
     $matches = [];
     preg_match_all( '/u00[0-9a-fA-F]{2}/', $text, $matches );
 
@@ -834,9 +838,19 @@ function get_manager_name($post_id = null) {
         return null;
     }
 
-    $owner_data = json_decode( $owner_json, false );
-    $owner_name = $owner_data->Name ?? null;
-    return $owner_name ? fix_crm_broken_unicode( $owner_name ) : null;
+    $owner_ref = json_decode( $owner_json, false );
+    $owner_entity = hacklabr\get_crm_entity_by_id( 'systemuser', $owner_ref->Id );
+
+    $owner_name = $owner_entity->Attributes['fullname'] ?? fix_crm_broken_unicode( $owner_ref->Name ?? null );
+    $owner_email = $owner_entity->Attributes['internalemailaddress'] ?? null;
+
+    if ( $owner_email && $owner_name ) {
+        return sprintf( '<a href="mailto:%s">%s</a>', $owner_email, $owner_name );
+    } elseif ( $owner_name ) {
+        return $owner_name;
+    } else {
+        return null;
+    }
 }
 
 /**
