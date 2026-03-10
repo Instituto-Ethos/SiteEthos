@@ -85,6 +85,7 @@
             if (!res.ok) throw new Error(`HTTP ${res.status}`)
             const data = await res.json()
             const items = Array.isArray(data) ? data : []
+            listWrapper.style.display = ''
             renderList(items)
         } catch (err) {
             if (err.name === 'AbortError') return;
