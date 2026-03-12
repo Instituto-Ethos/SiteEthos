@@ -350,9 +350,14 @@ function wrap_event_registration_form (string $form_html, array $form) {
     if (!empty($hl_event_registration)) {
         $message = sprintf($message_template, $hl_event_registration['status'], $hl_event_registration['message']);
         $awaiting_payment = is_paid_event($post_id);
-    } elseif (!registrations_are_open($post_id)) {
-        $message = sprintf($message_template, 'error', __('Registrations are closed.', 'hacklabr'));
-        return $heading . $message;
+    } else {
+        $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
+        $availability = check_event_availability($post_id, $project_id);
+
+        if (!empty($availability['status'])) {
+            $message = sprintf($message_template, 'error', $availability['message']);
+            return $heading . $message;
+        }
     }
 
     if ($awaiting_payment) {

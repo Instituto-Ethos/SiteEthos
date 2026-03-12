@@ -2,7 +2,7 @@
 
 namespace hacklabr;
 
-function check_event_availability (int $post_id, string $project_id, string $contact_id): array {
+function check_event_availability (int $post_id, string $project_id, string|null $contact_id = null): array {
     if (!registrations_are_open($post_id)) {
         return [
             'clear'   => true,
@@ -36,7 +36,7 @@ function check_event_availability (int $post_id, string $project_id, string $con
             'status'  => 'error',
             'message' => __('Registrations are closed.', 'hacklabr'),
         ];
-    } elseif (in_array($contact_id, $registered_ids)) {
+    } elseif ($contact_id && in_array($contact_id, $registered_ids)) {
         return [
             'clear'   => false,
             'status'  => 'error',
