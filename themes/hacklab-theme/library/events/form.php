@@ -3,18 +3,20 @@
 namespace hacklabr;
 
 function is_paid_event (int $post_id) {
-    /*
-    $event_type = get_post_meta($post_id, '_ethos_crm:fut_lk_tipoparceria', true);
-    if ($event_type) {
-        $event_type = json_encode($event_type)['Name'];
-        if ($event_type === 'Conferência') {
-            return true;
-        }
-    }
-    */
-
     $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago', true));
     return $is_paid;
+}
+
+/**
+ * Don't show the new form for older events
+ */
+function is_legacy_event (int $post_id) {
+    $post = get_post($post_id);
+    $post_creation = $post->post_date_gmt;
+
+    $threshold = '2026-03-12 20:00:00';
+
+    return strcmp($post_creation, $threshold) < 0;
 }
 
 function get_event_registration_fields () {
