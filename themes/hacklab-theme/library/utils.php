@@ -813,11 +813,11 @@ function fix_crm_broken_unicode( string|null $text ): string|null {
 }
 
 /**
- * Retrieves the name of the manager associated with an organization.
+ * Retrieves the name and email of the manager associated with an organization.
  * @param int|null $post_id The organization ID (default to current user's organization).
- * @return string|null The display name of the manager, or null if no manager is found.
+ * @return object|null The manager data, or null if no manager is found.
  */
-function get_manager_name($post_id = null) {
+function get_manager_data($post_id = null): object|null {
     if ( empty( $post_id ) ) {
         $current_user = get_current_user_id();
 
@@ -844,10 +844,11 @@ function get_manager_name($post_id = null) {
     $owner_name = $owner_entity->Attributes['fullname'] ?? fix_crm_broken_unicode( $owner_ref->Name ?? null );
     $owner_email = $owner_entity->Attributes['internalemailaddress'] ?? null;
 
-    if ( $owner_email && $owner_name ) {
-        return sprintf( '<a href="mailto:%s">%s</a>', $owner_email, $owner_name );
-    } elseif ( $owner_name ) {
-        return $owner_name;
+    if ( $owner_name ) {
+        return (object) [
+            'email' => $owner_email,
+            'name' => $owner_name,
+        ];
     } else {
         return null;
     }

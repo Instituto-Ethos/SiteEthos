@@ -17,7 +17,7 @@ function nome_do_contato_shortcode ($attributes) {
     return get_primary_contact_name($post_id) ?: $attrs['fallback'];
 }
 
-function nome_do_gerente_shortcode ($attributes) {
+function nome_do_gerente_shortcode ($attributes): string|null {
     $attrs = shortcode_atts([
         'fallback' => '',
         'postid' => null,
@@ -27,6 +27,18 @@ function nome_do_gerente_shortcode ($attributes) {
         $post_id = intval($attrs['postid']);
     } else {
         $post_id = null;
+    }
+
+    $manager = get_manager_data($post_id);
+
+    if ($manager) {
+        if (!empty($manager->email)) {
+            return sprintf( '<a href="mailto:%s">%s</a>', $manager->email, $manager->name );
+        } else {
+            return $manager->name;
+        }
+    } else {
+        return $attrs['fallback'];
     }
 
     return get_manager_name($post_id) ?: $attrs['fallback'];
