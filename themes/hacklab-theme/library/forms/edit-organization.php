@@ -200,6 +200,7 @@ function contacts_delete_user($user_id) {
     }
 
     notify_user_deactivation($user_id);
+    send_user_deactivation_email($user_id);
 
     wp_delete_user($user_id, null);
 }
@@ -289,6 +290,33 @@ function notify_user_deactivation($user_id) {
     update_crm_entity('contact', $contact_id, [
         'statecode' => \ethos\crm\ContactStatus::Inactive->value,
     ]);
+}
+
+function send_user_deactivation_email($user_id) {
+    $company =  get_organization_by_user($user_id);
+    $manager = get_manager_data($company->ID);
+
+    $user = get_user($user_id);
+
+    $email_to = $manager->email ?? '';
+
+    $email_subject = __('User deactivation', 'hacklabr');
+
+    $email_data = [
+        __('Name', 'hacklabr') => $user->display_name,
+        __('Email', 'hacklabr') => $user->user_email,
+    ];
+
+    $email_message = '';
+    foreach ($email_data as $key => $value) {
+        $email_message .= "<p><b>{$key}:</b> {$value}</p>";
+    }
+
+    $email_headers = [
+        'Content-Type: text/html; charset=UTF-8',
+    ];
+
+    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
 }
 
 function validate_edit_organization_form($form_id, $form, $params) {
