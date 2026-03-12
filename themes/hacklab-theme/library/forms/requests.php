@@ -2,6 +2,26 @@
 
 namespace hacklabr;
 
+function get_request_subject_options (): array {
+    $subject_options = [
+        'alteracao-plano' => _x('Plan change', 'subject', 'hacklabr'),
+        'declaracao-associacao' => _x('Statement of association', 'subject', 'hacklabr'),
+        'financeiro' => _x('Financial', 'subject', 'hacklabr'),
+        /*
+        'fale-conosco' => _x('Talk to us', 'subject', 'hacklabr'),
+        'indicadores' => _x('Ethos Indicators', 'subject', 'hacklabr'),
+        'cursos' => _x('Courses', 'subject', 'hacklabr'),
+        'eventos' => _x('Events', 'subject', 'hacklabr'),
+        'palestras' => _x('Lectures', 'subject', 'hacklabr'),
+        'pactos' => _x('Pacts', 'subject', 'hacklabr'),
+        'conferencia' => _x('Conference', 'subject', 'hacklabr'),
+        'outros' => _x('Other', 'subject', 'hacklabr'),
+        */
+    ];
+
+    return $subject_options;
+}
+
 function get_request_crm_area (string $subject): string|null {
     switch ($subject) {
         case 'alteracao-plano':
@@ -50,21 +70,7 @@ function get_request_crm_type (string $subject): string|null {
 function get_request_occurrence_fields () {
     $privacy_policy_url =  get_privacy_policy_url();
 
-    $subject_options = [
-        'alteracao-plano' => _x('Plan change', 'subject', 'hacklabr'),
-        'declaracao-associacao' => _x('Statement of association', 'subject', 'hacklabr'),
-        'financeiro' => _x('Financial', 'subject', 'hacklabr'),
-        /*
-        'fale-conosco' => _x('Talk to us', 'subject', 'hacklabr'),
-        'indicadores' => _x('Ethos Indicators', 'subject', 'hacklabr'),
-        'cursos' => _x('Courses', 'subject', 'hacklabr'),
-        'eventos' => _x('Events', 'subject', 'hacklabr'),
-        'palestras' => _x('Lectures', 'subject', 'hacklabr'),
-        'pactos' => _x('Pacts', 'subject', 'hacklabr'),
-        'conferencia' => _x('Conference', 'subject', 'hacklabr'),
-        'outros' => _x('Other', 'subject', 'hacklabr'),
-        */
-    ];
+    $subject_options = get_request_subject_options();
 
     $fields = [
         'assunto' => [
@@ -194,6 +200,8 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
             $incident_id = create_crm_entity('incident', $attributes);
             do_action('logger', 'Created request (incident) with ID = ' . $incident_id);
 
+            send_request_occurrence_email($current_user, $incident_id, $params);
+
             $success_page = get_page_by_path('solicitacao-enviada') ?: get_page_by_path('boas-vindas');
             wp_safe_redirect(get_permalink($success_page));
             exit;
@@ -203,3 +211,46 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
     }
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_request_occurrence_form', 10, 3);
+
+function send_request_occurrence_email (int $user_id, string $incident_id, array $params) {
+    $company =  get_organization_by_user($user_id);
+    $manager = get_manager_data($company->ID);
+
+    $sender = get_user($user_id);
+    $sender_name = $sender->display_name;
+    $sender_email = $sender->user_email;
+
+    $sender_detail = '';
+    if (current_user_can('edit_others_associates')) {
+        $sender_detail = ' ' . __('(via helpdesk)', 'hacklabr');
+    }
+
+    $subject_options = get_request_subject_options();
+    $subject = $subject_options[$params['assunto']];
+
+    $email_to = $manager->email ?? '';
+
+    /* translators: %s: Subject. */
+    $email_subject = sprintf(__('New Request: %s', 'hacklabr'), $subject);
+
+    $email_data = [
+        __('Sender', 'hacklabr') => sprintf( '<a href="mailto:%s">%s</a>%s', $sender_email, $sender_name, $sender_detail),
+        __('Organization', 'hacklabr') => $company->post_title,
+        __('Subject', 'hacklabr') => $subject,
+        __('Title', 'hacklabr') => $params['titulo'],
+        __('Description', 'hacklabr') => str_replace("\n", '<br/>', $params['descricao']),
+        __('Occurrence', 'hacklabr') => $incident_id,
+    ];
+
+    $email_message = '';
+    foreach ($email_data as $key => $value) {
+        $email_message .= "<p><b>{$key}:</b> {$value}</p>";
+    }
+
+    $email_headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        sprintf( 'Reply-To: %s <%s>', $sender_name, $sender_email ),
+    ];
+
+    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
+}
