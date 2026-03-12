@@ -17,7 +17,7 @@ function nome_do_contato_shortcode ($attributes) {
     return get_primary_contact_name($post_id) ?: $attrs['fallback'];
 }
 
-function nome_do_gerente_shortcode ($attributes): string|null {
+function nome_do_gerente_shortcode ($attributes) {
     $attrs = shortcode_atts([
         'fallback' => '',
         'postid' => null,
@@ -40,8 +40,6 @@ function nome_do_gerente_shortcode ($attributes): string|null {
     } else {
         return $attrs['fallback'];
     }
-
-    return get_manager_name($post_id) ?: $attrs['fallback'];
 }
 
 function nome_da_empresa_shortcode ($attributes) {
