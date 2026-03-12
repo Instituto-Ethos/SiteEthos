@@ -42,7 +42,6 @@ function get_my_plan_data () {
 
 function render_my_plan_callback ($attributes) {
     $plan = get_my_plan_data();
-    var_dump($plan);
 
     if (empty($plan)) {
         return '';
