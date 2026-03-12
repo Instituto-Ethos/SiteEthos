@@ -37,9 +37,9 @@ function nome_do_gerente_shortcode ($attributes) {
         } else {
             return $manager->name;
         }
-    } else {
-        return $attrs['fallback'];
     }
+
+    return $attrs['fallback'];
 }
 
 function nome_da_empresa_shortcode ($attributes) {
