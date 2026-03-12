@@ -25,7 +25,7 @@ use WP_Query;
 function add_associates_manager_role() {
     add_role(
         'manager_associates',
-        __( 'Admin-Relacionamento', 'hacklabr' ),
+        __( 'Admin-Relationship', 'hacklabr' ),
         [
             'read' => true,
             'edit_others_posts' => false,
@@ -66,6 +66,12 @@ add_action( 'wp_logout', 'hacklabr\\clean_managed_organization_on_logout' );
 
 function get_managed_organization_id(): int|null {
     if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = isset( $_GET['organization'] ) ? intval( $_GET['organization'] ) : 0;
+
+        if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {
+            return $organization_id;
+        }
+
         $organization_id = isset( $_COOKIE['organization_id'] ) ? intval( $_COOKIE['organization_id'] ) : 0;
 
         if ( $organization_id && get_post_type( $organization_id ) === 'organizacao' ) {

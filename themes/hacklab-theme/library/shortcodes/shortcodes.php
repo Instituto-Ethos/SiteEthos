@@ -29,7 +29,17 @@ function nome_do_gerente_shortcode ($attributes) {
         $post_id = null;
     }
 
-    return get_manager_name($post_id) ?: $attrs['fallback'];
+    $manager = get_manager_data($post_id);
+
+    if ($manager) {
+        if (!empty($manager->email)) {
+            return sprintf( '<a href="mailto:%s">%s</a>', $manager->email, $manager->name );
+        } else {
+            return $manager->name;
+        }
+    }
+
+    return $attrs['fallback'];
 }
 
 function nome_da_empresa_shortcode ($attributes) {
