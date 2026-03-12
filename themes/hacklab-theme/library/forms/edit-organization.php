@@ -56,20 +56,7 @@ function get_edit_organization_fields() {
 function get_edit_organization_finance_fields() {
     $fields = get_registration_step4_fields();
 
-    $current_user = get_current_user_id();
-
-    /**
-     * Checks if the current user has permission to edit other associates.
-     * If so, retrieves the organization ID from the cookies.
-     * If the organization is valid, fetches the user ID of the organization author.
-     */
-    if ( current_user_can( 'edit_others_associates' ) ) {
-        $organization_id = get_managed_organization_id();
-
-        if ( $organization_id ) {
-            $current_user = get_post_field( 'post_author', $organization_id );
-        }
-    }
+    $current_user = get_associated_user_id();
 
     if (class_exists('PMProGroupAcct_Group') && !empty($current_user)) {
 
@@ -90,20 +77,7 @@ function get_edit_organization_finance_fields() {
 
 function get_organization_params($form_id, $fields) {
     return function () use ($form_id, $fields) {
-        $user_id = get_current_user_id();
-
-        /**
-         * Checks if the current user has permission to edit other associates.
-         * If so, retrieves the organization ID from the cookies.
-         * If the organization is valid, fetches the user ID of the organization author.
-         */
-        if ( current_user_can( 'edit_others_associates' ) ) {
-            $organization_id = get_managed_organization_id();
-
-            if ( $organization_id ) {
-                $user_id = get_post_field( 'post_author', $organization_id );
-            }
-        }
+        $user_id = get_associated_user_id();
 
         $organization = get_organization_by_user($user_id);
 
@@ -220,7 +194,7 @@ function contacts_delete_user($user_id) {
 
     $is_ethos_admin = !empty(get_user_meta($user_id, '_ethos_admin', true));
     $is_ethos_approver = !empty(get_user_meta($user_id, '_ethos_approver', true));
-    $is_current_user = get_current_user_id() == $user_id;
+    $is_current_user = get_associated_user_id() == $user_id;
     if ($is_ethos_admin || $is_ethos_approver || $is_current_user) {
         return;
     }
@@ -318,20 +292,7 @@ function notify_user_deactivation($user_id) {
 }
 
 function validate_edit_organization_form($form_id, $form, $params) {
-    $current_user = get_current_user_id();
-
-    /**
-     * Checks if the current user has permission to edit other associates.
-     * If so, retrieves the organization ID from the cookies.
-     * If the organization is valid, fetches the user ID of the organization author.
-     */
-    if ( current_user_can( 'edit_others_associates' ) ) {
-        $organization_id = get_managed_organization_id();
-
-        if ( $organization_id ) {
-            $current_user = get_post_field( 'post_author', $organization_id );
-        }
-    }
+    $current_user = get_associated_user_id();
 
     $is_ethos_admin = get_user_meta( $current_user, '_ethos_admin', true );
 

@@ -153,20 +153,7 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
             return;
         }
 
-        $current_user = get_current_user_id();
-
-        /**
-         * Checks if the current user has permission to edit other associates.
-         * If so, retrieves the organization ID from the cookies.
-         * If the organization is valid, fetches the user ID of the organization author.
-         */
-        if ( current_user_can( 'edit_others_associates' ) ) {
-            $organization_id = get_managed_organization_id();
-
-            if ( $organization_id ) {
-                $current_user = get_post_field( 'post_author', $organization_id );
-            }
-        }
+        $current_user = get_associated_user_id();
 
         $account_id = get_user_meta($current_user, '_ethos_crm_account_id', true);
         $contact_id = get_user_meta($current_user, '_ethos_crm_contact_id', true);

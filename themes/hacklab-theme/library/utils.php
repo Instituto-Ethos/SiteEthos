@@ -819,7 +819,7 @@ function fix_crm_broken_unicode( string|null $text ): string|null {
  */
 function get_manager_data($post_id = null): object|null {
     if ( empty( $post_id ) ) {
-        $current_user = get_current_user_id();
+        $current_user = hacklabr\get_associated_user_id();
 
         $organization = hacklabr\get_organization_by_user( $current_user );
 
@@ -863,7 +863,7 @@ function get_manager_data($post_id = null): object|null {
  */
 function get_organization_name( $post_id = null ) {
     if ( empty( $post_id ) ) {
-        $current_user = get_current_user_id();
+        $current_user = hacklabr\get_associated_user_id();
 
         $organization = hacklabr\get_organization_by_user( $current_user );
 
@@ -888,7 +888,7 @@ function get_organization_name( $post_id = null ) {
  */
 function get_primary_contact_name($post_id = null) {
     if ( empty( $post_id ) ) {
-        $current_user = get_current_user_id();
+        $current_user = hacklabr\get_associated_user_id();
 
         $organization = hacklabr\get_organization_by_user( $current_user );
 

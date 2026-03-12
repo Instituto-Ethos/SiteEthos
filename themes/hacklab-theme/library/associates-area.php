@@ -82,6 +82,25 @@ function get_managed_organization_id(): int|null {
     return null;
 }
 
+/**
+ * For admin-relationship users, return the ID of primary contact's associated user.
+ * Otherwise, return the current user ID.
+ * @return int The user ID.
+ */
+function get_associated_user_id(): int {
+    $user_id = get_current_user_id();
+
+    if ( current_user_can( 'edit_others_associates' ) ) {
+        $organization_id = get_managed_organization_id();
+
+        if ( $organization_id ) {
+            $user_id = get_post_field( 'post_author', $organization_id );
+        }
+    }
+
+    return $user_id;
+}
+
 function is_associates_area_page( \WP_Post|int|null $post = null ): bool {
     return get_page_template_slug( $post ) == 'template-associates-area.php';
 }

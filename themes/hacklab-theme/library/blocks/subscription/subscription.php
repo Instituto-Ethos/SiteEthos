@@ -24,20 +24,7 @@ function get_subscription_data ($attributes): array {
 }
 
 function render_subscription_callback ($attributes) {
-    $user_id = get_current_user_id();
-
-    /**
-     * Checks if the current user has permission to edit other associates.
-     * If so, retrieves the organization ID from the cookies.
-     * If the organization is valid, fetches the user ID of the organization author.
-     */
-    if ( current_user_can( 'edit_others_associates' ) ) {
-        $organization_id = get_managed_organization_id();
-
-        if ( $organization_id ) {
-            $user_id = get_post_field( 'post_author', $organization_id );
-        }
-    }
+    $user_id = get_associated_user_id();
 
     $organization = get_organization_by_user($user_id);
 

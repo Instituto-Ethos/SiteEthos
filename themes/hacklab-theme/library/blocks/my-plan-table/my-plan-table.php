@@ -3,7 +3,7 @@
 namespace hacklabr;
 
 function get_my_plan_table_data () {
-    $user_id = get_current_user_id();
+    $user_id = get_associated_user_id();
 
     $plan = get_pmpro_plan($user_id);
 

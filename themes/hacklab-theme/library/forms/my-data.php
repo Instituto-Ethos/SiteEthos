@@ -9,26 +9,7 @@ function get_my_data_fields () {
 }
 
 function get_my_data_params ($form) {
-    /**
-     * Determines the appropriate user ID based on the current user's capabilities and request parameters.
-     *
-     * - If the current user has the 'edit_others_associates' capability, attempts to retrieve the 'organization' ID
-     *   from the cookies. If a valid organization ID is provided and its post type is 'organizacao',
-     *   sets $user_id to the author of that organization post.
-     * - Otherwise, sets $user_id to the ID of the currently logged-in user.
-     *
-     * @global int $user_id The user ID determined by the logic.
-     */
-    $user_id = 0;
-    if ( current_user_can( 'edit_others_associates' ) ) {
-        $organization_id = get_managed_organization_id();
-
-        if ( $organization_id ) {
-            $user_id = get_post_field( 'post_author', $organization_id );
-        }
-    } else {
-        $user_id = get_current_user_id();
-    }
+    $user_id = get_associated_user_id();
 
     $params = sanitize_form_params();
 
@@ -60,7 +41,7 @@ function register_my_data_form () {
 add_action('init', 'hacklabr\\register_my_data_form');
 
 function validate_my_data_form ($form_id, $form, $params) {
-    $user_id = ! empty( $params['_user_id'] ) ? $params['_user_id'] : get_current_user_id();
+    $user_id = ! empty( $params['_user_id'] ) ? $params['_user_id'] : get_associated_user_id();
 
     if ($form_id === 'edit-my-data' && !empty($user_id)) {
         $validation = validate_form($form['fields'], $params);

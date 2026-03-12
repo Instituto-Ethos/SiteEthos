@@ -3,7 +3,7 @@
 namespace hacklabr;
 
 function get_my_plan_data () {
-    $user_id = get_current_user_id();
+    $user_id = get_associated_user_id();
 
     $plan_slug = get_pmpro_plan($user_id);
 
@@ -42,6 +42,7 @@ function get_my_plan_data () {
 
 function render_my_plan_callback ($attributes) {
     $plan = get_my_plan_data();
+    var_dump($plan);
 
     if (empty($plan)) {
         return '';
