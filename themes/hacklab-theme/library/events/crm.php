@@ -92,7 +92,7 @@ function create_registration (int $post_id, array $params) {
         $entity_id = create_crm_entity('fut_participante', $attibutes);
 
         if ($paid_event) {
-            $message = __('You are registered to this event, by payment is pending.', 'hacklabr');
+            $message = __('You are registered to this event, but payment is pending.', 'hacklabr');
         } else {
             $message = __('You are successfully registered to this event!', 'hacklabr');
         }
