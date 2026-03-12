@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-12T20:13:09+00:00\n"
+"POT-Creation-Date: 2026-03-12T21:16:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -357,6 +357,7 @@ msgstr ""
 #: library/events/form.php:106
 #: library/forms/custom-forms.php:314
 #: library/forms/edit-organization.php:307
+#: library/forms/edit-organization.php:334
 #: library/forms/registration.php:277
 msgid "Email"
 msgstr ""
@@ -573,6 +574,7 @@ msgstr ""
 
 #: library/forms/custom-forms.php:313
 #: library/forms/edit-organization.php:306
+#: library/forms/edit-organization.php:333
 msgid "Name"
 msgstr ""
 
@@ -622,6 +624,14 @@ msgstr ""
 
 #: library/forms/edit-organization.php:303
 msgid "User deactivation"
+msgstr ""
+
+#: library/forms/edit-organization.php:330
+msgid "User edition"
+msgstr ""
+
+#: library/forms/edit-organization.php:342
+msgid "Modified fields:"
 msgstr ""
 
 #: library/forms/helpers.php:40

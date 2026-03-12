@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-03-12T20:13:09+00:00\n"
-"PO-Revision-Date: 2026-03-12 17:14-0300\n"
+"POT-Creation-Date: 2026-03-12T21:16:20+00:00\n"
+"PO-Revision-Date: 2026-03-12 18:17-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -344,7 +344,8 @@ msgid "Invalid phone number"
 msgstr "Número de telefone inválido"
 
 #: library/events/form.php:106 library/forms/custom-forms.php:314
-#: library/forms/edit-organization.php:307 library/forms/registration.php:277
+#: library/forms/edit-organization.php:307
+#: library/forms/edit-organization.php:334 library/forms/registration.php:277
 msgid "Email"
 msgstr "Email"
 
@@ -554,6 +555,7 @@ msgid "Add one more contact"
 msgstr "Adicionar mais um contato"
 
 #: library/forms/custom-forms.php:313 library/forms/edit-organization.php:306
+#: library/forms/edit-organization.php:333
 msgid "Name"
 msgstr "Nome"
 
@@ -601,6 +603,14 @@ msgstr "Editar finanças da organização"
 #: library/forms/edit-organization.php:303
 msgid "User deactivation"
 msgstr "Desativação de usuário"
+
+#: library/forms/edit-organization.php:330
+msgid "User edition"
+msgstr "Edição de usuário"
+
+#: library/forms/edit-organization.php:342
+msgid "Modified fields:"
+msgstr "Campos modificados:"
 
 #: library/forms/helpers.php:40
 msgid "Address (street)"

@@ -319,7 +319,7 @@ function send_user_deactivation_email($user_id) {
     return wp_mail($email_to, $email_subject, $email_message, $email_headers);
 }
 
-function send_user_edition_email($user_id, $params, $old_meta) {
+function send_user_edition_email($user_id, $params, $previous_meta) {
     $company =  get_organization_by_user($user_id);
     $manager = get_manager_data($company->ID);
 
@@ -327,7 +327,7 @@ function send_user_edition_email($user_id, $params, $old_meta) {
 
     $email_to = $manager->email ?? '';
 
-    $email_subject = __('User deactivation', 'hacklabr');
+    $email_subject = __('User edition', 'hacklabr');
 
     $email_data = [
         __('Name', 'hacklabr') => $user->display_name,
@@ -343,8 +343,8 @@ function send_user_edition_email($user_id, $params, $old_meta) {
 
     $fields = get_registration_step5_fields();
     foreach ($fields as $key => $field) {
-        if (($params[$key] ?? '') != ($old_meta[$key][0] ?? '')) {
-            $email_message .= "<p><b>{$key}:</b> {$params[$key]}</p>";
+        if ($field['label'] && ($params[$key] ?? '') != ($previous_meta[$key][0] ?? '')) {
+            $email_message .= "<p><b>{$field['label']}:</b> {$params[$key]}</p>";
         }
     }
 
@@ -444,7 +444,7 @@ function validate_edit_organization_form($form_id, $form, $params) {
 
             \ethos\crm\create_contact($user_id, $organization->ID);
         } else {
-            $old_meta = get_user_meta($user_id);
+            $previous_meta = get_user_meta($user_id);
 
             wp_update_user([
                 'ID' => $user_id,
@@ -454,7 +454,7 @@ function validate_edit_organization_form($form_id, $form, $params) {
             ]);
 
             \ethos\crm\update_contact($user_id);
-            send_user_edition_email($user_id, $user_meta, $old_meta);
+            send_user_edition_email($user_id, $user_meta, $previous_meta);
         }
 
         $current_url = untrailingslashit($_SERVER['REQUEST_URI']);
