@@ -230,17 +230,20 @@ function send_request_occurrence_email (int $user_id, string $incident_id, array
     $subject_options = get_request_subject_options();
     $subject = $subject_options[$params['assunto']];
 
+    $title = $params['titulo'];
+    $description = str_replace("\n", '<br/>', $params['descricao']);
+
     $email_to = $manager->email ?? '';
 
-    /* translators: %s: Subject. */
-    $email_subject = sprintf(__('New Request: %s', 'hacklabr'), $subject);
+    /* translators: %1$s: Subject, %2$s: Title. */
+    $email_subject = sprintf(__('New Request: [%1$s] %2$s', 'hacklabr'), $subject, $title);
 
     $email_data = [
         __('Sender', 'hacklabr') => sprintf( '<a href="mailto:%s">%s</a>%s', $sender_email, $sender_name, $sender_detail),
         __('Organization', 'hacklabr') => $company->post_title,
         __('Subject', 'hacklabr') => $subject,
-        __('Title', 'hacklabr') => $params['titulo'],
-        __('Description', 'hacklabr') => str_replace("\n", '<br/>', $params['descricao']),
+        __('Title', 'hacklabr') => $title,
+        __('Description', 'hacklabr') => $description,
         __('Occurrence', 'hacklabr') => $incident_id,
     ];
 

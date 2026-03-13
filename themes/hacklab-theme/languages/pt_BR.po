@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-03-13T14:29:13+00:00\n"
-"PO-Revision-Date: 2026-03-13 11:30-0300\n"
+"POT-Creation-Date: 2026-03-13T15:11:47+00:00\n"
+"PO-Revision-Date: 2026-03-13 12:17-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -138,7 +138,7 @@ msgid "Date"
 msgstr "Data"
 
 #: library/blocks/subscription/subscription.php:46
-#: library/forms/requests.php:117 library/forms/requests.php:242
+#: library/forms/requests.php:117 library/forms/requests.php:245
 msgid "Title"
 msgstr "Título"
 
@@ -1042,7 +1042,7 @@ msgctxt "subject"
 msgid "Other"
 msgstr "Outros"
 
-#: library/forms/requests.php:94 library/forms/requests.php:241
+#: library/forms/requests.php:94 library/forms/requests.php:244
 msgid "Subject"
 msgstr "Assunto"
 
@@ -1078,24 +1078,24 @@ msgstr "Solicitações"
 msgid "(via helpdesk)"
 msgstr "(via suporte)"
 
-#. translators: %s: Subject.
-#: library/forms/requests.php:236
-msgid "New Request: %s"
-msgstr "Nova Ocorrência: %s"
-
+#. translators: %1$s: Subject, %2$s: Title.
 #: library/forms/requests.php:239
+msgid "New Request: [%1$s] %2$s"
+msgstr "Nova Ocorrência: [%1$s] %2$s"
+
+#: library/forms/requests.php:242
 msgid "Sender"
 msgstr "Remetente"
 
-#: library/forms/requests.php:240
+#: library/forms/requests.php:243
 msgid "Organization"
 msgstr "Organização"
 
-#: library/forms/requests.php:243
+#: library/forms/requests.php:246
 msgid "Description"
 msgstr "Descrição"
 
-#: library/forms/requests.php:244
+#: library/forms/requests.php:247
 msgid "Occurrence"
 msgstr "Ocorrência"
 
@@ -2009,9 +2009,3 @@ msgstr "Sistema"
 msgctxt "Font family name"
 msgid "Title"
 msgstr "Título"
-
-#~ msgid "Invalid accessibility option"
-#~ msgstr "Opção de acessibilidade inválida"
-
-#~ msgid "Company"
-#~ msgstr "Empresa"
