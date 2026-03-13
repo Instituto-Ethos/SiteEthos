@@ -53,28 +53,6 @@ function get_edit_organization_fields() {
     return $fields;
 }
 
-function get_edit_organization_finance_fields() {
-    $fields = get_registration_step4_fields();
-
-    $current_user = get_associated_user_id();
-
-    if (class_exists('PMProGroupAcct_Group') && !empty($current_user)) {
-
-        $group_id = (int) get_user_meta($current_user, '_pmpro_group', true);
-
-        $membership_price = calculate_membership_price($group_id);
-
-        $fields['pagto_sugerido']['default'] = $membership_price;
-        $fields['pagto_sugerido']['disabled'] = true;
-    }
-
-    foreach ($fields as $key => $field) {
-        $fields[$key]['disabled'] = true;
-    }
-
-    return $fields;
-}
-
 function get_organization_params($form_id, $fields) {
     return function () use ($form_id, $fields) {
         $user_id = get_associated_user_id();
@@ -112,7 +90,6 @@ function get_organization_params($form_id, $fields) {
 
 function register_edit_organization_form() {
     $fields_contacts = get_edit_contact_fields();
-    $fields_finance = get_edit_organization_finance_fields();
     $fields_organization = get_edit_organization_fields();
 
     register_form('edit-organization', __('Edit organization', 'hacklabr'), [
@@ -129,12 +106,6 @@ function register_edit_organization_form() {
     register_form('edit-organization-contacts__hidden', __('Edit contacts', 'hacklabr') . ' ' . __('(hidden)', 'hacklabr'), [
         'fields' => [],
         'hidden' => true,
-    ]);
-
-    register_form('edit-organization-finances', __('Edit organization finances', 'hacklabr'), [
-        'fields' => $fields_finance,
-        'submit_label' => false,
-        'get_params' => get_organization_params('edit-organization-finances', $fields_finance),
     ]);
 }
 add_action('init', 'hacklabr\\register_edit_organization_form');
@@ -384,24 +355,6 @@ function validate_edit_organization_form($form_id, $form, $params) {
         ]);
 
         \ethos\crm\update_organization((int) $post_id);
-    }
-
-    if ($form_id === 'edit-organization-finances') {
-        $validation = validate_form($form['fields'], $params);
-
-        if ($validation !== true) {
-            return;
-        }
-
-        $post_id = $params['_organization_id'];
-        $post_meta = $params;
-
-        unset($post_meta['_hacklabr_form']);
-        unset($post_meta['_organization_id']);
-
-        foreach ($params as $meta_key => $meta_value) {
-            update_post_meta($post_id, $meta_key, $meta_value);
-        }
     }
 
     if ($form_id === 'edit-organization-contacts') {
