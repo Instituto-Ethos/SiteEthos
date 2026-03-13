@@ -7,16 +7,15 @@ function get_request_subject_options (): array {
         'alteracao-plano' => _x('Plan change', 'subject', 'hacklabr'),
         'declaracao-associacao' => _x('Statement of association', 'subject', 'hacklabr'),
         'financeiro' => _x('Financial', 'subject', 'hacklabr'),
-        /*
         'fale-conosco' => _x('Talk to us', 'subject', 'hacklabr'),
         'indicadores' => _x('Ethos Indicators', 'subject', 'hacklabr'),
         'cursos' => _x('Courses', 'subject', 'hacklabr'),
         'eventos' => _x('Events', 'subject', 'hacklabr'),
         'palestras' => _x('Lectures', 'subject', 'hacklabr'),
+        'publicacoes' => _x('Publications', 'subject', 'hacklabr'),
         'pactos' => _x('Pacts', 'subject', 'hacklabr'),
         'conferencia' => _x('Conference', 'subject', 'hacklabr'),
         'outros' => _x('Other', 'subject', 'hacklabr'),
-        */
     ];
 
     return $subject_options;
@@ -27,8 +26,17 @@ function get_request_crm_area (string $subject): string|null {
         case 'alteracao-plano':
         case 'declaracao-associacao':
             return '969830005'; // Relacionamento e Captação
+        case 'conferencia':
         case 'eventos':
             return '969830002'; // Eventos
+        case 'cursos':
+        case 'fale-conosco':
+        case 'indicadores':
+        case 'outros':
+        case 'pactos':
+        case 'palestras':
+        case 'publicacoes':
+            return '490750000'; // Institucional
         case 'financeiro':
             return '969830004'; // Financeiro
         default:
@@ -56,7 +64,14 @@ function get_request_crm_type (string $subject): string|null {
         case 'alteracao-plano':
         case 'declaracao-associacao':
             return '969830000'; // Associação
+        case 'conferencia':
+        case 'cursos':
+        case 'eventos':
+        case 'fale-conosco':
         case 'financeiro':
+        case 'outros':
+        case 'palestras':
+        case 'publicacoes':
             return '969830011'; // Outros
         case 'indicadores':
             return '969830005'; // Indicadores Ethos - Geral
