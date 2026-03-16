@@ -470,6 +470,20 @@ class Assets
                 }
             ],
 
+            'my-plan' => [
+                'file' => 'my-plan.js',
+                'pre-load' => true,
+                'preload_callback' => function () {
+                    return is_page( 'meu-plano' );
+                },
+                'localize_callback' => function () {
+                    $user_id = get_associated_user_id();
+                    return [
+                        'plan' => get_pmpro_plan( $user_id ),
+                    ];
+                },
+            ],
+
             'sync-crm' => [
                 'file' => 'sync-crm.js',
                 'pre-load' => false,

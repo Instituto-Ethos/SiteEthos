@@ -3,31 +3,25 @@
 .my-plan {
 
     &__summary {
-        font-size: $font-size--large;
         margin-bottom: $gap--large;
+
+        p {
+            font-size: $font-size--large;
+        }
+
+        strong {
+            color: $color--primary-dark;
+        }
     }
 
-    &__advantages {
+    &__featured-column {
 
-        .choose-plan__text {
+        &:is(th) {
+            background-color: #A3DDF5 !important;
+        }
 
-            ul, li {
-                margin-block: size(8);
-            }
-
-            p, li:has(s) {
-                display: none !important;
-            }
-
-            li {
-                display: list-item;
-                list-style: circle;
-                margin-inline-start: $font-size--large;
-
-                &:before {
-                    display: none;
-                }
-            }
+        &:is(td) {
+            background-color: #D1EEFA;
         }
     }
 }

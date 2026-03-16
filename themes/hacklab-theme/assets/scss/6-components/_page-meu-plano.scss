@@ -8,30 +8,13 @@
             & img{
                 margin:0px;
             }
-            &:nth-last-child(2){
-                display: flex;
-                gap: $gap--small;
-                padding: $padding--medium $padding--xx-large;
-                @include mobile{
-                    padding: 18px 0px !important;
-                }
-
-                span{
-                    color: $color--primary-dark !important;
-                    font-weight: $font-weight--bold;
-                    @include mobile{
-                        font-size: 11px!important;
-                    }
-                }
-                img{
-                    width: 18px;
-                    height: 18px;
-                }
-            }
         }
         tbody > tr >  td > mark{
             display: flex;
             justify-content: center;
+        }
+        table, tr, td {
+            border-color: white;
         }
     }
     main > p > strong{

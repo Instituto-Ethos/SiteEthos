@@ -17,13 +17,13 @@ function get_my_plan_data () {
             'slug' => 'conexao',
             'contains' => ['conexao'],
         ];
-    } else if ($plan_slug === 'essencial') {
+    } elseif ($plan_slug === 'essencial') {
         $plan = (object) [
             'label' => 'Essencial',
             'slug' => 'essencial',
             'contains' => ['essencial', 'conexao'],
         ];
-    } else if ($plan_slug === 'vivencia') {
+    } elseif ($plan_slug === 'vivencia') {
         $plan = (object) [
             'label' => 'Vivência',
             'slug' => 'vivencia',
@@ -50,11 +50,8 @@ function render_my_plan_callback ($attributes) {
     ob_start();
 ?>
     <div class="my-plan">
-        <p><?php _ex('Plan', 'membership', 'hacklabr') ?> <?= $plan->label ?>:</p>
-        <div class="my-plan__advantages">
-            <?php foreach ($plan->contains as $slug): ?>
-                <?php dynamic_sidebar('vantagens_' . $slug); ?>
-            <?php endforeach; ?>
+        <div class="my-plan__summary">
+            <p><?php _ex('Your current plan:', 'membership', 'hacklabr') ?> <strong><?= $plan->label ?></strong>.</p>
         </div>
     </div>
 <?php
