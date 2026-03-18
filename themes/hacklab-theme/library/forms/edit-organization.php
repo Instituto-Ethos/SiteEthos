@@ -263,6 +263,42 @@ function notify_user_deactivation($user_id) {
     ]);
 }
 
+function send_user_creation_email($user_id, $params) {
+    $company =  get_organization_by_user($user_id);
+    $manager = get_manager_data($company->ID);
+
+    $user = get_user($user_id);
+
+    $email_to = $manager->email ?? '';
+
+    $email_subject = __('User creation', 'hacklabr');
+
+    $email_data = [
+        __('Name', 'hacklabr') => $user->display_name,
+        __('Email', 'hacklabr') => $user->user_email,
+    ];
+
+    $email_message = '';
+    foreach ($email_data as $key => $value) {
+        $email_message .= "<p><b>{$key}:</b> {$value}</p>";
+    }
+
+    $email_message .= '<hr><p>' . __('User fields:', 'hacklabr') . '</p>';
+
+    $fields = get_registration_step5_fields();
+    foreach ($fields as $key => $field) {
+        if ($field['label'] && ($params[$key] ?? '')) {
+            $email_message .= "<p><b>{$field['label']}:</b> {$params[$key]}</p>";
+        }
+    }
+
+    $email_headers = [
+        'Content-Type: text/html; charset=UTF-8',
+    ];
+
+    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
+}
+
 function send_user_deactivation_email($user_id) {
     $company =  get_organization_by_user($user_id);
     $manager = get_manager_data($company->ID);
@@ -396,6 +432,7 @@ function validate_edit_organization_form($form_id, $form, $params) {
             }
 
             \ethos\crm\create_contact($user_id, $organization->ID);
+            send_user_creation_email($user_id, $user_meta);
         } else {
             $previous_meta = get_user_meta($user_id);
 

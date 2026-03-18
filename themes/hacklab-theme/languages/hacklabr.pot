@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-13T15:11:47+00:00\n"
+"POT-Creation-Date: 2026-03-18T15:21:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -105,7 +105,6 @@ msgid "Admin-Relationship"
 msgstr ""
 
 #: library/blocks/my-payments/my-payments.php:71
-#: library/blocks/my-plan/my-plan.php:53
 #: library/forms/registration.php:381
 msgctxt "membership"
 msgid "Plan"
@@ -132,6 +131,11 @@ msgstr ""
 #: dist/blocks/my-plan-table-row/editor.js:19
 #: dist/blocks/my-plan-table-row/editor.js:97
 msgid "Benefits"
+msgstr ""
+
+#: library/blocks/my-plan/my-plan.php:54
+msgctxt "membership"
+msgid "Your current plan:"
 msgstr ""
 
 #: library/blocks/subscription/subscription.php:45
@@ -356,8 +360,9 @@ msgstr ""
 
 #: library/events/form.php:106
 #: library/forms/custom-forms.php:314
-#: library/forms/edit-organization.php:307
-#: library/forms/edit-organization.php:334
+#: library/forms/edit-organization.php:278
+#: library/forms/edit-organization.php:314
+#: library/forms/edit-organization.php:341
 #: library/forms/registration.php:277
 msgid "Email"
 msgstr ""
@@ -573,8 +578,9 @@ msgid "Add one more contact"
 msgstr ""
 
 #: library/forms/custom-forms.php:313
-#: library/forms/edit-organization.php:306
-#: library/forms/edit-organization.php:333
+#: library/forms/edit-organization.php:277
+#: library/forms/edit-organization.php:313
+#: library/forms/edit-organization.php:340
 msgid "Name"
 msgstr ""
 
@@ -601,36 +607,40 @@ msgstr ""
 msgid "Email is already in use"
 msgstr ""
 
-#: library/forms/edit-organization.php:118
+#: library/forms/edit-organization.php:95
 msgid "Edit organization"
 msgstr ""
 
-#: library/forms/edit-organization.php:123
-#: library/forms/edit-organization.php:129
+#: library/forms/edit-organization.php:100
+#: library/forms/edit-organization.php:106
 msgid "Edit contacts"
 msgstr ""
 
-#: library/forms/edit-organization.php:126
+#: library/forms/edit-organization.php:103
 msgid "Save"
 msgstr ""
 
-#: library/forms/edit-organization.php:129
+#: library/forms/edit-organization.php:106
 msgid "(hidden)"
 msgstr ""
 
-#: library/forms/edit-organization.php:134
-msgid "Edit organization finances"
+#: library/forms/edit-organization.php:274
+msgid "User creation"
 msgstr ""
 
-#: library/forms/edit-organization.php:303
+#: library/forms/edit-organization.php:286
+msgid "User fields:"
+msgstr ""
+
+#: library/forms/edit-organization.php:310
 msgid "User deactivation"
 msgstr ""
 
-#: library/forms/edit-organization.php:330
+#: library/forms/edit-organization.php:337
 msgid "User edition"
 msgstr ""
 
-#: library/forms/edit-organization.php:342
+#: library/forms/edit-organization.php:349
 msgid "Modified fields:"
 msgstr ""
 
@@ -1381,28 +1391,36 @@ msgstr ""
 msgid "Membership registration finished"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/card-header/editor.js:19
-#: dist/blocks/download-image/editor.js:29
-#: dist/blocks/banner-with-image/editor.js:129
-#: dist/blocks/card-header/editor.js:115
-#: dist/blocks/download-image/editor.js:129
-msgid "Header content"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:80
+#: dist/blocks/card-header/editor.js:66
+#: dist/blocks/download-image/editor.js:80
+msgid "Change image"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/card-header/editor.js:19
-#: dist/blocks/posts-grid/editor.js:19
-#: dist/blocks/banner-with-image/editor.js:143
-#: dist/blocks/card-header/editor.js:142
-#: dist/blocks/posts-grid/editor.js:1921
-msgid "Layout"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:83
+#: dist/blocks/card-header/editor.js:69
+#: dist/blocks/download-image/editor.js:83
+msgid "Remove image"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29
-#: dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:89
+#: dist/blocks/card-header/editor.js:75
+#: dist/blocks/download-image/editor.js:89
+msgid "Select image"
+msgstr ""
+
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/download-image/editor.js:2
 #: dist/blocks/banner-with-image/editor.js:97
 #: dist/blocks/banner-with-image/editor.js:146
 #: dist/blocks/card-header/editor.js:83
@@ -1410,49 +1428,40 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29
-#: dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:80
-#: dist/blocks/card-header/editor.js:66
-#: dist/blocks/download-image/editor.js:80
-msgid "Change image"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:129
+#: dist/blocks/card-header/editor.js:115
+#: dist/blocks/download-image/editor.js:129
+msgid "Header content"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29
-#: dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:83
-#: dist/blocks/card-header/editor.js:69
-#: dist/blocks/download-image/editor.js:83
-msgid "Remove image"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/banner-with-image/editor.js:143
+#: dist/blocks/card-header/editor.js:142
+#: dist/blocks/posts-grid/editor.js:1921
+msgid "Layout"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29
-#: dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:89
-#: dist/blocks/card-header/editor.js:75
-#: dist/blocks/download-image/editor.js:89
-msgid "Select image"
-msgstr ""
-
-#: dist/blocks/card-body/editor.js:19
+#: dist/blocks/card-body/editor.js:2
 #: dist/blocks/card-body/editor.js:58
 msgid "Body content"
 msgstr ""
 
-#: dist/blocks/card-header/editor.js:19
+#: dist/blocks/card-header/editor.js:2
 #: dist/blocks/card-header/editor.js:145
 msgid "Background image"
 msgstr ""
 
-#: dist/blocks/form/editor.js:19
+#: dist/blocks/form/editor.js:2
 #: dist/blocks/form/editor.js:1383
 msgid "Select option"
 msgstr ""
 
-#: dist/blocks/form/editor.js:19
+#: dist/blocks/form/editor.js:2
 #: dist/blocks/form/editor.js:1388
 #: dist/blocks/form/editor.js:1390
 msgid "Form"
