@@ -175,6 +175,7 @@ function parse_contact_into_user_meta( Entity $contact, Entity|null $account ) {
     if ( ! empty( $account ) && is_subsidiary_company( $account ) ) {
         $email = generate_unique_email( $email, $account );
     }
+    $email = apply_filters( 'pre_user_email', $email );
 
     if ( empty( $email ) ) {
         return null;
