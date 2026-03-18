@@ -6,8 +6,6 @@ function get_request_subject_options (): array {
     $subject_options = [
         'alteracao-plano' => _x('Plan change', 'subject', 'hacklabr'),
         'declaracao-associacao' => _x('Statement of association', 'subject', 'hacklabr'),
-        'financeiro' => _x('Financial', 'subject', 'hacklabr'),
-        'fale-conosco' => _x('Talk to us', 'subject', 'hacklabr'),
         'indicadores' => _x('Ethos Indicators', 'subject', 'hacklabr'),
         'cursos' => _x('Courses', 'subject', 'hacklabr'),
         'eventos' => _x('Events', 'subject', 'hacklabr'),
@@ -15,6 +13,7 @@ function get_request_subject_options (): array {
         'publicacoes' => _x('Publications', 'subject', 'hacklabr'),
         'pactos' => _x('Pacts', 'subject', 'hacklabr'),
         'conferencia' => _x('Conference', 'subject', 'hacklabr'),
+        'financeiro' => _x('Financial', 'subject', 'hacklabr'),
         'outros' => _x('Other', 'subject', 'hacklabr'),
     ];
 
@@ -30,7 +29,6 @@ function get_request_crm_area (string $subject): string|null {
         case 'eventos':
             return '969830002'; // Eventos
         case 'cursos':
-        case 'fale-conosco':
         case 'indicadores':
         case 'outros':
         case 'pactos':
@@ -67,7 +65,6 @@ function get_request_crm_type (string $subject): string|null {
         case 'conferencia':
         case 'cursos':
         case 'eventos':
-        case 'fale-conosco':
         case 'financeiro':
         case 'outros':
         case 'palestras':
