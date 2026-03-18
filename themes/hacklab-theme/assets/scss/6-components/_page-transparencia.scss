@@ -1,0 +1,18 @@
+.page-transparencia {
+
+    .wp-block-columns {
+        align-items: center !important;
+        margin-top: $margin--medium;
+        padding-inline: $padding--small;
+
+        p {
+            font-size: $font-size--large;
+        }
+
+        &:not(:last-of-type) {
+            border-bottom: 1px solid $color--high-dark;
+            margin-bottom: $margin--medium;
+            padding-bottom: $padding--medium;
+        }
+    }
+}
