@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-03-18T15:21:27+00:00\n"
-"PO-Revision-Date: 2026-03-18 12:24-0300\n"
+"POT-Creation-Date: 2026-03-19T17:04:49+00:00\n"
+"PO-Revision-Date: 2026-03-19 14:08-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -143,7 +143,7 @@ msgid "Date"
 msgstr "Data"
 
 #: library/blocks/subscription/subscription.php:46
-#: library/forms/requests.php:117 library/forms/requests.php:245
+#: library/forms/requests.php:114 library/forms/requests.php:242
 msgid "Title"
 msgstr "Título"
 
@@ -349,9 +349,10 @@ msgid "Invalid phone number"
 msgstr "Número de telefone inválido"
 
 #: library/events/form.php:106 library/forms/custom-forms.php:314
-#: library/forms/edit-organization.php:278
-#: library/forms/edit-organization.php:314
-#: library/forms/edit-organization.php:341 library/forms/registration.php:277
+#: library/forms/edit-organization.php:276
+#: library/forms/edit-organization.php:303
+#: library/forms/edit-organization.php:321
+#: library/forms/edit-organization.php:361 library/forms/registration.php:277
 msgid "Email"
 msgstr "Email"
 
@@ -560,9 +561,10 @@ msgstr ""
 msgid "Add one more contact"
 msgstr "Adicionar mais um contato"
 
-#: library/forms/custom-forms.php:313 library/forms/edit-organization.php:277
-#: library/forms/edit-organization.php:313
-#: library/forms/edit-organization.php:340
+#: library/forms/custom-forms.php:313 library/forms/edit-organization.php:275
+#: library/forms/edit-organization.php:302
+#: library/forms/edit-organization.php:320
+#: library/forms/edit-organization.php:360
 msgid "Name"
 msgstr "Nome"
 
@@ -603,25 +605,41 @@ msgstr "Salvar"
 msgid "(hidden)"
 msgstr "(oculto)"
 
-#: library/forms/edit-organization.php:274
+#: library/forms/edit-organization.php:141
+msgid "Main contact added"
+msgstr "Contato relevante promovido"
+
+#: library/forms/edit-organization.php:161
+msgid "Approver changed"
+msgstr "Aprovador de cortesias modificado"
+
+#: library/forms/edit-organization.php:195
+msgid "Main contact downgraded"
+msgstr "Contato relevante rebaixado"
+
+#: library/forms/edit-organization.php:272
 msgid "User creation"
 msgstr "Criação de usuário"
 
-#: library/forms/edit-organization.php:286
+#: library/forms/edit-organization.php:284
 msgid "User fields:"
 msgstr "Campos do usuário:"
 
-#: library/forms/edit-organization.php:310
+#: library/forms/edit-organization.php:299
 msgid "User deactivation"
 msgstr "Desativação de usuário"
 
-#: library/forms/edit-organization.php:337
+#: library/forms/edit-organization.php:317
 msgid "User edition"
 msgstr "Edição de usuário"
 
-#: library/forms/edit-organization.php:349
+#: library/forms/edit-organization.php:329
 msgid "Modified fields:"
 msgstr "Campos modificados:"
+
+#: library/forms/edit-organization.php:359 library/forms/requests.php:240
+msgid "Organization"
+msgstr "Organização"
 
 #: library/forms/helpers.php:40
 msgid "Address (street)"
@@ -1005,75 +1023,70 @@ msgstr "Declaração de Associação"
 
 #: library/forms/requests.php:9
 msgctxt "subject"
-msgid "Financial"
-msgstr "Financeiro"
-
-#: library/forms/requests.php:10
-msgctxt "subject"
-msgid "Talk to us"
-msgstr "Fale Conosco"
-
-#: library/forms/requests.php:11
-msgctxt "subject"
 msgid "Ethos Indicators"
 msgstr "Indicadores Ethos"
 
-#: library/forms/requests.php:12
+#: library/forms/requests.php:10
 msgctxt "subject"
 msgid "Courses"
 msgstr "Cursos"
 
-#: library/forms/requests.php:13
+#: library/forms/requests.php:11
 msgctxt "subject"
 msgid "Events"
 msgstr "Eventos"
 
-#: library/forms/requests.php:14
+#: library/forms/requests.php:12
 msgctxt "subject"
 msgid "Lectures"
 msgstr "Palestras"
 
-#: library/forms/requests.php:15
+#: library/forms/requests.php:13
 msgctxt "subject"
 msgid "Publications"
 msgstr "Publicações"
 
-#: library/forms/requests.php:16
+#: library/forms/requests.php:14
 msgctxt "subject"
 msgid "Pacts"
 msgstr "Pactos"
 
-#: library/forms/requests.php:17
+#: library/forms/requests.php:15
 msgctxt "subject"
 msgid "Conference"
 msgstr "Conferência"
 
-#: library/forms/requests.php:18
+#: library/forms/requests.php:16
+msgctxt "subject"
+msgid "Financial"
+msgstr "Financeiro"
+
+#: library/forms/requests.php:17
 msgctxt "subject"
 msgid "Other"
 msgstr "Outros"
 
-#: library/forms/requests.php:94 library/forms/requests.php:244
+#: library/forms/requests.php:91 library/forms/requests.php:241
 msgid "Subject"
 msgstr "Assunto"
 
-#: library/forms/requests.php:99
+#: library/forms/requests.php:96
 msgid "Invalid subject"
 msgstr "Assunto inválido"
 
-#: library/forms/requests.php:118
+#: library/forms/requests.php:115
 msgid "Request title"
 msgstr "Título da solicitação"
 
-#: library/forms/requests.php:124
+#: library/forms/requests.php:121
 msgid "Describe your requirements"
 msgstr "Descreva suas necessidades"
 
-#: library/forms/requests.php:125
+#: library/forms/requests.php:122
 msgid "Describe briefly your demand"
 msgstr "Descreva brevemente sua demanda"
 
-#: library/forms/requests.php:131
+#: library/forms/requests.php:128
 msgid ""
 "I have read and agreed with the <a href=\"%s\" target=\"_blank\">Privacy "
 "Policy</a>"
@@ -1081,32 +1094,28 @@ msgstr ""
 "Li e concordo com a <a href=\"%s\" target=\"_blank\">Política de "
 "Privacidade</a>"
 
-#: library/forms/requests.php:156
+#: library/forms/requests.php:153
 msgid "Requests"
 msgstr "Solicitações"
 
-#: library/forms/requests.php:227
+#: library/forms/requests.php:224
 msgid "(via helpdesk)"
 msgstr "(via suporte)"
 
 #. translators: %1$s: Subject, %2$s: Title.
-#: library/forms/requests.php:239
+#: library/forms/requests.php:236
 msgid "New Request: [%1$s] %2$s"
 msgstr "Nova Ocorrência: [%1$s] %2$s"
 
-#: library/forms/requests.php:242
+#: library/forms/requests.php:239
 msgid "Sender"
 msgstr "Remetente"
 
 #: library/forms/requests.php:243
-msgid "Organization"
-msgstr "Organização"
-
-#: library/forms/requests.php:246
 msgid "Description"
 msgstr "Descrição"
 
-#: library/forms/requests.php:247
+#: library/forms/requests.php:244
 msgid "Occurrence"
 msgstr "Ocorrência"
 
@@ -1360,63 +1369,64 @@ msgstr "Autor:%s"
 msgid "Membership registration finished"
 msgstr "Cadastro de membro finalizado"
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:80
-#: dist/blocks/card-header/editor.js:66 dist/blocks/download-image/editor.js:80
-msgid "Change image"
-msgstr "Alterar imagem"
-
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:83
-#: dist/blocks/card-header/editor.js:69 dist/blocks/download-image/editor.js:83
-msgid "Remove image"
-msgstr "Remover imagem"
-
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:89
-#: dist/blocks/card-header/editor.js:75 dist/blocks/download-image/editor.js:89
-msgid "Select image"
-msgstr "Selecionar imagem"
-
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:97
-#: dist/blocks/banner-with-image/editor.js:146
-#: dist/blocks/card-header/editor.js:83 dist/blocks/download-image/editor.js:97
-msgid "Image"
-msgstr "Imagem"
-
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/card-header/editor.js:19 dist/blocks/download-image/editor.js:29
 #: dist/blocks/banner-with-image/editor.js:129
 #: dist/blocks/card-header/editor.js:115
 #: dist/blocks/download-image/editor.js:129
 msgid "Header content"
 msgstr "Conteúdo do cabeçalho"
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2 dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/card-header/editor.js:19 dist/blocks/posts-grid/editor.js:19
 #: dist/blocks/banner-with-image/editor.js:143
 #: dist/blocks/card-header/editor.js:142 dist/blocks/posts-grid/editor.js:1921
 msgid "Layout"
 msgstr "Layout"
 
-#: dist/blocks/card-body/editor.js:2 dist/blocks/card-body/editor.js:58
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:97
+#: dist/blocks/banner-with-image/editor.js:146
+#: dist/blocks/card-header/editor.js:83 dist/blocks/download-image/editor.js:97
+msgid "Image"
+msgstr "Imagem"
+
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:80
+#: dist/blocks/card-header/editor.js:66 dist/blocks/download-image/editor.js:80
+msgid "Change image"
+msgstr "Alterar imagem"
+
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:83
+#: dist/blocks/card-header/editor.js:69 dist/blocks/download-image/editor.js:83
+msgid "Remove image"
+msgstr "Remover imagem"
+
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:89
+#: dist/blocks/card-header/editor.js:75 dist/blocks/download-image/editor.js:89
+msgid "Select image"
+msgstr "Selecionar imagem"
+
+#: dist/blocks/card-body/editor.js:19 dist/blocks/card-body/editor.js:58
 msgid "Body content"
 msgstr "Conteúdo do corpo"
 
-#: dist/blocks/card-header/editor.js:2 dist/blocks/card-header/editor.js:145
+#: dist/blocks/card-header/editor.js:19 dist/blocks/card-header/editor.js:145
 msgid "Background image"
 msgstr "Imagem de fundo"
 
-#: dist/blocks/form/editor.js:2 dist/blocks/form/editor.js:1383
+#: dist/blocks/form/editor.js:19 dist/blocks/form/editor.js:1383
 msgid "Select option"
 msgstr "Selecione a opção"
 
-#: dist/blocks/form/editor.js:2 dist/blocks/form/editor.js:1388
+#: dist/blocks/form/editor.js:19 dist/blocks/form/editor.js:1388
 #: dist/blocks/form/editor.js:1390
 msgid "Form"
 msgstr "Formulário"
@@ -2019,6 +2029,3 @@ msgstr "Sistema"
 msgctxt "Font family name"
 msgid "Title"
 msgstr "Título"
-
-#~ msgid "Edit organization finances"
-#~ msgstr "Editar finanças da organização"

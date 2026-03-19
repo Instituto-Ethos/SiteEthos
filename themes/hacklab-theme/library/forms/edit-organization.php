@@ -138,6 +138,7 @@ function contacts_add_admin($user_id) {
         update_user_meta($user_id, '_ethos_admin', '1');
 
         notify_admin_addition($user_id);
+        send_user_role_email($user_id, __('Main contact added', 'hacklabr'));
     }
 }
 
@@ -157,6 +158,7 @@ function contacts_add_approver($user_id) {
     update_user_meta($user_id, '_ethos_approver', '1');
 
     notify_approver_change($user_id);
+    send_user_role_email($user_id, __('Approver changed', 'hacklabr'));
 }
 
 function contacts_delete_user($user_id) {
@@ -190,6 +192,7 @@ function contacts_remove_admin($user_id) {
         delete_user_meta($user_id, '_ethos_admin', '1');
 
         notify_admin_removal($user_id);
+        send_user_role_email($user_id, __('Main contact downgraded', 'hacklabr'));
     }
 }
 
@@ -264,16 +267,13 @@ function notify_user_deactivation($user_id) {
 }
 
 function send_user_creation_email($user_id, $params) {
-    $company =  get_organization_by_user($user_id);
-    $manager = get_manager_data($company->ID);
-
     $user = get_user($user_id);
-
-    $email_to = $manager->email ?? '';
+    $company =  get_organization_by_user($user_id);
 
     $email_subject = __('User creation', 'hacklabr');
 
     $email_data = [
+        __('Organization', 'hacklabr') => $company->post_title,
         __('Name', 'hacklabr') => $user->display_name,
         __('Email', 'hacklabr') => $user->user_email,
     ];
@@ -292,24 +292,17 @@ function send_user_creation_email($user_id, $params) {
         }
     }
 
-    $email_headers = [
-        'Content-Type: text/html; charset=UTF-8',
-    ];
-
-    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
+    return send_user_management_email($user_id, $email_subject, $email_message);
 }
 
 function send_user_deactivation_email($user_id) {
-    $company =  get_organization_by_user($user_id);
-    $manager = get_manager_data($company->ID);
-
     $user = get_user($user_id);
-
-    $email_to = $manager->email ?? '';
+    $company =  get_organization_by_user($user_id);
 
     $email_subject = __('User deactivation', 'hacklabr');
 
     $email_data = [
+        __('Organization', 'hacklabr') => $company->post_title,
         __('Name', 'hacklabr') => $user->display_name,
         __('Email', 'hacklabr') => $user->user_email,
     ];
@@ -319,24 +312,17 @@ function send_user_deactivation_email($user_id) {
         $email_message .= "<p><b>{$key}:</b> {$value}</p>";
     }
 
-    $email_headers = [
-        'Content-Type: text/html; charset=UTF-8',
-    ];
-
-    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
+    return send_user_management_email($user_id, $email_subject, $email_message);
 }
 
 function send_user_edition_email($user_id, $params, $previous_meta) {
-    $company =  get_organization_by_user($user_id);
-    $manager = get_manager_data($company->ID);
-
     $user = get_user($user_id);
-
-    $email_to = $manager->email ?? '';
+    $company =  get_organization_by_user($user_id);
 
     $email_subject = __('User edition', 'hacklabr');
 
     $email_data = [
+        __('Organization', 'hacklabr') => $company->post_title,
         __('Name', 'hacklabr') => $user->display_name,
         __('Email', 'hacklabr') => $user->user_email,
     ];
@@ -355,11 +341,38 @@ function send_user_edition_email($user_id, $params, $previous_meta) {
         }
     }
 
-    $email_headers = [
+    return send_user_management_email($user_id, $email_subject, $email_message);
+}
+
+function send_user_management_email($user_id, $subject, $message) {
+    $company =  get_organization_by_user($user_id);
+    $manager = get_manager_data($company->ID);
+
+    $to = $manager->email ?? '';
+
+    $headers = [
         'Content-Type: text/html; charset=UTF-8',
     ];
 
-    return wp_mail($email_to, $email_subject, $email_message, $email_headers);
+    return wp_mail($to, $subject, $message, $headers);
+}
+
+function send_user_role_email($user_id, $email_subject) {
+    $user = get_user($user_id);
+    $company = get_organization_by_user($user_id);
+
+    $email_data = [
+        __('Organization', 'hacklabr') => $company->post_title,
+        __('Name', 'hacklabr') => $user->display_name,
+        __('Email', 'hacklabr') => $user->user_email,
+    ];
+
+    $email_message = '';
+    foreach ($email_data as $key => $value) {
+        $email_message .= "<p><b>{$key}:</b> {$value}</p>";
+    }
+
+    return send_user_management_email($user_id, $email_subject, $email_message);
 }
 
 function validate_edit_organization_form($form_id, $form, $params) {
