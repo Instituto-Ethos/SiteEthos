@@ -1063,24 +1063,3 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
-
-
-add_filter('posts_results', function ($posts, $query) {
-    // Não afeta admin
-    if (is_admin()) {
-        return $posts;
-    }
-
-    // Se não estiver logado, remove manualmente posts da categoria 'curadoria'
-    if (!is_user_logged_in()) {
-        foreach ($posts as $i => $post) {
-            if (has_category('curadoria', $post)) {
-                unset($posts[$i]);
-            }
-        }
-        // Reindexa o array (importante!)
-        $posts = array_values($posts);
-    }
-
-    return $posts;
-}, 10, 2);
