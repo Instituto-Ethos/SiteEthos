@@ -25,6 +25,7 @@ require __DIR__ . '/library/utils.php';
 require __DIR__ . '/library/the-events-calendar/index.php';
 require __DIR__ . '/library/blocks/index.php';
 require __DIR__ . '/library/associates-area.php';
+require __DIR__ . '/library/exclusive-content.php';
 require __DIR__ . '/library/remove-thumbnail-and-excerpt.php';
 require __DIR__ . '/library/shortcodes/shortcodes.php';
 require __DIR__ . '/library/scripts/index.php';
