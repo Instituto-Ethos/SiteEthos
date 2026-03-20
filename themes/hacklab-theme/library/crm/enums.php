@@ -2,6 +2,16 @@
 
 namespace ethos\crm;
 
+enum AccountStatus: int {
+    case Active = 0;
+    case Inactive = 1;
+
+    public static function isActive (int $statecode): bool {
+        $value = self::tryFrom($statecode);
+        return $value === self::Active;
+    }
+}
+
 enum BrazilianUF: int {
     case AC = 7;
     case AL = 15;

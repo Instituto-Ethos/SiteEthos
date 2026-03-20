@@ -67,6 +67,10 @@ function get_account_by_contact( Entity $contact ) {
 }
 
 function is_active_account( Entity $account ) {
+    if ( ! AccountStatus::isActive( $account->Attributes['statecode'] ) ) {
+        return false;
+    }
+
     $account_status = $account->FormattedValues['fut_pl_associacao'] ?? '';
     return in_array( $account_status, ['Associado', 'Grupo Econômico'] );
 }
