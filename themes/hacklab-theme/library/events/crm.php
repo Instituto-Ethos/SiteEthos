@@ -11,8 +11,12 @@ function check_event_availability (int $post_id, string $project_id, string|null
         ];
     }
 
-    $registration_end = get_post_meta($post_id, '_ethos_crm:fut_dt_data_encerramento_inscricoes', true);
     $current_date = date('c');
+
+    $registration_end = get_post_meta($post_id, '_ethos_crm:fut_dt_data_encerramento_inscricoes', true);
+    if (empty($registration_end)) {
+        $registration_end = get_post_meta($post_id, '_ethos_crm:fut_dt_dataehoratermino', true);
+    }
 
     if ($current_date > $registration_end) {
         update_post_meta($post_id, '_ethos:event_status', 'PAST');
