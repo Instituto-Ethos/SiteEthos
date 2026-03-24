@@ -817,7 +817,12 @@ function fix_crm_broken_unicode( string|null $text ): string|null {
  * @param int|null $post_id The organization ID (default to current user's organization).
  * @return object|null The manager data, or null if no manager is found.
  */
-function get_manager_data($post_id = null): object|null {
+function get_manager_data( $post_id = null ): object|null {
+    $cached_data = get_post_meta( $post_id, '_ethos:manager_data', true );
+    if ( ! empty( $cached_data ) ) {
+        return json_decode( $cached_data );
+    }
+
     if ( empty( $post_id ) ) {
         $current_user = hacklabr\get_associated_user_id();
 
@@ -845,10 +850,14 @@ function get_manager_data($post_id = null): object|null {
     $owner_email = $owner_entity->Attributes['internalemailaddress'] ?? null;
 
     if ( $owner_name ) {
-        return (object) [
+        $owner_data = (object) [
             'email' => $owner_email,
             'name' => $owner_name,
         ];
+
+        update_post_meta( $post_id, '_ethos:manager_data', $owner_data, true );
+
+        return $owner_data;
     } else {
         return null;
     }

@@ -388,6 +388,8 @@ function update_from_account( Entity $account, \WP_Post $post ) {
         'meta_input' => $post_meta,
     ] );
 
+    delete_post_meta( $post->ID, '_ethos:manager_data' );
+
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
 
     if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) && ! empty( $attributes['fut_pl_tipo_associacao'] ) ) {
