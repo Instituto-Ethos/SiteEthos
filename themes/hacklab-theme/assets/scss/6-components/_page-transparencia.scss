@@ -15,4 +15,11 @@
             padding-bottom: $padding--medium;
         }
     }
+
+    .wp-block-buttons {
+
+        @include mobile {
+            justify-content: center !important;
+        }
+    }
 }
