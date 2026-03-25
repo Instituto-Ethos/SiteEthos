@@ -149,7 +149,11 @@ function get_courtesy_limits (int $post_id, string|null $plan): int {
     };
 }
 
-function get_courtesy_type (int $post_id, string $contact_id, string $account_id): int {
+function get_courtesy_type (int $post_id, string|null $contact_id, string|null $account_id): int {
+    if (empty($contact_id) || empty($account_id)) {
+        return 969830000; // NÃO
+    }
+
     $user = get_user_by_contact($contact_id);
     if (empty($user)) {
         return 969830000; // NÃO
