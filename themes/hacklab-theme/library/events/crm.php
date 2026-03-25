@@ -331,7 +331,8 @@ function get_registration_lead (array $params): string|null {
     }
 
     // Case 4. If lead does not exist, create it, and return its UUID
-    return create_registration_lead($params);
+    // return create_registration_lead($params);
+    return null;
 }
 
 function registrations_are_open (int $post_id): bool {
