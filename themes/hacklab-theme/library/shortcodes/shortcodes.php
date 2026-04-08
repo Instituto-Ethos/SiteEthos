@@ -91,11 +91,39 @@ function render_company_size_shortcode() : string {
     return $html;
 }
 
+function render_company_count_shortcode() : string {
+    $data = \ethos\crm\get_organizations_count_data();
+
+    $last_updated_text = '';
+
+    if ( ! empty( $data['last_updated'] ) ) {
+        // Convert ISO 8601 to Brazilian format
+        $date = new \DateTime( $data['last_updated'] );
+        $last_updated_text = sprintf(
+            '<div class="company-count__updated">Atualizado em: %s</div>',
+            $date->format( 'd/m/Y' )
+        );
+    }
+
+    $html = '<div class="company-count">';
+    $html .= '<div class="company-count__container">';
+    $html .= $last_updated_text;
+    $html .= '<div class="company-count__total">';
+    $html .= '<span class="company-count__label">Total de empresas associadas:</span>';
+    $html .= '<span class="company-count__number">' . $data['total'] . '</span>';
+    $html .= '</div>';
+    $html .= '</div>';
+    $html .= '</div>';
+
+    return $html;
+}
+
 function register_shortcodes() {
     add_shortcode( 'nome-do-contato', 'hacklabr\\nome_do_contato_shortcode' );
     add_shortcode( 'nome-do-gerente', 'hacklabr\\nome_do_gerente_shortcode' );
     add_shortcode( 'nome-da-empresa', 'hacklabr\\nome_da_empresa_shortcode' );
     add_shortcode( 'porte-das-organizacoes', 'hacklabr\\render_company_size_shortcode' );
+    add_shortcode( 'contagem-de-organizacoes', 'hacklabr\\render_company_count_shortcode' );
 }
 
 add_action( 'init', 'hacklabr\\register_shortcodes' );

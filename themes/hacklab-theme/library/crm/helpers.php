@@ -154,3 +154,60 @@ function get_organizations_company_size_data() : array {
 
     return $result;
 }
+
+/**
+ * Retrieves and caches the count of organizations and last update date.
+ *
+ * This function queries the WordPress database for published 'organizacao' posts
+ * that have a CRM account ID, returning the total count and the most recent
+ * modification date. Results are cached using WordPress transients for 12 hours.
+ *
+ * @since 1.0.0
+ *
+ * @return array {
+ *     @type int         $total        Total number of organizations with CRM account ID.
+ *     @type string|null $last_updated ISO 8601 date string of last update or null.
+ * }
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ */
+function get_organizations_count_data() : array {
+    global $wpdb;
+
+    $transient_key = 'organizations_count_data';
+
+    $cached = get_transient( $transient_key );
+    if ( $cached !== false ) {
+        return $cached;
+    }
+
+    $sql = "
+        SELECT
+            COUNT(DISTINCT p.ID) AS total,
+            MAX(pm2.meta_value) AS last_updated
+        FROM {$wpdb->posts} p
+        INNER JOIN {$wpdb->postmeta} pm1
+            ON pm1.post_id = p.ID
+            AND pm1.meta_key = %s
+            AND pm1.meta_value != ''
+        LEFT JOIN {$wpdb->postmeta} pm2
+            ON pm2.post_id = p.ID
+            AND pm2.meta_key = %s
+        WHERE p.post_type = %s
+          AND p.post_status = %s
+    ";
+
+    $result = $wpdb->get_row(
+        $wpdb->prepare( $sql, '_ethos_crm:accountid', '_ethos_crm:modifiedon', 'organizacao', 'publish' ),
+        ARRAY_A
+    );
+
+    $data = [
+        'total'        => (int) ( $result['total'] ?? 0 ),
+        'last_updated' => $result['last_updated'] ?? null,
+    ];
+
+    set_transient( $transient_key, $data, 12 * HOUR_IN_SECONDS );
+
+    return $data;
+}
