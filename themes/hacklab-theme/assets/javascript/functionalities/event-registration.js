@@ -18,7 +18,7 @@ async function restPost (endpointUrl, args) {
 document.addEventListener('DOMContentLoaded', () => {
     applyMasks()
 
-    document.querySelector('#cnpj').addEventListener('hacklabr:change', async (event) => {
+    document.querySelector('#cnpj')?.addEventListener('hacklabr:change', async (event) => {
         const cnpj = event.data
         if (cnpj.length === 14) {
             try {

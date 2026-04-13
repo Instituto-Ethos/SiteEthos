@@ -70,7 +70,7 @@ function enqueue_last_modified_items (string $entity_name, string|null $last_syn
     }
 }
 
-function sync_next_entity ($args) {
+function sync_next_entity (array $args) {
     [$entity_name, $entity_id] = $args;
 
     \hacklabr\forget_cached_crm_entity($entity_name, $entity_id);
