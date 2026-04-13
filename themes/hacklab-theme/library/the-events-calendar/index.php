@@ -75,3 +75,18 @@ function get_event_url( $subscription ) {
 
     return '#';
 }
+
+function get_venue_from_crm( string|null $venue ): string|null {
+    if ( is_singular( 'tribe_events' ) ) {
+        $post_id = get_the_ID();
+
+        $place = get_post_meta( $post_id, '_ethos_crm:fut_txt_local', true );
+        if ( ! empty( $place ) ) {
+            return str_replace( [ "\n", "\r" ], [ '<br/>', '' ], $place );
+        }
+    }
+
+    return $venue;
+}
+
+add_filter( 'tribe_get_venue', 'hacklabr\\get_venue_from_crm' );
