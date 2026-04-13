@@ -5,8 +5,8 @@ namespace hacklabr;
 function check_event_availability (int $post_id, string $project_id, string|null $contact_id = null): array {
     if (!registrations_are_open($post_id)) {
         return [
-            'clear'   => true,
             'status'  => 'error',
+            'form'    => 'hide',
             'message' => __('Registrations are closed.', 'hacklabr'),
         ];
     }
@@ -22,8 +22,8 @@ function check_event_availability (int $post_id, string $project_id, string|null
         update_post_meta($post_id, '_ethos:event_status', 'PAST');
 
         return [
-            'clear'   => true,
             'status'  => 'error',
+            'form'    => 'hide',
             'message' => __('Registrations are closed.', 'hacklabr'),
         ];
     }
@@ -36,14 +36,14 @@ function check_event_availability (int $post_id, string $project_id, string|null
         update_post_meta($post_id, '_ethos:event_status', 'FULL');
 
         return [
-            'clear'   => true,
             'status'  => 'error',
+            'form'    => 'hide',
             'message' => __('Registrations are closed.', 'hacklabr'),
         ];
     } elseif ($contact_id && in_array($contact_id, $registered_ids)) {
         return [
-            'clear'   => false,
             'status'  => 'error',
+            'form'    => 'clean',
             'message' => __('You are already registered in this event.', 'hacklabr'),
         ];
     } else {
@@ -102,15 +102,15 @@ function create_registration (int $post_id, array $params) {
         }
 
         return [
-            'clear'     => !$paid_event,
             'status'    => 'success',
+            'form'      => $paid_event ? 'checkout' : 'hide',
             'message'   => $message,
             'entity_id' => $entity_id,
         ];
     } catch (\Exception $e) {
         return [
-            'clear'   => false,
             'status'  => 'error',
+            'form'    => 'preserve',
             'message' => $e->getMessage(),
         ];
     }

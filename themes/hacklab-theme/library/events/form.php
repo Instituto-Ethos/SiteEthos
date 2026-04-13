@@ -244,7 +244,7 @@ function get_event_registration_fields () {
 
 function get_event_registration_params () {
     global $hl_event_registration;
-    if (empty($hl_event_registration) || $hl_event_registration['clear'] === false) {
+    if (empty($hl_event_registration) || $hl_event_registration['form'] !== 'preserve') {
         $params = sanitize_form_params();
     } else {
         $params = [];
@@ -351,14 +351,26 @@ function wrap_event_registration_form (string $form_html, array $form) {
 
     if (!empty($hl_event_registration)) {
         $message = sprintf($message_template, $hl_event_registration['status'], $hl_event_registration['message']);
-        $awaiting_payment = is_paid_event($post_id);
+        $awaiting_payment = $hl_event_registration['form'] === 'checkout';
+
+        if ($hl_event_registration['form'] === 'hide') {
+            if ($hl_event_registration['status'] === 'success') {
+                $reload_link = sprintf('<p><button type="button" class="button button--solid" onclick="location.reload(true)">%s</button></p>', __('New registration', 'hacklabr'));
+                return $heading . $message . $reload_link;
+            } else {
+                return $heading . $message;
+            }
+        }
     } else {
         $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
         $availability = check_event_availability($post_id, $project_id);
 
         if (!empty($availability['status'])) {
             $message = sprintf($message_template, 'error', $availability['message']);
-            return $heading . $message;
+
+            if ($availability['form'] === 'hide') {
+                return $heading . $message;
+            }
         }
     }
 
