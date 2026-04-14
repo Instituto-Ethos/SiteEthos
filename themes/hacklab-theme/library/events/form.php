@@ -355,7 +355,7 @@ function wrap_event_registration_form (string $form_html, array $form) {
 
         if ($hl_event_registration['form'] === 'hide') {
             if ($hl_event_registration['status'] === 'success') {
-                $reload_link = sprintf('<p><button type="button" class="button button--solid" onclick="location.reload(true)">%s</button></p>', __('New registration', 'hacklabr'));
+                $reload_link = sprintf('<p><button type="button" class="button button--solid" onclick="location.replace(location.href)">%s</button></p>', __('New registration', 'hacklabr'));
                 return $heading . $message . $reload_link;
             } else {
                 return $heading . $message;
