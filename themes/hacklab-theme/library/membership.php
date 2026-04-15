@@ -24,12 +24,23 @@ function add_user_to_pmpro_group (int $user_id, int $group_id) {
 
     assert($membership instanceof \PMProGroupAcct_Group_Member);
 
-    \pmpro_changeMembershipLevel($child_level_id, $user_id);
+    // Avoid retriggering PMPro side effects for users that already have this level.
+    $current_level = \pmpro_getMembershipLevelForUser($user_id);
+    $current_level_id = (int) ($current_level->id ?? 0);
+
+    if ($current_level_id !== $child_level_id) {
+        \pmpro_changeMembershipLevel($child_level_id, $user_id);
+    }
 
     return $membership;
 }
 
 function approve_user( int $user_id, int $level_id ) {
+    // Re-approving an already approved member can resend PMPro emails.
+    if (\PMPro_Approvals::isApproved($user_id, $level_id)) {
+        return true;
+    }
+
     return \PMPro_Approvals::approveMember( $user_id, $level_id, true );
 }
 
