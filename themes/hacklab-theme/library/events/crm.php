@@ -328,10 +328,11 @@ function get_registration_lead (array $params): string|null {
         if (!empty($leads->Entities)) {
             return $leads->Entities[0]->Id;
         }
+
+        // Case 4. If lead does not exist, create it, and return its UUID
+        return create_registration_lead($params);
     }
 
-    // Case 4. If lead does not exist, create it, and return its UUID
-    // return create_registration_lead($params);
     return null;
 }
 
