@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ethos 1.5.0-dev\n"
+"Project-Id-Version: Ethos 1.5.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-04-13T14:30:48+00:00\n"
+"POT-Creation-Date: 2026-04-17T15:37:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -128,7 +128,7 @@ msgid "Situation"
 msgstr ""
 
 #: library/blocks/my-plan-table/my-plan-table.php:22
-#: dist/blocks/my-plan-table-row/editor.js:2
+#: dist/blocks/my-plan-table-row/editor.js:19
 #: dist/blocks/my-plan-table-row/editor.js:97
 msgid "Benefits"
 msgstr ""
@@ -1144,7 +1144,7 @@ msgstr ""
 msgid "Occurrence"
 msgstr ""
 
-#: library/membership.php:189
+#: library/membership.php:200
 msgid "Organizations"
 msgstr ""
 
@@ -1316,7 +1316,7 @@ msgid "Publication Sample"
 msgstr ""
 
 #: single-publicacao.php:22
-msgid "No document available."
+msgid "No sample available."
 msgstr ""
 
 #: single-publicacao.php:41
@@ -1408,36 +1408,28 @@ msgstr ""
 msgid "Membership registration finished"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:80
-#: dist/blocks/card-header/editor.js:66
-#: dist/blocks/download-image/editor.js:80
-msgid "Change image"
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/card-header/editor.js:19
+#: dist/blocks/download-image/editor.js:29
+#: dist/blocks/banner-with-image/editor.js:129
+#: dist/blocks/card-header/editor.js:115
+#: dist/blocks/download-image/editor.js:129
+msgid "Header content"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:83
-#: dist/blocks/card-header/editor.js:69
-#: dist/blocks/download-image/editor.js:83
-msgid "Remove image"
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/card-header/editor.js:19
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/banner-with-image/editor.js:143
+#: dist/blocks/card-header/editor.js:142
+#: dist/blocks/posts-grid/editor.js:1921
+msgid "Layout"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:89
-#: dist/blocks/card-header/editor.js:75
-#: dist/blocks/download-image/editor.js:89
-msgid "Select image"
-msgstr ""
-
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:29
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29
+#: dist/blocks/download-image/editor.js:39
 #: dist/blocks/banner-with-image/editor.js:97
 #: dist/blocks/banner-with-image/editor.js:146
 #: dist/blocks/card-header/editor.js:83
@@ -1445,289 +1437,298 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/download-image/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:129
-#: dist/blocks/card-header/editor.js:115
-#: dist/blocks/download-image/editor.js:129
-msgid "Header content"
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29
+#: dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:80
+#: dist/blocks/card-header/editor.js:66
+#: dist/blocks/download-image/editor.js:80
+msgid "Change image"
 msgstr ""
 
-#: dist/blocks/banner-with-image/editor.js:2
-#: dist/blocks/card-header/editor.js:2
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/banner-with-image/editor.js:143
-#: dist/blocks/card-header/editor.js:142
-#: dist/blocks/posts-grid/editor.js:1921
-msgid "Layout"
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29
+#: dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:83
+#: dist/blocks/card-header/editor.js:69
+#: dist/blocks/download-image/editor.js:83
+msgid "Remove image"
 msgstr ""
 
-#: dist/blocks/card-body/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:39
+#: dist/blocks/card-header/editor.js:29
+#: dist/blocks/download-image/editor.js:39
+#: dist/blocks/banner-with-image/editor.js:89
+#: dist/blocks/card-header/editor.js:75
+#: dist/blocks/download-image/editor.js:89
+msgid "Select image"
+msgstr ""
+
+#: dist/blocks/card-body/editor.js:19
 #: dist/blocks/card-body/editor.js:58
 msgid "Body content"
 msgstr ""
 
-#: dist/blocks/card-header/editor.js:2
+#: dist/blocks/card-header/editor.js:19
 #: dist/blocks/card-header/editor.js:145
 msgid "Background image"
 msgstr ""
 
-#: dist/blocks/form/editor.js:2
+#: dist/blocks/form/editor.js:19
 #: dist/blocks/form/editor.js:1383
 msgid "Select option"
 msgstr ""
 
-#: dist/blocks/form/editor.js:2
+#: dist/blocks/form/editor.js:19
 #: dist/blocks/form/editor.js:1388
 #: dist/blocks/form/editor.js:1390
 msgid "Form"
 msgstr ""
 
-#: dist/blocks/my-payments/editor.js:2
+#: dist/blocks/my-payments/editor.js:19
 #: dist/blocks/my-payments/editor.js:63
 msgid "My Payments"
 msgstr ""
 
-#: dist/blocks/my-plan-table-row/editor.js:2
+#: dist/blocks/my-plan-table-row/editor.js:19
 #: dist/blocks/my-plan-table-row/editor.js:61
 #: dist/blocks/my-plan-table-row/editor.js:112
 msgid "Custom text"
 msgstr ""
 
-#: dist/blocks/my-plan-table/editor.js:2
+#: dist/blocks/my-plan-table/editor.js:19
 #: dist/blocks/my-plan-table/editor.js:78
 msgid "My Plan - Table"
 msgstr ""
 
-#: dist/blocks/my-plan/editor.js:2
+#: dist/blocks/my-plan/editor.js:19
 #: dist/blocks/my-plan/editor.js:72
 msgid "My Plan"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1346
-msgid "OR"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1938
+msgid "Enable pagination?"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1347
-msgid "AND"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1947
+msgid "Posts per page"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1350
-msgid "Compare terms"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1961
+msgid "Grid columns"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1381
-msgid "Post type"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1971
+msgid "Grid rows"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1386
-msgid "No post type"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1981
+msgid "Grid gap"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1419
-msgid "Taxonomy"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1989
+msgid "Hide author"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1424
-msgid "No taxonomy"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:1997
+msgid "Hide categories"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1446
-msgid "Terms"
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:2005
+msgid "Hide date"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:2013
+msgid "Hide excerpt"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:2021
+msgid "Show taxonomies"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:19
+#: dist/blocks/posts-grid/editor.js:2029
+msgid "Prevent repeat posts"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:30
 #: dist/blocks/posts-grid/editor.js:1502
 msgid "Query"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:30
 #: dist/blocks/posts-grid/editor.js:1526
 msgid "Show children posts?"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:30
 #: dist/blocks/posts-grid/editor.js:1570
 msgid "Filter posts to not display"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:41
 #: dist/blocks/posts-grid/editor.js:1632
 msgid "Card model"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:41
 #: dist/blocks/posts-grid/editor.js:1637
 msgctxt "card"
 msgid "Default model"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:52
 #: dist/blocks/posts-grid/editor.js:1678
 msgid "Card modifier"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:63
+#: dist/blocks/posts-grid/editor.js:1346
+msgid "OR"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:63
+#: dist/blocks/posts-grid/editor.js:1347
+msgid "AND"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:63
+#: dist/blocks/posts-grid/editor.js:1350
+msgid "Compare terms"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:74
+#: dist/blocks/posts-grid/editor.js:1381
+msgid "Post type"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:74
+#: dist/blocks/posts-grid/editor.js:1386
+msgid "No post type"
+msgstr ""
+
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1742
 msgctxt "size"
 msgid "Large"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1743
 msgctxt "size"
 msgid "Medium"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1744
 msgctxt "size"
 msgid "Small"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1745
 msgctxt "size"
 msgid "Extra Large"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1746
 msgctxt "size"
 msgid "Extra Small"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:85
 #: dist/blocks/posts-grid/editor.js:1794
 msgid "Size"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/posts-grid/editor.js:96
 #: dist/blocks/posts-grid/editor.js:1836
 msgid "Taxonomies"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1938
-msgid "Enable pagination?"
+#: dist/blocks/posts-grid/editor.js:107
+#: dist/blocks/posts-grid/editor.js:1419
+msgid "Taxonomy"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1947
-msgid "Posts per page"
+#: dist/blocks/posts-grid/editor.js:107
+#: dist/blocks/posts-grid/editor.js:1424
+msgid "No taxonomy"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1961
-msgid "Grid columns"
+#: dist/blocks/posts-grid/editor.js:118
+#: dist/blocks/posts-grid/editor.js:1446
+msgid "Terms"
 msgstr ""
 
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1971
-msgid "Grid rows"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1981
-msgid "Grid gap"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1989
-msgid "Hide author"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:1997
-msgid "Hide categories"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:2005
-msgid "Hide date"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:2013
-msgid "Hide excerpt"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:2021
-msgid "Show taxonomies"
-msgstr ""
-
-#: dist/blocks/posts-grid/editor.js:2
-#: dist/blocks/posts-grid/editor.js:2029
-msgid "Prevent repeat posts"
-msgstr ""
-
-#: dist/blocks/read-more/editor.js:2
+#: dist/blocks/read-more/editor.js:19
 #: dist/blocks/read-more/editor.js:66
 msgid "Full text"
 msgstr ""
 
-#: dist/blocks/read-more/editor.js:2
+#: dist/blocks/read-more/editor.js:19
 #: dist/blocks/read-more/editor.js:86
 msgid "Lines shown"
 msgstr ""
 
-#: dist/blocks/read-more/editor.js:2
-#: dist/blocks/read-more/index.js:1
+#: dist/blocks/read-more/editor.js:19
+#: dist/blocks/read-more/index.js:19
 #: dist/blocks/read-more/editor.js:105
 #: dist/blocks/read-more/index.js:16
 msgid "Read less"
 msgstr ""
 
-#: dist/blocks/read-more/editor.js:2
-#: dist/blocks/read-more/index.js:1
+#: dist/blocks/read-more/editor.js:19
+#: dist/blocks/read-more/index.js:19
 #: dist/blocks/read-more/editor.js:105
 #: dist/blocks/read-more/editor.js:123
 #: dist/blocks/read-more/index.js:13
 msgid "Read more"
 msgstr ""
 
-#: dist/blocks/steps-viewer/editor.js:2
+#: dist/blocks/steps-viewer/editor.js:29
 #: dist/blocks/steps-viewer/editor.js:97
 msgid "Steps"
 msgstr ""
 
-#: dist/blocks/steps-viewer/editor.js:2
+#: dist/blocks/steps-viewer/editor.js:29
 #: dist/blocks/steps-viewer/editor.js:100
 msgid "Current step"
 msgstr ""
 
-#: dist/blocks/steps-viewer/editor.js:2
+#: dist/blocks/steps-viewer/editor.js:29
 #: dist/blocks/steps-viewer/editor.js:110
 msgid "Last step"
 msgstr ""
 
-#: dist/blocks/steps-viewer/editor.js:2
+#: dist/blocks/steps-viewer/editor.js:29
 #: dist/blocks/steps-viewer/editor.js:120
 #: dist/blocks/steps-viewer/editor.js:136
 msgid "Step %s of %s"
 msgstr ""
 
-#: dist/blocks/subscription/editor.js:2
+#: dist/blocks/subscription/editor.js:19
 #: dist/blocks/subscription/editor.js:63
 msgid "Subscription"
 msgstr ""
 
-#: dist/js/functionalities/gutenberg.js:2
+#: dist/js/functionalities/gutenberg.js:29
 #: dist/js/functionalities/gutenberg.js:2510
 msgid "Iconify ID"
 msgstr ""
 
-#: dist/js/functionalities/sync-crm.js:2
+#: dist/js/functionalities/sync-crm.js:29
 #: dist/js/functionalities/sync-crm.js:119
 #: dist/js/functionalities/sync-crm.js:122
 msgid "Sync with CRM"

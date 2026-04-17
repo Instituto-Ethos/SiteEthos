@@ -19,7 +19,7 @@
                     <?php _e('Publication Sample', 'hacklabr'); ?>
                 </a>
             <?php else : ?>
-                <p><?php _e('No document available.', 'hacklabr'); ?></p>
+                <p><?php _e('No sample available.', 'hacklabr'); ?></p>
             <?php endif; ?>
         </button>
     </aside>
