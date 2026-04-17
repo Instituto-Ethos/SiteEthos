@@ -153,6 +153,12 @@ function get_event_registration_fields () {
             'label' => __('Business name', 'hacklabr'),
             'placeholder' => __('Enter the business name', 'hacklabr'),
             'required' => false,
+            'validate' => function ($value, $context) {
+                if (empty($value) && !empty($context['cnpj'])) {
+                    return __('Business name is required if CNPJ is provided', 'hacklabr');
+                }
+                return true;
+            },
         ],
         'cargo' => [
             'type' => 'text',
