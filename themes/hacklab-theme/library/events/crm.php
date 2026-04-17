@@ -57,8 +57,13 @@ function check_event_availability (int $post_id, string $project_id, string|null
 function create_registration (int $post_id, array $params) {
     $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
+    $lead_id = null;
+    if (!empty($params['cnpj'])) {
+        $lead_id = get_registration_lead($params);
+    }
+
     $account_id = get_registration_account($params);
-    $contact_id = get_registration_contact($params);
+    $contact_id = get_registration_contact($params, $lead_id);
 
     $paid_event = is_paid_event($post_id);
 
@@ -116,9 +121,7 @@ function create_registration (int $post_id, array $params) {
     }
 }
 
-function create_registration_contact (array $params) {
-    $lead_id = get_registration_lead($params);
-
+function create_registration_contact (array $params, string|null $lead_id = null) {
     $full_name = trim($params['nome_completo']);
     $name_parts = explode(' ',  $full_name);
     $first_name = $name_parts[0];
@@ -271,7 +274,7 @@ function get_registration_account (array $params): string|null {
     return null;
 }
 
-function get_registration_contact (array $params): string {
+function get_registration_contact (array $params, string|null $lead_id = null): string {
     // Case 1. Retrieve UUID from current user's data
     if (($user_id = get_current_user_id()) && ($contact_id = get_user_meta($user_id, '_ethos_crm_contact_id', true))) {
         return $contact_id;
@@ -299,7 +302,7 @@ function get_registration_contact (array $params): string {
     }
 
     // Case 4. If contact does not exist, create it, and return its UUID
-    return create_registration_contact($params);
+    return create_registration_contact($params, $lead_id);
 }
 
 function get_registration_lead (array $params): string|null {
