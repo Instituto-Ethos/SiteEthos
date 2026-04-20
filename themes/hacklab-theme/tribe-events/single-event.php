@@ -217,9 +217,6 @@ if( isset($recurrence['rules']) ) {
         if (isset($_GET['certificado'])) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
-            echo do_shortcode('[ethosDadosEvento menu_order=""]');
-            echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
-            /*
             if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
                 echo do_shortcode('[ethosDadosEvento menu_order=""]');
                 echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
@@ -227,7 +224,6 @@ if( isset($recurrence['rules']) ) {
                 echo do_shortcode('[event-details]');
                 echo do_shortcode('[event-registration]');
             }
-            */
         }
     }
     ?>
