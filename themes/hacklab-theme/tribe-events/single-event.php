@@ -197,6 +197,12 @@ if( isset($recurrence['rules']) ) {
 </header>
 
 <main class="post-content stack container">
+    <?php
+    if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
+        the_content();
+    }
+    ?>
+
     <div class="btn">
         <?php
         if ( $pdf || $inscrever ) {
