@@ -197,6 +197,8 @@ if( isset($recurrence['rules']) ) {
 </header>
 
 <main class="post-content stack container">
+    <?php the_content(); ?>
+
     <div class="btn">
         <?php
         if ( $pdf || $inscrever ) {
@@ -219,15 +221,6 @@ if( isset($recurrence['rules']) ) {
         } else {
             echo do_shortcode('[ethosDadosEvento menu_order=""]');
             echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
-            /*
-            if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
-                echo do_shortcode('[ethosDadosEvento menu_order=""]');
-                echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
-            } else {
-                echo do_shortcode('[event-details]');
-                echo do_shortcode('[event-registration]');
-            }
-            */
         }
     }
     ?>
