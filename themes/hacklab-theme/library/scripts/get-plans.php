@@ -24,14 +24,14 @@ function cli_get_active_plans () {
 
     foreach ($accounts as $account) {
         if (\ethos\crm\is_active_account($account)) {
-            $account_status = $account->FormattedValues['fut_pl_associacao'];
+            $account_status = $account->FormattedValues['fut_pl_associacao'] ?? '';
             $is_group = $account_status === 'Grupo Econômico';
 
             fputcsv($csv, [
                 $account->Id,
                 $account->Attributes['name'] ?? '',
                 $is_group ? 'Sim' : 'Não',
-                $account->FormattedValues['fut_pl_tipo_associacao'],
+                $account->FormattedValues['fut_pl_tipo_associacao'] ?? '',
             ]);
         }
     }
