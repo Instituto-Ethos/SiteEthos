@@ -38,7 +38,7 @@ function exclude_exclusive_content_from_results (\WP_Query $query): \WP_Query {
         ];
 
         $old_tax_query = $query->get('tax_query');
-        if (empty($old_tax_query)) {
+        if (!empty($old_tax_query)) {
             $query->set('tax_query', [ 'relation' => 'AND', $old_tax_query, $tax_query ]);
         } else {
             $query->set('tax_query', [ 'relation' => 'AND', $tax_query ]);
