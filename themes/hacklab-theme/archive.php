@@ -14,25 +14,7 @@ if($wp_query->get('category_name')){
     $active_tab = 'all';
 }
 
-$desired_order = [ 'DIREITOS HUMANOS', 'INTEGRIDADE', 'GESTÃO SUSTENTÁVEL', 'MEIO AMBIENTE', 'INSTITUCIONAL' ];
-
-function custom_sort($a, $b) {
-    global $desired_order;
-    $pos_a = array_search($a->name, $desired_order);
-    $pos_b = array_search($b->name, $desired_order);
-
-    if ($pos_a === false && $pos_b === false) {
-        return 0;
-    } elseif ($pos_a === false) {
-        return 1;
-    } elseif ($pos_b === false) {
-        return -1;
-    } else {
-        return $pos_a - $pos_b;
-    }
-}
-
-usort($terms, 'custom_sort');
+usort($terms, 'sort_categories');
 
 ?>
 

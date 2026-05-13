@@ -1072,3 +1072,19 @@ function fix_attachments_on_wp_mail( $atts ) {
 
     return $atts;
 }
+
+function sort_categories( \WP_Term $a, \WP_Term $b ): int {
+    $desired_order = [ 'DIREITOS HUMANOS', 'INTEGRIDADE', 'GESTÃO SUSTENTÁVEL', 'MEIO AMBIENTE', 'INSTITUCIONAL' ];
+    $pos_a = array_search( $a->name, $desired_order );
+    $pos_b = array_search( $b->name, $desired_order );
+
+    if ( $pos_a === false && $pos_b === false ) {
+        return 0;
+    } elseif ( $pos_a === false ) {
+        return 1;
+    } elseif ( $pos_b === false ) {
+        return -1;
+    } else {
+        return $pos_a - $pos_b;
+    }
+}
