@@ -142,3 +142,184 @@ function manually_sync_entity() {
     }
 }
 add_action('admin_init', 'ethos\\crm\\manually_sync_entity');
+
+/**
+ * Resets WordPress internal query log and object cache to free memory.
+ *
+ * Intended to be called periodically inside long-running loops (e.g. bulk post
+ * updates) to prevent memory exhaustion from accumulated query logs and cached objects.
+ *
+ * @since 1.0.0
+ *
+ * @global wpdb    $wpdb            WordPress database abstraction object.
+ * @global WP_Object_Cache $wp_object_cache WordPress object cache instance.
+ */
+function stop_the_insanity () : void {
+    global $wpdb, $wp_object_cache;
+
+    $wpdb->queries = [];
+
+    if ( is_object( $wp_object_cache ) ) {
+        $wp_object_cache->group_ops = [];
+        $wp_object_cache->stats = [];
+        $wp_object_cache->memcache_debug = [];
+        $wp_object_cache->cache = [];
+    }
+
+    if ( method_exists( $wp_object_cache, '__remoteset' ) ) {
+        $wp_object_cache->__remoteset();
+    }
+}
+
+/**
+ * Compares all published organizations in WordPress against active accounts in
+ * the Dynamics 365 CRM and moves orphaned organizations to the trash.
+ *
+ * An organization is considered orphan when it has a `_ethos_crm_account_id` meta
+ * value but the corresponding CRM account is either inactive, not associated
+ * ("Associado"/"Grupo Econômico"), or no longer exists.
+ *
+ * Results are persisted in the `_ethos_last_reconciliation` option and transient
+ * caches for organization counts are invalidated.
+ *
+ * @since 1.0.0
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @return array {
+ *     Reconciliation result.
+ *
+ *     @type string $datetime  MySQL timestamp of execution.
+ *     @type int    $total_wp  Total published organizations with CRM account ID.
+ *     @type int    $total_crm Total active/associated accounts found in CRM.
+ *     @type int    $trashed   Number of organizations moved to trash.
+ *     @type array  $orphans   {
+ *         List of trashed organizations.
+ *
+ *         @type int    $post_id    WordPress post ID.
+ *         @type string $post_title Organization title.
+ *         @type string $account_id CRM account UUID.
+ *     }
+ * }
+ */
+function reconcile_organizations () : array {
+    global $wpdb;
+
+    do_action( 'ethos_crm:log', 'Reconciliation: starting', 'debug' );
+
+    $crm_active_ids = [];
+
+    $accounts = \hacklabr\iterate_crm_entities( 'account', [
+        'cache'    => false,
+        'per_page' => 100,
+        'orderby'  => 'name',
+        'order'    => 'ASC',
+    ] );
+
+    foreach ( $accounts as $account ) {
+        if ( is_active_account( $account ) ) {
+            $crm_active_ids[] = strtolower( $account->Id );
+        }
+    }
+
+    $crm_active_ids = array_flip( $crm_active_ids );
+
+    $sql = "
+        SELECT p.ID AS post_id, p.post_title, pm.meta_value AS account_id
+        FROM {$wpdb->posts} p
+        INNER JOIN {$wpdb->postmeta} pm
+            ON pm.post_id = p.ID AND pm.meta_key = %s
+        WHERE p.post_type = %s
+          AND p.post_status = %s
+    ";
+
+    $wp_orgs = $wpdb->get_results(
+        $wpdb->prepare( $sql, '_ethos_crm_account_id', 'organizacao', 'publish' )
+    );
+
+    $orphans = [];
+
+    foreach ( $wp_orgs as $org ) {
+        $account_id_lower = strtolower( $org->account_id );
+        if ( ! isset( $crm_active_ids[ $account_id_lower ] ) ) {
+            $orphans[] = $org;
+        }
+    }
+
+    $trashed = 0;
+    $trashed_orphans = [];
+
+    foreach ( $orphans as $i => $orphan ) {
+        $result = wp_update_post( [
+            'ID'          => $orphan->post_id,
+            'post_status' => 'trash',
+        ], true );
+
+        if ( is_wp_error( $result ) ) {
+            do_action( 'ethos_crm:log', "Reconciliation: FAILED to trash organization \"{$orphan->post_title}\" (post {$orphan->post_id}): " . $result->get_error_message(), 'error' );
+            continue;
+        }
+
+        do_action( 'ethos_crm:log', "Reconciliation: trashed organization \"{$orphan->post_title}\" (post {$orphan->post_id}, account {$orphan->account_id})", 'debug' );
+
+        $trashed++;
+        $trashed_orphans[] = $orphan;
+
+        if ( ( $i + 1 ) % 20 === 0 ) {
+            stop_the_insanity();
+        }
+    }
+
+    delete_transient( 'organizations_count_data' );
+    delete_transient( 'organizations_company_size_data' );
+
+    $result = [
+        'datetime'  => current_time( 'mysql' ),
+        'total_wp'  => count( $wp_orgs ),
+        'total_crm' => count( $crm_active_ids ),
+        'trashed'   => $trashed,
+        'orphans'   => array_map( function ( $orphan ) {
+            return [
+                'post_id'    => $orphan->post_id,
+                'post_title' => $orphan->post_title,
+                'account_id' => $orphan->account_id,
+            ];
+        }, $trashed_orphans ),
+    ];
+
+    update_option( '_ethos_last_reconciliation', $result );
+
+    do_action( 'ethos_crm:log', "Reconciliation: finished. WP={$result['total_wp']}, CRM={$result['total_crm']}, Trashed={$trashed}", 'debug' );
+
+    return $result;
+}
+
+/**
+ * Enqueues a reconciliation job into the ethos_jobs table for async processing.
+ *
+ * Called by the `hacklabr\run_reconciliation` WP-Cron event. The actual reconciliation
+ * is performed by `handle_reconcile_job()` when the job is picked up by `call_next_job()`.
+ *
+ * @since 1.0.0
+ */
+function run_reconciliation () {
+    ensure_jobs_table();
+    schedule_job( 'reconcile_organizations', [] );
+}
+
+/**
+ * Job handler that executes the organization reconciliation.
+ *
+ * Triggered by the `ethos_job:reconcile_organizations` action when the job
+ * is dequeued by `call_next_job()`.
+ *
+ * @since 1.0.0
+ *
+ * @param array $args Job payload (unused, kept for interface compatibility).
+ */
+function handle_reconcile_job ( array $args ) {
+    reconcile_organizations();
+}
+add_action( 'ethos_job:reconcile_organizations', 'ethos\\crm\\handle_reconcile_job' );
+
+add_action( 'hacklabr\\run_reconciliation', 'ethos\\crm\\run_reconciliation' );
