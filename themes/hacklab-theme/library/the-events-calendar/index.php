@@ -29,6 +29,13 @@ add_filter( 'tribe_events_pro_recurrence_redirect_url', function( $url ) {
     return $url;
 }, 10 );
 
+add_filter( 'register_post_type_args', function ( $args, $post_type ) {
+    if ( $post_type === 'tribe_event_series' ) {
+        $args['exclude_from_search'] = true;
+    }
+    return $args;
+}, 20, 2 );
+
 function replace_events_meta_save_class() {
     remove_action( 'save_post', [ 'Tribe__Events__Main', 'addEventMeta' ], 15 );
     add_action( 'save_post', 'hacklabr\ethos_events_save_meta', 10, 2 );
