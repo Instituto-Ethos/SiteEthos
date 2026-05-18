@@ -101,13 +101,15 @@ function get_organizations_company_size_data() : array {
         FROM {$wpdb->posts} p
         INNER JOIN {$wpdb->postmeta} pm
             ON pm.post_id = p.ID AND pm.meta_key = %s
+        INNER JOIN {$wpdb->postmeta} pm_crm
+            ON pm_crm.post_id = p.ID AND pm_crm.meta_key = %s AND pm_crm.meta_value != ''
         WHERE p.post_type = %s
           AND p.post_status = %s
         GROUP BY LOWER(pm.meta_value)
     ";
 
     $rows = $wpdb->get_results(
-        $wpdb->prepare( $sql, 'porte', 'organizacao', 'publish' ),
+        $wpdb->prepare( $sql, 'porte', '_ethos_crm:accountid', 'organizacao', 'publish' ),
         ARRAY_A
     );
 
