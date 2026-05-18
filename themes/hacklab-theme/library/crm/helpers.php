@@ -211,3 +211,61 @@ function get_organizations_count_data() : array {
 
     return $data;
 }
+
+/**
+ * Renders an Account ID search input on the organizations admin list table.
+ *
+ * Outputs a text field above the posts table that allows filtering organizations
+ * by their Dynamics 365 `_ethos_crm_account_id` meta value (exact match).
+ *
+ * @since 1.0.0
+ *
+ * @param string $post_type The current post type being listed.
+ */
+function admin_account_id_search_field( string $post_type ) : void {
+    if ( $post_type !== 'organizacao' ) {
+        return;
+    }
+
+    $value = isset( $_GET['crm_account_id'] ) ? sanitize_text_field( $_GET['crm_account_id'] ) : '';
+
+    printf(
+        '<input type="search" name="crm_account_id" placeholder="%s" value="%s" />',
+        esc_attr__( 'Account ID (UUID)', 'hacklabr' ),
+        esc_attr( $value )
+    );
+}
+add_action( 'restrict_manage_posts', 'ethos\\crm\\admin_account_id_search_field' );
+
+/**
+ * Applies the Account ID filter to the organizations admin list query.
+ *
+ * When `crm_account_id` is present in the request, adds an exact-match
+ * `meta_query` clause for `_ethos_crm_account_id` to the main WP_Query.
+ *
+ * @since 1.0.0
+ *
+ * @param \WP_Query $query The current WP_Query instance.
+ */
+function admin_account_id_search_query( \WP_Query $query ) : void {
+    if ( ! is_admin() ) {
+        return;
+    }
+
+    if ( $query->get( 'post_type' ) !== 'organizacao' ) {
+        return;
+    }
+
+    if ( empty( $_GET['crm_account_id'] ) ) {
+        return;
+    }
+
+    $meta = $query->get( 'meta_query', [] );
+    $meta[] = [
+        'key'     => '_ethos_crm_account_id',
+        'value'   => sanitize_text_field( $_GET['crm_account_id'] ),
+        'compare' => '=',
+    ];
+    $query->set( 'meta_query', $meta );
+}
+add_action( 'pre_get_posts', 'ethos\\crm\\admin_account_id_search_query' );
