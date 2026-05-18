@@ -70,9 +70,35 @@ add_action( 'init', function() {
     }
 }, 150 );
 
+add_action( 'init', function() {
+    if ( isset( $_GET['crm_sync_account'] ) && current_user_can( 'manage_options' ) ) {
+        if ( function_exists( 'ethos\\crm\\import_account' ) && function_exists( 'hacklabr\\get_crm_entity_by_id' ) ) {
+            $account_id = sanitize_text_field( $_GET['crm_sync_account'] );
+            ini_set( 'max_execution_time', 0 );
+            echo "IMPORTANDO ORGANIZACAO: " . esc_html( $account_id ) . "<pre>";
+
+            $entity = \hacklabr\get_crm_entity_by_id( 'account', $account_id );
+
+            if ( empty( $entity ) ) {
+                echo "Account nao encontrada no CRM.";
+            } else {
+                $result = \ethos\crm\import_account( $entity, true );
+
+                if ( $result && ! is_wp_error( $result ) ) {
+                    echo "Organizacao importada com sucesso. Post ID: " . $result;
+                } else {
+                    $error = is_wp_error( $result ) ? $result->get_error_message() : 'Retorno nulo — a organizacao pode estar inativa ou sem associacao no CRM.';
+                    echo "Erro ao importar: " . esc_html( $error );
+                }
+            }
+
+            die;
+        }
+    }
+}, 150 );
+
 /**
  * Adds a custom filter to the WordPress search query in admin to include meta fields in the search.
- *
  * Hooks:
  * - `admin_init`: Initializes the custom filter when the admin area is initialized.
  * - `posts_search`: Modifies the search query to include posts with a specific meta key and value.
