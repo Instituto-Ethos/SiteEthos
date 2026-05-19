@@ -63,6 +63,7 @@ function post_types_in_search_results( $query ) {
         if($post_type) {
             if($post_type === 'events'){
                 $query->set( 'post_type', 'tribe_events' );
+                $query->set( 'post_parent', 0 );
             }else{
                 $query->set( 'post_type', explode(',', $post_type) );
 
@@ -71,4 +72,13 @@ function post_types_in_search_results( $query ) {
     }
 }
 add_action( 'pre_get_posts', 'hacklabr\\post_types_in_search_results' );
+
+function exclude_event_children_from_search( $where, $query ) {
+    if ( $query->is_search() && ! $query->is_admin() ) {
+        global $wpdb;
+        $where .= " AND ({$wpdb->posts}.post_type != 'tribe_events' OR {$wpdb->posts}.post_parent = 0)";
+    }
+    return $where;
+}
+add_filter( 'posts_where', 'hacklabr\\exclude_event_children_from_search', 10, 2 );
 

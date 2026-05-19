@@ -6,7 +6,10 @@ require_once get_theme_file_path( 'library/the-events-calendar/Meta_Save.php' );
 
 add_action( 'init', 'hacklabr\replace_events_meta_save_class' );
 
-// Keep past occurrences accessible: avoid TEC Pro recurrence redirect.
+// @todo Avaliar remocao: estes filtros pertenciam ao TEC Pro pre-6.0 (Tribe__Events__Pro__Recurrence__Navigation).
+//       No TEC Pro v7+ com Custom Tables V1, os hooks `tribe_events_pro_detect_recurrence_redirect` e
+//       `tribe_events_pro_recurrence_redirect_url` nao sao mais aplicados (apply_filters). Este codigo e inativo.
+//       O redirect de ocorrencias para o evento pai e feito por redirect_recurring_events_to_parent() em utils.php.
 add_filter( 'tribe_events_pro_detect_recurrence_redirect', '__return_false', 10, 2 );
 add_filter( 'tribe_events_pro_recurrence_redirect_url', function( $url ) {
     $wp_query = tribe_get_global_query_object();
@@ -25,6 +28,13 @@ add_filter( 'tribe_events_pro_recurrence_redirect_url', function( $url ) {
 
     return $url;
 }, 10 );
+
+add_filter( 'register_post_type_args', function ( $args, $post_type ) {
+    if ( $post_type === 'tribe_event_series' ) {
+        $args['exclude_from_search'] = true;
+    }
+    return $args;
+}, 20, 2 );
 
 function replace_events_meta_save_class() {
     remove_action( 'save_post', [ 'Tribe__Events__Main', 'addEventMeta' ], 15 );
