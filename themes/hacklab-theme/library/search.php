@@ -82,3 +82,16 @@ function exclude_event_children_from_search( $where, $query ) {
 }
 add_filter( 'posts_where', 'hacklabr\\exclude_event_children_from_search', 10, 2 );
 
+function exclude_orphaned_events_from_search( $where, $query ) {
+    if ( $query->is_search() && ! $query->is_admin() ) {
+        global $wpdb;
+        $tec_table = $wpdb->prefix . 'tec_events';
+        $where .= " AND (
+            {$wpdb->posts}.post_type != 'tribe_events'
+            OR {$wpdb->posts}.ID IN (SELECT post_id FROM {$tec_table})
+        )";
+    }
+    return $where;
+}
+add_filter( 'posts_where', 'hacklabr\\exclude_orphaned_events_from_search', 10, 2 );
+
