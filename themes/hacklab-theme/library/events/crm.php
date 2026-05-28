@@ -323,9 +323,21 @@ function get_registration_lead (array $params): string|null {
         }
 
         // Case 3. Retrieve UUID directly from CRM leads
+
+        // Case 3.1. Without CNPJ mask
         $leads = get_crm_entities('lead', [
             'filters' => [
-                'fut_st_cnpjsemmascara' => $params['cnpj'],
+                'fut_st_cnpj' => $params['cnpj'],
+            ],
+        ]);
+        if (!empty($leads->Entities)) {
+            return $leads->Entities[0]->Id;
+        }
+
+        // Case 3.2. With CNPJ mask
+        $leads = get_crm_entities('lead', [
+            'filters' => [
+                'fut_st_cnpj' => format_cnpj($params['cnpj']),
             ],
         ]);
         if (!empty($leads->Entities)) {
