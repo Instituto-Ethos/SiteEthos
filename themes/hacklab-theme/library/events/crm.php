@@ -62,10 +62,28 @@ function create_registration (int $post_id, array $params) {
         $lead_id = get_registration_lead($params);
     }
 
-    $account_id = get_registration_account($params);
-    $contact_id = get_registration_contact($params, $lead_id);
-
     $paid_event = is_paid_event($post_id);
+    $associates_event = is_associates_event($post_id);
+
+    $account_id = get_registration_account($params);
+    $contact_id = get_registration_contact($params, $lead_id, !$associates_event);
+
+    if ($associates_event) {
+        $user_is_associate = false;
+
+        if (!empty($contact_id)) {
+            $user_id = get_user_by_contact($contact_id);
+            $user_is_associate = !empty($user_id);
+        }
+
+        if (!$user_is_associate) {
+            return [
+                'status'  => 'error',
+                'form'    => 'clean',
+                'message' => __('This event is exclusive for associates.', 'hacklabr'),
+            ];
+        }
+    }
 
     $availability = check_event_availability($post_id, $project_id, $contact_id);
     if (!empty($availability['status'])) {
@@ -274,7 +292,7 @@ function get_registration_account (array $params): string|null {
     return null;
 }
 
-function get_registration_contact (array $params, string|null $lead_id = null): string {
+function get_registration_contact (array $params, string|null $lead_id = null, bool $allow_creation = true): string|null {
     // Case 1. Retrieve UUID from current user's data
     if (($user_id = get_current_user_id()) && ($contact_id = get_user_meta($user_id, '_ethos_crm_contact_id', true))) {
         return $contact_id;
@@ -302,7 +320,11 @@ function get_registration_contact (array $params, string|null $lead_id = null): 
     }
 
     // Case 4. If contact does not exist, create it, and return its UUID
-    return create_registration_contact($params, $lead_id);
+    if ($allow_creation) {
+        return create_registration_contact($params, $lead_id);
+    } else {
+        return null;
+    }
 }
 
 function get_registration_lead (array $params): string|null {

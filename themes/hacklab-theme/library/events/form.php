@@ -2,6 +2,11 @@
 
 namespace hacklabr;
 
+function is_associates_event (int $post_id) {
+    $is_associates = !empty(get_post_meta($post_id, '_ethos_crm:i4d_apenas_para_associados', true));
+    return $is_associates;
+}
+
 function is_paid_event (int $post_id) {
     $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago', true));
     return $is_paid;
