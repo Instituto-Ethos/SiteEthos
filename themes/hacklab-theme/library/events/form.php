@@ -19,7 +19,7 @@ function is_legacy_event (int $post_id) {
     $post = get_post($post_id);
     $post_creation = $post->post_date_gmt;
 
-    $threshold = '2026-03-12 20:00:00';
+    $threshold = '2026-06-02 00:00:00';
 
     return strcmp($post_creation, $threshold) < 0;
 }
