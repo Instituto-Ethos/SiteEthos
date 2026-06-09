@@ -2,6 +2,11 @@
 
 namespace hacklabr;
 
+function is_associates_event (int $post_id) {
+    $is_associates = !empty(get_post_meta($post_id, '_ethos_crm:i4d_apenas_para_associados', true));
+    return $is_associates;
+}
+
 function is_paid_event (int $post_id) {
     $is_paid = !empty(get_post_meta($post_id, '_ethos_crm:fut_pago', true));
     return $is_paid;
@@ -14,7 +19,7 @@ function is_legacy_event (int $post_id) {
     $post = get_post($post_id);
     $post_creation = $post->post_date_gmt;
 
-    $threshold = '2026-03-12 20:00:00';
+    $threshold = '2026-06-02 00:00:00';
 
     return strcmp($post_creation, $threshold) < 0;
 }
