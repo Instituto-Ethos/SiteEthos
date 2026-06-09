@@ -100,3 +100,82 @@ function get_venue_from_crm( string|null $venue ): string|null {
 }
 
 add_filter( 'tribe_get_venue', 'hacklabr\\get_venue_from_crm' );
+
+add_action( 'ethos_job:fix_orphaned_events', 'hacklabr\\fix_orphaned_events_batch' );
+
+function fix_orphaned_events_batch() {
+    global $wpdb;
+
+    $batch_size   = 10;
+    $max_batches  = 50;
+    $tec_table    = $wpdb->prefix . 'tec_events';
+    $batch_option = '_ethos_fix_orphaned_events_batch';
+
+    $orphans = $wpdb->get_col( $wpdb->prepare(
+        "SELECT p.ID FROM {$wpdb->posts} p
+         LEFT JOIN {$tec_table} te ON te.post_id = p.ID
+         WHERE p.post_type = 'tribe_events'
+           AND p.post_status = 'publish'
+           AND te.event_id IS NULL
+         ORDER BY p.ID
+         LIMIT %d",
+        $batch_size
+    ) );
+
+    if ( empty( $orphans ) ) {
+        delete_option( $batch_option );
+        do_action( 'logger', 'fix_orphaned_events: Nenhum evento orfao restante. Tarefa concluida.', 'info' );
+        return;
+    }
+
+    $batch_num   = (int) get_option( $batch_option, 0 ) + 1;
+    $events_service = tribe( \TEC\Events\Custom_Tables\V1\Updates\Events::class );
+    $fixed   = 0;
+    $skipped = 0;
+
+    foreach ( $orphans as $post_id ) {
+        $start = get_post_meta( $post_id, '_EventStartDate', true );
+        if ( empty( $start ) ) {
+            $skipped++;
+            do_action( 'logger', "fix_orphaned_events: Post {$post_id} ignorado - sem _EventStartDate", 'warning' );
+            continue;
+        }
+
+        $result = $events_service->update( $post_id );
+        if ( $result ) {
+            $fixed++;
+        } else {
+            $skipped++;
+            do_action( 'logger', "fix_orphaned_events: Post {$post_id} falhou ao atualizar custom tables", 'error' );
+        }
+    }
+
+    $remaining = (int) $wpdb->get_var(
+        "SELECT COUNT(*) FROM {$wpdb->posts} p
+         LEFT JOIN {$tec_table} te ON te.post_id = p.ID
+         WHERE p.post_type = 'tribe_events'
+           AND p.post_status = 'publish'
+           AND te.event_id IS NULL"
+    );
+
+    do_action( 'logger', sprintf(
+        'fix_orphaned_events: Batch %d/%d concluido - Corrigidos: %d, Ignorados: %d, Restantes: %d',
+        $batch_num, $max_batches, $fixed, $skipped, $remaining
+    ), 'info' );
+
+    if ( $remaining > 0 && $batch_num < $max_batches ) {
+        update_option( $batch_option, $batch_num );
+        \ethos\crm\ensure_jobs_table();
+        \ethos\crm\schedule_job( 'fix_orphaned_events', '' );
+    } else {
+        delete_option( $batch_option );
+        if ( $batch_num >= $max_batches ) {
+            do_action( 'logger', sprintf(
+                'fix_orphaned_events: Limite de %d batches atingido. Restantes: %d. Interrompido para evitar loop infinito.',
+                $max_batches, $remaining
+            ), 'warning' );
+        } else {
+            do_action( 'logger', 'fix_orphaned_events: Todos os eventos orfaos foram processados. Tarefa concluida.', 'info' );
+        }
+    }
+}

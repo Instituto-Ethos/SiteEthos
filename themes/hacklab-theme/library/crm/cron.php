@@ -323,3 +323,129 @@ function handle_reconcile_job ( array $args ) {
 add_action( 'ethos_job:reconcile_organizations', 'ethos\\crm\\handle_reconcile_job' );
 
 add_action( 'hacklabr\\run_reconciliation', 'ethos\\crm\\run_reconciliation' );
+
+/**
+ * Enqueues a deduplication job into the ethos_jobs table for async processing.
+ *
+ * Called by the `hacklabr\handle_run_deduplication()` admin-post handler.
+ * The actual deduplication is performed by `handle_deduplicate_job()` when
+ * the job is picked up by `call_next_job()`.
+ *
+ * @since 1.0.0
+ */
+function run_deduplication () {
+    ensure_jobs_table();
+    schedule_job( 'deduplicate_organizations', [] );
+}
+
+/**
+ * Deduplicates published organizations that share the same CRM Account ID.
+ *
+ * For each group of duplicates, keeps only the most recent post (highest ID)
+ * and moves the older ones to the trash. Results are persisted in the
+ * `_ethos_last_deduplication` option.
+ *
+ * @since 1.0.0
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @return array {
+ *     Deduplication result.
+ *
+ *     @type string $datetime   MySQL timestamp of execution.
+ *     @type int    $duplicates Number of duplicate groups found.
+ *     @type int    $trashed    Number of posts moved to trash.
+ *     @type array  $groups     {
+ *         List of duplicate groups processed.
+ *
+ *         @type string $account_id  CRM account UUID.
+ *         @type int    $kept        Post ID that was kept.
+ *         @type array  $trashed_ids Post IDs that were trashed.
+ *     }
+ * }
+ */
+function deduplicate_organizations () : array {
+    global $wpdb;
+
+    do_action( 'ethos_crm:log', 'Deduplication: starting', 'debug' );
+
+    $sql = "
+        SELECT pm.meta_value AS account_id, GROUP_CONCAT( p.ID ORDER BY p.ID DESC ) AS post_ids
+        FROM {$wpdb->posts} p
+        INNER JOIN {$wpdb->postmeta} pm
+            ON pm.post_id = p.ID AND pm.meta_key = %s
+        WHERE p.post_type = %s
+          AND p.post_status = %s
+        GROUP BY pm.meta_value
+        HAVING COUNT( * ) > 1
+        ORDER BY pm.meta_value
+    ";
+
+    $groups = $wpdb->get_results(
+        $wpdb->prepare( $sql, '_ethos_crm_account_id', 'organizacao', 'publish' )
+    );
+
+    $trashed      = 0;
+    $group_results = [];
+
+    foreach ( $groups as $i => $group ) {
+        $ids = array_map( 'absint', explode( ',', $group->post_ids ) );
+        $kept_id      = array_shift( $ids );
+        $trashed_ids  = [];
+
+        foreach ( $ids as $dup_id ) {
+            $result = wp_update_post( [
+                'ID'          => $dup_id,
+                'post_status' => 'trash',
+            ], true );
+
+            if ( is_wp_error( $result ) ) {
+                do_action( 'ethos_crm:log', "Deduplication: FAILED to trash post {$dup_id} (account {$group->account_id}): " . $result->get_error_message(), 'error' );
+                continue;
+            }
+
+            $trashed++;
+            $trashed_ids[] = $dup_id;
+        }
+
+        if ( ! empty( $trashed_ids ) ) {
+            $group_results[] = [
+                'account_id'  => $group->account_id,
+                'kept'        => $kept_id,
+                'trashed_ids' => $trashed_ids,
+            ];
+        }
+
+        if ( ( $i + 1 ) % 20 === 0 ) {
+            stop_the_insanity();
+        }
+    }
+
+    $result = [
+        'datetime'   => current_time( 'mysql' ),
+        'duplicates' => count( $group_results ),
+        'trashed'    => $trashed,
+        'groups'     => $group_results,
+    ];
+
+    update_option( '_ethos_last_deduplication', $result );
+
+    do_action( 'ethos_crm:log', "Deduplication: finished. Groups={$result['duplicates']}, Trashed={$trashed}", 'debug' );
+
+    return $result;
+}
+
+/**
+ * Job handler that executes the organization deduplication.
+ *
+ * Triggered by the `ethos_job:deduplicate_organizations` action when the job
+ * is dequeued by `call_next_job()`.
+ *
+ * @since 1.0.0
+ *
+ * @param array $args Job payload (unused, kept for interface compatibility).
+ */
+function handle_deduplicate_job ( array $args ) {
+    deduplicate_organizations();
+}
+add_action( 'ethos_job:deduplicate_organizations', 'ethos\\crm\\handle_deduplicate_job' );
