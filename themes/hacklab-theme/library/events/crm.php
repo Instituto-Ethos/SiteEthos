@@ -83,6 +83,18 @@ function create_registration (int $post_id, array $params) {
                 'message' => __('This event is exclusive for associates.', 'hacklabr'),
             ];
         }
+
+        if (!empty($account_id)) {
+            $account = get_crm_entity_by_id('account', $account_id);
+
+            if (($account->Attributes['fut_pl_situacaofinanceira'] ?? 0) === 969830003 /* Adimplente Congelada */) {
+                return [
+                    'status'  => 'error',
+                    'form'    => 'clean',
+                    'message' => __('Your association is frozen. Please contact your account manager.', 'hacklabr'),
+                ];
+            }
+        }
     }
 
     $availability = check_event_availability($post_id, $project_id, $contact_id);

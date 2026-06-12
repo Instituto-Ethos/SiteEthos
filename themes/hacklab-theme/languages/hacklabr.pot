@@ -2,14 +2,14 @@
 # This file is distributed under the GNU General Public License v2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Ethos 1.5.6 (feat/events-form)\n"
+"Project-Id-Version: Ethos 1.6.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-01T15:23:27+00:00\n"
+"POT-Creation-Date: 2026-06-12T18:12:18+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: hacklabr\n"
@@ -182,11 +182,15 @@ msgstr ""
 msgid "This event is exclusive for associates."
 msgstr ""
 
-#: library/events/crm.php:122
+#: library/events/crm.php:94
+msgid "Your association is frozen. Please contact your account manager."
+msgstr ""
+
+#: library/events/crm.php:134
 msgid "You are registered to this event, but payment is pending."
 msgstr ""
 
-#: library/events/crm.php:124
+#: library/events/crm.php:136
 msgid "You are successfully registered to this event!"
 msgstr ""
 

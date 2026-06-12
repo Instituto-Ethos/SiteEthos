@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-06-01T15:23:27+00:00\n"
-"PO-Revision-Date: 2026-06-01 12:26-0300\n"
+"POT-Creation-Date: 2026-06-12T18:12:18+00:00\n"
+"PO-Revision-Date: 2026-06-12 15:14-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -180,11 +180,15 @@ msgstr "Você já se inscreveu neste evento."
 msgid "This event is exclusive for associates."
 msgstr "Este evento é exclusivo para associados."
 
-#: library/events/crm.php:122
+#: library/events/crm.php:94
+msgid "Your association is frozen. Please contact your account manager."
+msgstr "Sua associação está congelada. Contate seu gerente de conta."
+
+#: library/events/crm.php:134
 msgid "You are registered to this event, but payment is pending."
 msgstr "Você já se inscreveu neste evento, mas o pagamento está pendente."
 
-#: library/events/crm.php:124
+#: library/events/crm.php:136
 msgid "You are successfully registered to this event!"
 msgstr "Inscrição realizada com sucesso!"
 
