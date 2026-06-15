@@ -297,6 +297,7 @@ function get_registration_account (array $params): string|null {
         ],
     ]);
     if (!empty($accounts->Entities)) {
+        cache_crm_entity($accounts->Entities[0]);
         return $accounts->Entities[0]->Id;
     }
 
@@ -328,6 +329,7 @@ function get_registration_contact (array $params, string|null $lead_id = null, b
         ],
     ]);
     if (!empty($contacts->Entities)) {
+        cache_crm_entity($contacts->Entities[0]);
         return $contacts->Entities[0]->Id;
     }
 
@@ -365,6 +367,7 @@ function get_registration_lead (array $params): string|null {
             ],
         ]);
         if (!empty($leads->Entities)) {
+            cache_crm_entity($leads->Entities[0]);
             return $leads->Entities[0]->Id;
         }
 
@@ -375,6 +378,7 @@ function get_registration_lead (array $params): string|null {
             ],
         ]);
         if (!empty($leads->Entities)) {
+            cache_crm_entity($leads->Entities[0]);
             return $leads->Entities[0]->Id;
         }
 
