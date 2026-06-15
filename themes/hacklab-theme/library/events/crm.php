@@ -273,14 +273,15 @@ function get_event_registrations (string $project_id) {
 
 function get_registration_account (array $params): string|null {
     // Case 1. Retrieve UUID from current user's organization
-    if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
-        return $account_id;
+    if (empty($params['cnpj'])) {
+        if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
+            return $account_id;
+        } else {
+            return null;
+        }
     }
 
     // Case 2. Retrieve UUID from other WordPress organizations
-    if (empty($params['cnpj'])) {
-        return null;
-    }
     $posts = get_posts([
         'meta_query' => [
             [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
