@@ -91,7 +91,7 @@ function create_registration (int $post_id, array $params) {
                 return [
                     'status'  => 'error',
                     'form'    => 'clean',
-                    'message' => __('Your association is frozen. Please contact your account manager.', 'hacklabr'),
+                    'message' => __('Your registration could not be processed. Please contact your account manager to resolve any outstanding issues or report any errors.', 'hacklabr'),
                 ];
             }
         }
