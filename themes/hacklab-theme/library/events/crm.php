@@ -83,6 +83,18 @@ function create_registration (int $post_id, array $params) {
                 'message' => __('This event is exclusive for associates.', 'hacklabr'),
             ];
         }
+
+        if (!empty($account_id)) {
+            $account = get_crm_entity_by_id('account', $account_id);
+
+            if (($account->Attributes['fut_pl_situacaofinanceira'] ?? 0) === 969830003 /* Adimplente Congelada */) {
+                return [
+                    'status'  => 'error',
+                    'form'    => 'clean',
+                    'message' => __('Your registration could not be processed. Please contact your account manager to resolve any outstanding issues or report any errors.', 'hacklabr'),
+                ];
+            }
+        }
     }
 
     $availability = check_event_availability($post_id, $project_id, $contact_id);
@@ -261,14 +273,15 @@ function get_event_registrations (string $project_id) {
 
 function get_registration_account (array $params): string|null {
     // Case 1. Retrieve UUID from current user's organization
-    if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
-        return $account_id;
+    if (empty($params['cnpj'])) {
+        if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
+            return $account_id;
+        } else {
+            return null;
+        }
     }
 
     // Case 2. Retrieve UUID from other WordPress organizations
-    if (empty($params['cnpj'])) {
-        return null;
-    }
     $posts = get_posts([
         'meta_query' => [
             [ 'key' => 'cnpj', 'value' => $params['cnpj'] ],
@@ -285,6 +298,7 @@ function get_registration_account (array $params): string|null {
         ],
     ]);
     if (!empty($accounts->Entities)) {
+        cache_crm_entity($accounts->Entities[0]);
         return $accounts->Entities[0]->Id;
     }
 
@@ -316,6 +330,7 @@ function get_registration_contact (array $params, string|null $lead_id = null, b
         ],
     ]);
     if (!empty($contacts->Entities)) {
+        cache_crm_entity($contacts->Entities[0]);
         return $contacts->Entities[0]->Id;
     }
 
@@ -353,6 +368,7 @@ function get_registration_lead (array $params): string|null {
             ],
         ]);
         if (!empty($leads->Entities)) {
+            cache_crm_entity($leads->Entities[0]);
             return $leads->Entities[0]->Id;
         }
 
@@ -363,6 +379,7 @@ function get_registration_lead (array $params): string|null {
             ],
         ]);
         if (!empty($leads->Entities)) {
+            cache_crm_entity($leads->Entities[0]);
             return $leads->Entities[0]->Id;
         }
 
