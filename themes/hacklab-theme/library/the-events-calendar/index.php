@@ -111,15 +111,22 @@ function fix_orphaned_events_batch() {
     $tec_table    = $wpdb->prefix . 'tec_events';
     $batch_option = '_ethos_fix_orphaned_events_batch';
 
+    // Bail if TEC custom table does not exist (plugin deactivated).
+    if ( $wpdb->get_var( $wpdb->prepare( "SHOW TABLES LIKE %s", $tec_table ) ) !== $tec_table ) {
+        delete_option( $batch_option );
+        do_action( 'logger', 'fix_orphaned_events: Tabela ' . $tec_table . ' nao encontrada. TEC esta ativo?', 'error' );
+        return;
+    }
+
     $orphans = $wpdb->get_col( $wpdb->prepare(
         "SELECT p.ID FROM {$wpdb->posts} p
          LEFT JOIN {$tec_table} te ON te.post_id = p.ID
-         WHERE p.post_type = 'tribe_events'
-           AND p.post_status = 'publish'
+         WHERE p.post_type = %s
+           AND p.post_status = %s
            AND te.event_id IS NULL
          ORDER BY p.ID
          LIMIT %d",
-        $batch_size
+        'tribe_events', 'publish', $batch_size
     ) );
 
     if ( empty( $orphans ) ) {
@@ -150,13 +157,14 @@ function fix_orphaned_events_batch() {
         }
     }
 
-    $remaining = (int) $wpdb->get_var(
+    $remaining = (int) $wpdb->get_var( $wpdb->prepare(
         "SELECT COUNT(*) FROM {$wpdb->posts} p
          LEFT JOIN {$tec_table} te ON te.post_id = p.ID
-         WHERE p.post_type = 'tribe_events'
-           AND p.post_status = 'publish'
-           AND te.event_id IS NULL"
-    );
+         WHERE p.post_type = %s
+           AND p.post_status = %s
+           AND te.event_id IS NULL",
+        'tribe_events', 'publish'
+    ) );
 
     do_action( 'logger', sprintf(
         'fix_orphaned_events: Batch %d/%d concluido - Corrigidos: %d, Ignorados: %d, Restantes: %d',
@@ -165,7 +173,6 @@ function fix_orphaned_events_batch() {
 
     if ( $remaining > 0 && $batch_num < $max_batches ) {
         update_option( $batch_option, $batch_num );
-        \ethos\crm\ensure_jobs_table();
         \ethos\crm\schedule_job( 'fix_orphaned_events', '' );
     } else {
         delete_option( $batch_option );
