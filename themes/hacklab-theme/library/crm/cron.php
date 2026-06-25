@@ -22,12 +22,22 @@ function call_next_job () {
         return false;
     }
 
+    do_action( 'ethos_crm:log', "call_next_job: Picked up job #{$row->job_id} name={$row->job_name} payload={$row->job_payload}", 'debug' );
+
+    // Delete the job before executing it to allow re-enqueueing during execution
+    // (e.g. batch jobs that schedule the next iteration).
+    $deleted = $wpdb->delete($wpdb->prefix . 'ethos_jobs', [ 'job_id' => $row->job_id ], ['%d']);
+
+    if ( empty( $deleted ) ) {
+        do_action( 'ethos_crm:log', "call_next_job: FAILED to delete job #{$row->job_id} before execution", 'error' );
+    }
+
     try {
         do_action('ethos_job:' . $row->job_name, json_decode($row->job_payload));
-        $result = $wpdb->delete($wpdb->prefix . 'ethos_jobs', [ 'job_id' => $row->job_id ], ['%d']);
-        return !empty($result);
+        do_action( 'ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) completed successfully", 'debug' );
+        return true;
     } catch (\Throwable $err) {
-        do_action('logger', $err->getMessage());
+        do_action('ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) threw exception: " . $err->getMessage(), 'error');
         return false;
     }
 }
@@ -45,6 +55,7 @@ function schedule_job (string $name, mixed $payload) {
     ]);
     $query = $wpdb->get_row($query_sql, \OBJECT);
     if (!empty($query)) {
+        do_action( 'ethos_crm:log', "schedule_job: Skipped duplicate job name={$name} payload={$json_payload} (already job #{$query->job_id})", 'debug' );
         return false;
     }
 
@@ -52,6 +63,13 @@ function schedule_job (string $name, mixed $payload) {
         'job_name' => $name,
         'job_payload' => $json_payload,
     ], ['%s', '%s']);
+
+    if ( empty( $result ) ) {
+        do_action( 'ethos_crm:log', "schedule_job: FAILED to insert job name={$name} payload={$json_payload}. DB error: " . $wpdb->last_error, 'error' );
+    } else {
+        do_action( 'ethos_crm:log', "schedule_job: Enqueued job name={$name} payload={$json_payload} as job #{$wpdb->insert_id}", 'debug' );
+    }
+
     return !empty($result);
 }
 
