@@ -17,6 +17,7 @@ $recurrence = get_post_meta($post_id, '_EventRecurrence', true );
 $pdf = get_field( 'pdf', $post_id );
 $inscrever = get_field( 'inscrever', $post_id );
 
+$project_id = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true);
 
 $event = tribe_get_event( get_the_ID() );
 
@@ -198,7 +199,7 @@ if( isset($recurrence['rules']) ) {
 
 <main class="post-content stack container">
     <?php
-    if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
+    if (empty($project_id) || hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
         the_content();
     }
     ?>
@@ -219,7 +220,7 @@ if( isset($recurrence['rules']) ) {
 
 
     <?php
-    if ($id = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true)) {
+    if ($project_id) {
         if (isset($_GET['certificado'])) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
