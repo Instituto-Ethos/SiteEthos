@@ -4,6 +4,8 @@ namespace hacklabr;
 
 use \ethos\crm\Plan;
 
+use function ethos\crm\get_post_id_by_account;
+
 function add_user_to_pmpro_group (int $user_id, int $group_id) {
     $group = get_pmpro_group($group_id);
 
@@ -194,6 +196,36 @@ function require_approval_for_login ($user) {
     return $user;
 }
 add_filter('wp_authenticate_user', 'hacklabr\\require_approval_for_login');
+
+function require_active_account_for_login(\WP_User|\WP_Error $user) {
+    if (!class_exists('PMPro_Approvals') || empty($user) || is_wp_error($user)) {
+        return $user;
+    }
+
+    assert($user instanceof \WP_User);
+
+    if (in_array('subscriber', (array) $user->roles, true)) {
+        $has_active_account = false;
+
+        $account_id = get_user_meta($user->ID, '_ethos_crm_account_id', true);
+
+        if (!empty($account_id)) {
+            $post_id = get_post_id_by_account($account_id);
+
+            if (!empty($post_id) && !is_wp_error($post_id)) {
+                $account_status = get_post_status($post_id);
+                $has_active_account = $account_status == 'publish';
+            }
+        }
+
+        if (!$has_active_account) {
+            return new \WP_Error('failed', 'Associação não está ativa.');
+        }
+    }
+
+    return $user;
+}
+add_filter('wp_authenticate_user', 'hacklabr\\require_active_account_for_login');
 
 function register_organization_cpt () {
     register_post_type('organizacao', [
