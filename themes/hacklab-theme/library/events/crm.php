@@ -2,6 +2,9 @@
 
 namespace hacklabr;
 
+use \hacklabr\batch\Dynamics_Batch_Builder;
+use \hacklabr\batch\Dynamics_Batch_Reference;
+
 function check_event_availability (int $post_id, string $project_id, string|null $contact_id = null): array {
     if (!registrations_are_open($post_id)) {
         return [
@@ -57,22 +60,30 @@ function check_event_availability (int $post_id, string $project_id, string|null
 function create_registration (int $post_id, array $params) {
     $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
-    $lead_id = null;
-    if (!empty($params['cnpj'])) {
-        $lead_id = get_registration_lead($params);
-    }
-
     $paid_event = is_paid_event($post_id);
     $associates_event = is_associates_event($post_id);
 
+    $client = get_client_on_dynamics();
+    $builder = new Dynamics_Batch_Builder($client->getClient());
+
+    $lead_id = null;
+    if (!empty($params['cnpj'])) {
+        $lead_id = get_registration_lead($params, $builder);
+    }
+
     $account_id = get_registration_account($params);
-    $contact_id = get_registration_contact($params, $lead_id, !$associates_event);
+    $contact_id = get_registration_contact($params, $lead_id, !$associates_event, $builder);
+
+    $contact_uuid = null;
+    if (!$contact_id instanceof Dynamics_Batch_Reference) {
+        $contact_uuid = $contact_id;
+    }
 
     if ($associates_event) {
         $user_is_associate = false;
 
-        if (!empty($contact_id)) {
-            $user_id = get_user_by_contact($contact_id);
+        if (!empty($contact_uuid)) {
+            $user_id = get_user_by_contact($contact_uuid);
             $user_is_associate = !empty($user_id);
         }
 
@@ -97,15 +108,21 @@ function create_registration (int $post_id, array $params) {
         }
     }
 
-    $availability = check_event_availability($post_id, $project_id, $contact_id);
+    $availability = check_event_availability($post_id, $project_id, $contact_uuid);
     if (!empty($availability['status'])) {
         return $availability;
     }
 
+    if ($contact_id instanceof Dynamics_Batch_Reference) {
+        $contact_ref = $contact_id;
+    } else {
+        $contact_ref = create_crm_reference('contact', $contact_id);
+    }
+
     $attibutes = [
-        'fut_lk_contato'        => create_crm_reference('contact', $contact_id),
-        'fut_lk_fatura_pf'      => create_crm_reference('contact', $contact_id),
-        'fut_pl_cortesia'       => get_courtesy_type($post_id, $contact_id, $account_id),
+        'fut_lk_contato'        => $contact_ref,
+        'fut_lk_fatura_pf'      => $contact_ref,
+        'fut_pl_cortesia'       => get_courtesy_type($post_id, $contact_uuid, $account_id),
         'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
@@ -128,19 +145,41 @@ function create_registration (int $post_id, array $params) {
     }
 
     try {
-        $entity_id = create_crm_entity('fut_participante', $attibutes);
+        $participant_ref = $builder->add_create('fut_participante', $attibutes);
+        $results = $builder->execute($contact_id instanceof Dynamics_Batch_Reference);
 
-        if ($paid_event) {
-            $message = __('You are registered to this event, but payment is pending.', 'hacklabr');
-        } else {
-            $message = __('You are successfully registered to this event!', 'hacklabr');
+        $participant_result = $builder->get_result($participant_ref);
+
+        if ($participant_result && $participant_result['status'] === 'success') {
+            if ($contact_id instanceof Dynamics_Batch_Reference) {
+                $contact_result = $builder->get_result($contact_id);
+                $contact_id = $contact_result['entity_id'] ?? null;
+            }
+
+            if ($paid_event) {
+                $message = __('You are registered to this event, but payment is pending.', 'hacklabr');
+            } else {
+                $message = __('You are successfully registered to this event!', 'hacklabr');
+            }
+
+            return [
+                'status'     => 'success',
+                'form'       => $paid_event ? 'checkout' : 'hide',
+                'message'    => $message,
+                'entity_id'  => $participant_result['entity_id'],
+                'contact_id' => $contact_id,
+            ];
+        }
+
+        $error_message = __('Registration failed.', 'hacklabr');
+        if (!empty($participant_result['message'])) {
+            $error_message = $participant_result['message'];
         }
 
         return [
-            'status'    => 'success',
-            'form'      => $paid_event ? 'checkout' : 'hide',
-            'message'   => $message,
-            'entity_id' => $entity_id,
+            'status'  => 'error',
+            'form'    => 'preserve',
+            'message' => $error_message,
         ];
     } catch (\Exception $e) {
         return [
@@ -151,7 +190,7 @@ function create_registration (int $post_id, array $params) {
     }
 }
 
-function create_registration_contact (array $params, string|null $lead_id = null) {
+function create_registration_contact (array $params, string|Dynamics_Batch_Reference|null $lead_id = null, ?Dynamics_Batch_Builder $builder = null): string|Dynamics_Batch_Reference {
     $full_name = trim($params['nome_completo']);
     $name_parts = explode(' ',  $full_name);
     $first_name = $name_parts[0];
@@ -182,13 +221,21 @@ function create_registration_contact (array $params, string|null $lead_id = null
     }
 
     if (!empty($lead_id)) {
-        $attributes['originatingleadid'] = create_crm_reference('lead', $lead_id);
+        if ($lead_id instanceof Dynamics_Batch_Reference) {
+            $attributes['originatingleadid'] = $lead_id;
+        } else {
+            $attributes['originatingleadid'] = create_crm_reference('lead', $lead_id);
+        }
     }
 
-    return create_crm_entity('contact', $attributes);
+    if ($builder) {
+        return $builder->add_create('contact', $attributes);
+    } else {
+        return create_crm_entity('contact', $attributes);
+    }
 }
 
-function create_registration_lead (array $params) {
+function create_registration_lead (array $params, ?Dynamics_Batch_Builder $builder = null): string|Dynamics_Batch_Reference {
     $systemuser = get_option('systemuser');
 
     $cnpj = trim($params['cnpj']);
@@ -247,7 +294,11 @@ function create_registration_lead (array $params) {
         }
     }
 
-    return create_crm_entity('lead', $attributes);
+    if ($builder) {
+        return $builder->add_create('lead', $attributes);
+    } else {
+        return create_crm_entity('lead', $attributes);
+    }
 }
 
 function generate_registration_number (int $post_id, int $count) {
@@ -306,7 +357,7 @@ function get_registration_account (array $params): string|null {
     return null;
 }
 
-function get_registration_contact (array $params, string|null $lead_id = null, bool $allow_creation = true): string|null {
+function get_registration_contact (array $params, string|Dynamics_Batch_Reference|null $lead_id = null, bool $allow_creation = true, ?Dynamics_Batch_Builder $builder = null): string|Dynamics_Batch_Reference|null {
     // Case 1. Retrieve UUID from current user's data
     if (($user_id = get_current_user_id()) && ($contact_id = get_user_meta($user_id, '_ethos_crm_contact_id', true))) {
         return $contact_id;
@@ -336,13 +387,13 @@ function get_registration_contact (array $params, string|null $lead_id = null, b
 
     // Case 4. If contact does not exist, create it, and return its UUID
     if ($allow_creation) {
-        return create_registration_contact($params, $lead_id);
+        return create_registration_contact($params, $lead_id, $builder);
     } else {
         return null;
     }
 }
 
-function get_registration_lead (array $params): string|null {
+function get_registration_lead (array $params, ?Dynamics_Batch_Builder $builder = null): string|Dynamics_Batch_Reference|null {
     // Case 1. Retrieve UUID from current user's organization
     if (($post_id = get_organization_by_user()) && ($lead_id = get_post_meta($post_id, '_ethos_crm_lead_id', true))) {
         return $lead_id;
@@ -360,31 +411,19 @@ function get_registration_lead (array $params): string|null {
         }
 
         // Case 3. Retrieve UUID directly from CRM leads
-
-        // Case 3.1. Without CNPJ mask
-        $leads = get_crm_entities('lead', [
-            'filters' => [
-                'fut_st_cnpj' => $params['cnpj'],
+        $leads = \hacklabr\batch\get_crm_entities_advanced('lead', [
+            'or' => [
+                ['field' => 'fut_st_cnpj', 'value' => $params['cnpj']],
+                ['field' => 'fut_st_cnpj', 'value' => format_cnpj($params['cnpj'])],
             ],
-        ]);
-        if (!empty($leads->Entities)) {
-            cache_crm_entity($leads->Entities[0]);
-            return $leads->Entities[0]->Id;
-        }
-
-        // Case 3.2. With CNPJ mask
-        $leads = get_crm_entities('lead', [
-            'filters' => [
-                'fut_st_cnpj' => format_cnpj($params['cnpj']),
-            ],
-        ]);
+        ], ['per_page' => 1]);
         if (!empty($leads->Entities)) {
             cache_crm_entity($leads->Entities[0]);
             return $leads->Entities[0]->Id;
         }
 
         // Case 4. If lead does not exist, create it, and return its UUID
-        return create_registration_lead($params);
+        return create_registration_lead($params, $builder);
     }
 
     return null;
