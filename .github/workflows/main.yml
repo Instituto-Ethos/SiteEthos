@@ -58,7 +58,7 @@ jobs:
           name: ${{ env.THEME_NAME }}
           path: ./${{ env.THEME_NAME }}/
       - name: Zip artifact
-        run: zip -r ${{ env.THEME_NAME }}.zip ./${{ env.THEME_NAME }}
+        run: zip -r ${{ github.event.repository.name }}.zip ./${{ env.THEME_NAME }}
       - name: Create GitHub Release
         id: create_release_develop
         uses: actions/create-release@v1
@@ -75,13 +75,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_develop.outputs.upload_url }}
-          asset_path: ./${{ env.THEME_NAME }}.zip
-          asset_name: ${{ env.THEME_NAME }}-${{ env.tag }}.zip
+          asset_path: ./${{ github.event.repository.name }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ env.tag }}.zip
           asset_content_type: application/zip
       - name: Wait for asset to be available
         id: check_asset_availability
         run: |
-          ASSET_NAME="${{ env.THEME_NAME }}-${{ env.tag }}.zip"
+          ASSET_NAME="${{ github.event.repository.name }}-${{ env.tag }}.zip"
           REPO="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.tag }}"
           ATTEMPTS=0
           MAX_ATTEMPTS=3
