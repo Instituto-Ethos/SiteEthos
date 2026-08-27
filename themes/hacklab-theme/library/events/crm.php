@@ -249,7 +249,7 @@ function create_registration_lead (array $params, ?Dynamics_Batch_Builder $build
 
     $attributes = [
         'companyname'                => $company_name,
-        'firstname'                  => $company_name,
+        'firstname'                  => $first_name,
         'fullname'                   => $company_name,
         'fut_st_cnpj'                => format_cnpj($cnpj),
         'fut_st_nome'                => $first_name,
