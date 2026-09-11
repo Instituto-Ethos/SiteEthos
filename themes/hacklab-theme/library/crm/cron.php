@@ -32,12 +32,28 @@ function call_next_job () {
         do_action( 'ethos_crm:log', "call_next_job: FAILED to delete job #{$row->job_id} before execution", 'error' );
     }
 
+    $payload      = json_decode($row->job_payload);
+    $attempts_key = 'ethos_job_attempts_' . md5( $row->job_name . json_encode($payload) );
+
     try {
-        do_action('ethos_job:' . $row->job_name, json_decode($row->job_payload));
+        do_action('ethos_job:' . $row->job_name, $payload);
+
+        delete_transient( $attempts_key );
+
         do_action( 'ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) completed successfully", 'debug' );
         return true;
     } catch (\Throwable $err) {
-        do_action('ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) threw exception: " . $err->getMessage(), 'error');
+        $attempts = (int) get_transient( $attempts_key ) + 1;
+        set_transient( $attempts_key, $attempts, DAY_IN_SECONDS );
+
+        if ( $attempts >= 5 ) {
+            delete_transient( $attempts_key );
+            do_action('logger', "call_next_job: Job #{$row->job_id} ({$row->job_name}) FAILED permanently after 5 attempts and was dropped: " . $err->getMessage(), 'error');
+        } else {
+            schedule_job( $row->job_name, $payload );
+            do_action('logger', "call_next_job: Job #{$row->job_id} ({$row->job_name}) threw exception (attempt {$attempts}/5), re-enqueued for retry: " . $err->getMessage(), 'error');
+        }
+
         return false;
     }
 }
@@ -73,7 +89,7 @@ function schedule_job (string $name, mixed $payload) {
     return !empty($result);
 }
 
-function enqueue_last_modified_items (string $entity_name, string|null $last_sync) {
+function enqueue_last_modified_items (string $entity_name, string|null $last_sync): bool {
     $entities = \hacklabr\get_crm_entities($entity_name, [
         'cache' => false,
         'orderby' => 'modifiedon',
@@ -81,11 +97,18 @@ function enqueue_last_modified_items (string $entity_name, string|null $last_syn
         'per_page' => 100,
     ]);
 
+    if (empty($entities) || empty($entities->Entities)) {
+        do_action( 'logger', "enqueue_last_modified_items: no {$entity_name} entities returned by CRM (connection problem?); sync checkpoint will NOT be advanced", 'error' );
+        return false;
+    }
+
     foreach( $entities->Entities as $entity ) {
         if (empty($last_sync) || strcmp($entity->Attributes['modifiedon'], $last_sync) > 0) {
             schedule_job('sync_entity', [$entity_name, $entity->Id]);
         }
     }
+
+    return true;
 }
 
 function sync_next_entity (array $args) {
@@ -131,13 +154,18 @@ function update_last_crm_sync (string|null $datetime = null) {
 function run_syncs () {
     $last_sync = get_last_crm_sync();
 
-    update_last_crm_sync();
-
     ensure_jobs_table();
 
-    enqueue_last_modified_items('account', $last_sync);
-    enqueue_last_modified_items('contact', $last_sync);
-    enqueue_last_modified_items('fut_projeto', $last_sync);
+    $success = true;
+    $success = enqueue_last_modified_items('account', $last_sync) && $success;
+    $success = enqueue_last_modified_items('contact', $last_sync) && $success;
+    $success = enqueue_last_modified_items('fut_projeto', $last_sync) && $success;
+
+    if ( $success ) {
+        update_last_crm_sync();
+    } else {
+        do_action( 'logger', 'run_syncs: one or more entity types failed to enqueue; last sync checkpoint NOT advanced', 'warning' );
+    }
 }
 add_action('hacklabr\\run_every_hour', 'ethos\\crm\\run_syncs');
 
@@ -238,6 +266,19 @@ function reconcile_organizations () : array {
         if ( is_active_account( $account ) ) {
             $crm_active_ids[] = strtolower( $account->Id );
         }
+    }
+
+    if ( empty( $crm_active_ids ) ) {
+        do_action( 'logger', 'Reconciliation: aborted - CRM returned zero active accounts (connection or data problem?). No organizations were trashed.', 'error' );
+
+        return [
+            'datetime'  => current_time( 'mysql' ),
+            'total_wp'  => 0,
+            'total_crm' => 0,
+            'trashed'   => 0,
+            'orphans'   => [],
+            'aborted'   => true,
+        ];
     }
 
     $crm_active_ids = array_flip( $crm_active_ids );
