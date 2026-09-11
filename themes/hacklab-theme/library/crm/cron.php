@@ -48,10 +48,10 @@ function call_next_job () {
 
         if ( $attempts >= 5 ) {
             delete_transient( $attempts_key );
-            do_action('logger', "call_next_job: Job #{$row->job_id} ({$row->job_name}) FAILED permanently after 5 attempts and was dropped: " . $err->getMessage(), 'error');
+            do_action('ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) FAILED permanently after 5 attempts and was dropped: " . $err->getMessage(), 'error');
         } else {
             schedule_job( $row->job_name, $payload );
-            do_action('logger', "call_next_job: Job #{$row->job_id} ({$row->job_name}) threw exception (attempt {$attempts}/5), re-enqueued for retry: " . $err->getMessage(), 'error');
+            do_action('ethos_crm:log', "call_next_job: Job #{$row->job_id} ({$row->job_name}) threw exception (attempt {$attempts}/5), re-enqueued for retry: " . $err->getMessage(), 'error');
         }
 
         return false;
@@ -98,7 +98,7 @@ function enqueue_last_modified_items (string $entity_name, string|null $last_syn
     ]);
 
     if (empty($entities) || empty($entities->Entities)) {
-        do_action( 'logger', "enqueue_last_modified_items: no {$entity_name} entities returned by CRM (connection problem?); sync checkpoint will NOT be advanced", 'error' );
+        do_action( 'ethos_crm:log', "enqueue_last_modified_items: no {$entity_name} entities returned by CRM (connection problem?); sync checkpoint will NOT be advanced", 'error' );
         return false;
     }
 
@@ -164,7 +164,7 @@ function run_syncs () {
     if ( $success ) {
         update_last_crm_sync();
     } else {
-        do_action( 'logger', 'run_syncs: one or more entity types failed to enqueue; last sync checkpoint NOT advanced', 'warning' );
+        do_action( 'ethos_crm:log', 'run_syncs: one or more entity types failed to enqueue; last sync checkpoint NOT advanced', 'warning' );
     }
 }
 add_action('hacklabr\\run_every_hour', 'ethos\\crm\\run_syncs');
@@ -269,7 +269,7 @@ function reconcile_organizations () : array {
     }
 
     if ( empty( $crm_active_ids ) ) {
-        do_action( 'logger', 'Reconciliation: aborted - CRM returned zero active accounts (connection or data problem?). No organizations were trashed.', 'error' );
+        do_action( 'ethos_crm:log', 'Reconciliation: aborted - CRM returned zero active accounts (connection or data problem?). No organizations were trashed.', 'error' );
 
         return [
             'datetime'  => current_time( 'mysql' ),
