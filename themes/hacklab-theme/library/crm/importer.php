@@ -224,7 +224,7 @@ function delete_from_account( \WP_Post $post ) {
             'group_id' => $group_id,
         ], [ '%d' ] );
 
-        $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_group', [
+        $wpdb->delete( $wpdb->prefix . 'pmprogroupacct_groups', [
             'id' => $group_id,
         ], [ '%d' ] );
 

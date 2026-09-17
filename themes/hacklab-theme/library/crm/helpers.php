@@ -200,7 +200,7 @@ function get_organizations_count_data() : array {
     ";
 
     $result = $wpdb->get_row(
-        $wpdb->prepare( $sql, '_ethos_crm:accountid', '_ethos_crm:modifiedon', 'organizacao', 'publish' ),
+        $wpdb->prepare( $sql, '_ethos_crm_account_id', '_ethos_crm:modifiedon', 'organizacao', 'publish' ),
         ARRAY_A
     );
 
