@@ -652,14 +652,14 @@ function import_contact( Entity $contact, Entity|null $account = null, bool $for
     $user_id = null;
 
     if ( empty( $existing_user ) ) {
-        if ( is_active_contact( $contact ) ) {
+        if ( is_active_contact( $contact, $account ) ) {
             do_action( 'ethos_crm:log', "Creating contact $contact_name - $contact_id", 'debug' );
             $user_id = create_from_contact( $contact, $account );
         } else {
             do_action( 'ethos_crm:log', "Skipping contact $contact_name - $contact_id", 'debug' );
         }
     } else {
-        if ( is_active_contact( $contact ) ) {
+        if ( is_active_contact( $contact, $account ) ) {
             if ( $force_update ) {
                 do_action( 'ethos_crm:log', "Updating contact $contact_name - $contact_id", 'debug' );
                 update_from_contact( $contact, $account, $existing_user );
