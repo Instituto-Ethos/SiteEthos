@@ -200,7 +200,7 @@
     }
 }
 
-.page-faca-parte-associe-se {
+.page-associe-se {
     .post-content {
         .card {
             &__header {
@@ -235,6 +235,10 @@
                 height: 360px;
                 margin: 0 auto;
             }
+        }
+
+        .wp-block-table table {
+            border-color: $color--high-pure;
         }
     }
 
