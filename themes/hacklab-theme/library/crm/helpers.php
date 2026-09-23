@@ -2,6 +2,8 @@
 
 namespace ethos\crm;
 
+use \AlexaCRM\Xrm\Entity;
+
 function generate_unique_user_login( string $user_name ) {
 	$login_base = substr( sanitize_title( $user_name ), 0, 60 );
 
@@ -22,7 +24,7 @@ function generate_unique_user_login( string $user_name ) {
     }
 }
 
-function get_contact( string $contact_id, string $account_id ) {
+function get_contact( string $contact_id, string $account_id ): int | null {
     $existing_user = get_single_user( [
         'meta_query' => [
             [ 'key' => '_ethos_crm_account_id', 'value' => $account_id ],
@@ -30,15 +32,15 @@ function get_contact( string $contact_id, string $account_id ) {
         ],
     ] );
 
-    if ( empty( $existing_user ) ) {
-        $account = \hacklabr\get_crm_entity_by_id( 'account', $account_id );
-        $contact = \hacklabr\get_crm_entity_by_id( 'contact', $contact_id );
-
-        if ( ! empty( $contact ) ) {
-            return create_from_contact( $contact, $account, false );
-        }
-    } else {
+    if ( ! empty( $existing_user ) ) {
         return $existing_user->ID;
+    }
+
+    $account = \hacklabr\get_crm_entity_by_id( 'account', $account_id );
+    $contact = \hacklabr\get_crm_entity_by_id( 'contact', $contact_id );
+
+    if ( $contact instanceof Entity && $account instanceof Entity && is_active_contact( $contact, $account ) ) {
+        return create_from_contact( $contact, $account );
     }
 
     return null;

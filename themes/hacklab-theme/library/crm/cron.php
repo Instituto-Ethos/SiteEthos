@@ -124,10 +124,10 @@ function sync_next_entity (array $args) {
 
     switch ($entity_name) {
         case 'account':
-            import_account($entity, true);
+            import_account($entity, false);
             break;
         case 'contact':
-            import_contact($entity, null, true);
+            import_contact($entity, null, false);
             break;
         case 'fut_projeto':
             import_fut_projeto($entity);
@@ -200,7 +200,7 @@ add_action('admin_init', 'ethos\\crm\\manually_sync_entity');
  * @global wpdb    $wpdb            WordPress database abstraction object.
  * @global WP_Object_Cache $wp_object_cache WordPress object cache instance.
  */
-function stop_the_insanity () : void {
+function free_runtime_memory () : void {
     global $wpdb, $wp_object_cache;
 
     $wpdb->queries = [];
@@ -325,7 +325,7 @@ function reconcile_organizations () : array {
         $trashed_orphans[] = $orphan;
 
         if ( ( $i + 1 ) % 20 === 0 ) {
-            stop_the_insanity();
+            free_runtime_memory();
         }
     }
 
@@ -476,7 +476,7 @@ function deduplicate_organizations () : array {
         }
 
         if ( ( $i + 1 ) % 20 === 0 ) {
-            stop_the_insanity();
+            free_runtime_memory();
         }
     }
 

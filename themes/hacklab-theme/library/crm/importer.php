@@ -4,6 +4,24 @@ namespace ethos\crm;
 
 use \AlexaCRM\Xrm\Entity;
 
+function is_post_synced( \WP_Post $post, Entity $entity ): bool {
+    if ( 'publish' !== $post->post_status ) {
+        return false;
+    }
+
+    $stored_modifiedon = get_post_meta( $post->ID, '_ethos_crm:modifiedon', true );
+    $received_modifiedon = $entity->Attributes['modifiedon'] ?? '';
+
+    return ! empty( $stored_modifiedon ) && $stored_modifiedon === (string) $received_modifiedon;
+}
+
+function is_user_synced( \WP_User $user, Entity $entity ): bool {
+    $stored_modifiedon = get_user_meta( $user->ID, '_ethos_crm:modifiedon', true );
+    $received_modifiedon = $entity->Attributes['modifiedon'] ?? '';
+
+    return ! empty( $stored_modifiedon ) && $stored_modifiedon === (string) $received_modifiedon;
+}
+
 /**
  * Better than calling `array_filter` than `array_unique` because the latter
  * preserve keys
@@ -309,11 +327,14 @@ function add_all_users_to_group( Entity $account, int $group_id ) {
     return $group_id;
 }
 
-function create_primary_contact( int $post_id, Entity $account ) {
+function create_primary_contact( int $post_id, Entity $account ): int | null {
     $account_id = $account->Id;
     $attributes = $account->Attributes;
 
-    $user_id = get_contact( $attributes['primarycontactid']->Id, $account_id ) ?? 0;
+    $user_id = get_contact( $attributes['primarycontactid']->Id, $account_id );
+    if ( empty( $user_id ) ) {
+        return null;
+    }
 
     $revenue = get_post_meta( $post_id, 'faturamento_anual', true ) ?: 'small';
     $level_id = Plan::from( $attributes['fut_pl_tipo_associacao'] )->toLevel( $revenue, true );
@@ -385,6 +406,7 @@ function update_from_account( Entity $account, \WP_Post $post ) {
     $post_id = wp_update_post( [
         'ID' => $post->ID,
         'post_title' => $post_meta['nome_fantasia'],
+        'post_status' => 'publish',
         'meta_input' => $post_meta,
     ] );
 
@@ -497,7 +519,9 @@ function replace_approver( Entity $account, \PMProGroupAcct_Group $group ) {
             delete_user_meta( $old_approver->ID, '_ethos_approver' );
         }
 
-        update_user_meta( $new_approver, '_ethos_approver', 1 );
+        if ( ! empty( $new_approver ) ) {
+            update_user_meta( $new_approver, '_ethos_approver', 1 );
+        }
     }
 }
 
@@ -508,6 +532,7 @@ function import_account( Entity $account, bool $force_update = false ): int | nu
 
     $existing_post = get_single_post( [
         'post_type' => 'organizacao',
+        'post_status' => ['publish', 'draft', 'private', 'trash', 'ethos_under_progress'],
         'meta_query' => [
             [ 'key' => '_ethos_crm_account_id', 'value' => $account_id ],
         ],
@@ -519,17 +544,14 @@ function import_account( Entity $account, bool $force_update = false ): int | nu
         if ( is_active_account( $account ) ) {
             do_action( 'ethos_crm:log', "Creating account $account_name - $account_id", 'debug' );
             $post_id = create_from_account( $account );
-        } else {
-            do_action( 'ethos_crm:log', "Skipping account $account_name - $account_id", 'debug' );
         }
     } else {
         if ( is_active_account( $account ) ) {
             $post_id = $existing_post->ID;
-            if ( $force_update ) {
+
+            if ( $force_update || ! is_post_synced( $existing_post, $account ) ) {
                 do_action( 'ethos_crm:log', "Updating account $account_name - $account_id", 'debug' );
                 update_from_account( $account, $existing_post );
-            } else {
-                do_action( 'ethos_crm:log', "Skipping account $account_name - $account_id", 'debug' );
             }
         } else {
             do_action( 'ethos_crm:log', "Deleting account $account_name - $account_id", 'debug' );
@@ -539,9 +561,9 @@ function import_account( Entity $account, bool $force_update = false ): int | nu
 
     if ( empty( $post_id ) || is_wp_error( $post_id ) ) {
         return null;
-    } else {
-        return $post_id;
     }
+
+    return $post_id;
 }
 
 function delete_from_contact( \WP_User $user ) {
@@ -637,7 +659,6 @@ function import_contact( Entity $contact, Entity|null $account = null, bool $for
         $account = get_account_by_contact( $contact );
 
         if ( empty( $account ) ) {
-            do_action( 'ethos_crm:log', "Skipping contact $contact_name - $contact_id", 'debug' );
             return null;
         }
     }
@@ -660,13 +681,12 @@ function import_contact( Entity $contact, Entity|null $account = null, bool $for
         }
     } else {
         if ( is_active_contact( $contact, $account ) ) {
-            if ( $force_update ) {
+            $user_id = $existing_user->ID;
+
+            if ( $force_update || ! is_user_synced( $existing_user, $contact ) ) {
                 do_action( 'ethos_crm:log', "Updating contact $contact_name - $contact_id", 'debug' );
                 update_from_contact( $contact, $account, $existing_user );
-            } else {
-                do_action( 'ethos_crm:log', "Skipping contact $contact_name - $contact_id", 'debug' );
             }
-            $user_id = $existing_user->ID;
         } else {
             do_action( 'ethos_crm:log', "Deleting contact $contact_name - $contact_id", 'debug' );
             delete_from_contact( $existing_user );
