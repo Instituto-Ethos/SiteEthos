@@ -2060,3 +2060,15 @@ msgstr "Sistema"
 msgctxt "Font family name"
 msgid "Title"
 msgstr "Título"
+
+#: assets/javascript/functionalities/event-registration.js
+msgid "Searching address..."
+msgstr "Buscando endereço..."
+
+#: assets/javascript/functionalities/event-registration.js
+msgid "Address not found for this ZIP code. Please fill it in manually."
+msgstr "Endereço não encontrado para este CEP. Preencha manualmente."
+
+#: library/forms/helpers.php
+msgid "Fill in the ZIP code to search the address automatically"
+msgstr "Preencha o CEP para buscar o endereço automaticamente"

@@ -103,7 +103,7 @@ function get_event_registration_fields () {
             },
         ],
 
-        // ...($paid_event ? get_address_fields() : []),
+        ...($paid_event ? get_address_fields() : []),
 
         'email' => [
             'type' => 'email',
@@ -326,6 +326,30 @@ function validate_event_registration_form (string $form_id, array $form, array $
 
         $post_id = get_the_ID();
 
+        if (is_paid_event($post_id) && !empty($params['voucher'])) {
+            if (!function_exists('\ethos\payments\validate_event_voucher')) {
+                global $hl_event_registration;
+                $hl_event_registration = [
+                    'status'  => 'error',
+                    'form'    => 'preserve',
+                    'message' => __('Online payment features are temporarily unavailable. Please contact us.', 'hacklabr'),
+                ];
+                return;
+            }
+
+            $voucher = \ethos\payments\validate_event_voucher($params['voucher']);
+
+            if (is_wp_error($voucher)) {
+                global $hl_event_registration;
+                $hl_event_registration = [
+                    'status'  => 'error',
+                    'form'    => 'preserve',
+                    'message' => $voucher->get_error_message(),
+                ];
+                return;
+            }
+        }
+
         register_for_event($post_id, $params);
     }
 }
@@ -386,14 +410,19 @@ function wrap_event_registration_form (string $form_html, array $form) {
     }
 
     if ($awaiting_payment) {
-        $params = get_event_registration_params();
-        $checkout = render_event_checkout(
-            $post_id,
-            $params,
-            __('Pay', 'hacklabr'),
-            'getnet-payment-button'
-        );
-        return $heading . $message . $checkout;
+        if (function_exists('\ethos\payments\render_event_checkout')) {
+            $params = get_event_registration_params();
+            $checkout = \ethos\payments\render_event_checkout(
+                $post_id,
+                $params,
+                __('Pay', 'hacklabr'),
+                'getnet-payment-button'
+            );
+            return $heading . $message . $checkout;
+        }
+
+        $message = sprintf($message_template, 'error', __('Online payment is temporarily unavailable. Please contact us.', 'hacklabr'));
+        return $heading . $message;
     }
 
     $form_html = $heading . $message . $form_html;

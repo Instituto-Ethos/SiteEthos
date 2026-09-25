@@ -120,17 +120,75 @@ function create_registration (int $post_id, array $params) {
         $contact_ref = create_crm_reference('contact', $contact_id);
     }
 
+    $courtesy_type = get_courtesy_type($post_id, $contact_uuid, $account_id);
+
+    $voucher = null;
+    if ($paid_event && !empty($params['voucher'])) {
+        if (!function_exists('\ethos\payments\validate_event_voucher')) {
+            return [
+                'status'  => 'error',
+                'form'    => 'preserve',
+                'message' => __('Online payment features are temporarily unavailable. Please contact us.', 'hacklabr'),
+            ];
+        }
+
+        $voucher = \ethos\payments\validate_event_voucher($params['voucher']);
+
+        if (is_wp_error($voucher)) {
+            return [
+                'status'  => 'error',
+                'form'    => 'preserve',
+                'message' => $voucher->get_error_message(),
+            ];
+        }
+    }
+
     $attibutes = [
         'fut_lk_contato'        => $contact_ref,
         'fut_lk_fatura_pf'      => $contact_ref,
-        'fut_pl_cortesia'       => get_courtesy_type($post_id, $contact_uuid, $account_id),
+        'fut_pl_cortesia'       => $courtesy_type,
         'fut_lk_projeto'        => create_crm_reference('fut_projeto', $project_id),
         'fut_txt_nro_inscricao' => generate_registration_number($post_id, $availability['filled'] ?? 0),
     ];
 
     if ($paid_event) {
         $attibutes['fut_bl_exibecamposfinanceiros'] = true;
-        $attibutes['fut_set_statusoperacao'] = 969830000; // Sem status
+        $attibutes['fut_int_quantidade_adquirida'] = 1;
+        $attibutes['fut_int_quantidade_restante'] = 0;
+
+        if (null !== $voucher) {
+            $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
+            $attibutes['fut_txt_tipodedesconto'] = 'VOUCHER';
+            $attibutes['fut_txt_token_gerado']   = $voucher->source_id;
+        } elseif (969830000 !== $courtesy_type) {
+            $plan = null;
+
+            if (!empty($contact_uuid)) {
+                $courtesy_user = get_user_by_contact($contact_uuid);
+                if (!empty($courtesy_user)) {
+                    $plan = get_pmpro_plan($courtesy_user->ID);
+                }
+            }
+
+            $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
+            $attibutes['fut_txt_tipodedesconto'] = 'CORTESIA-' . strtoupper((string) ($plan ?? 'ETHOS'));
+            $attibutes['fut_txt_porcentagem']    = '100.00';
+        } else {
+            $attibutes['fut_set_statusoperacao'] = 969830000; // Sem status
+
+            $student = (($params['estudante'] ?? '') === 'yes');
+
+            if (function_exists('\ethos\payments\calculate_event_price')) {
+                $price = \ethos\payments\calculate_event_price($post_id, $contact_uuid ?? '', $student, $account_id);
+
+                $attibutes['fut_mon_precocheio'] = $price->full;
+                $attibutes['fut_mon_valorpago']  = $price->net;
+
+                if (!empty($price->discount)) {
+                    $attibutes['fut_mon_desconto'] = $price->discount;
+                }
+            }
+        }
     } else {
         $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
     }
@@ -147,7 +205,14 @@ function create_registration (int $post_id, array $params) {
 
     try {
         $participant_ref = $builder->add_create('fut_participante', $attibutes);
-        $results = $builder->execute($contact_id instanceof Dynamics_Batch_Reference);
+
+        if (null !== $voucher) {
+            $builder->add_update('fut_participante', $voucher->source_id, [
+                'fut_int_quantidade_restante' => $voucher->remaining - 1,
+            ]);
+        }
+
+        $results = $builder->execute($contact_id instanceof Dynamics_Batch_Reference || null !== $voucher);
 
         $participant_result = $builder->get_result($participant_ref);
 
@@ -157,7 +222,10 @@ function create_registration (int $post_id, array $params) {
                 $contact_id = $contact_result['entity_id'] ?? null;
             }
 
-            if ($paid_event) {
+            $form = 'hide';
+
+            if ($paid_event && (null === $voucher) && (969830000 === $courtesy_type)) {
+                $form = 'checkout';
                 $message = __('You are registered to this event, but payment is pending.', 'hacklabr');
             } else {
                 $message = __('You are successfully registered to this event!', 'hacklabr');
@@ -165,7 +233,7 @@ function create_registration (int $post_id, array $params) {
 
             return [
                 'status'     => 'success',
-                'form'       => $paid_event ? 'checkout' : 'hide',
+                'form'       => $form,
                 'message'    => $message,
                 'entity_id'  => $participant_result['entity_id'],
                 'contact_id' => $contact_id,
@@ -435,6 +503,11 @@ function registrations_are_open (int $post_id): bool {
     $event_status = get_post_meta($post_id, '_ethos:event_status', true);
 
     if ($crm_status !== '1' || $event_status === 'FULL' || $event_status === 'PAST') {
+        return false;
+    }
+
+    $allow_web = get_post_meta($post_id, '_ethos_crm:fut_bt_permiteweb', true);
+    if ($allow_web !== '' && !in_array($allow_web, ['1', 'true', 'True'], true)) {
         return false;
     }
 

@@ -87,6 +87,7 @@ function get_address_fields (): array {
             'label' => __('CEP code', 'hacklabr'),
             'mask' => '00000-000',
             'placeholder' => __('Enter the CEP code', 'hacklabr'),
+            'hint' => __('Fill in the ZIP code to search the address automatically', 'hacklabr'),
             'required' => true,
             'validate' => function ($value, $context) {
                 if (!is_numeric($value) || strlen($value) !== 8) {

@@ -2,31 +2,6 @@
 
 namespace hacklabr;
 
-function calculate_event_price (int $post_id, string $contact_id, bool $student = false): object {
-    $full_price = get_event_price($post_id);
-
-    $user = get_user_by_contact($contact_id);
-    if (empty($user)) {
-        if ($student) {
-            $discount = round_amount($full_price / 2);
-            $net_price = round_amount($full_price - $discount);
-        } else {
-            $discount = null;
-            $net_price = $full_price;
-        }
-    } else {
-        $discount_rate = get_discount_rate($user->ID);
-        $discount = round_amount($full_price * $discount_rate);
-        $net_price = round_amount($full_price - $discount);
-    }
-
-    return (object) [
-        'discount' => $discount,
-        'full'     => $full_price,
-        'net'      => $net_price,
-    ];
-}
-
 function can_join_event (int $user_id, int $post_id): bool {
     $plan = get_pmpro_plan($user_id);
 
@@ -182,39 +157,6 @@ function get_courtesy_type (int $post_id, string|null $contact_id, string|null $
     return 969830000; // NÃO
 }
 
-function get_discount_rate (int $user_id): float {
-    $plan = get_pmpro_plan($user_id);
-    if (empty($plan)) {
-        return 0.0;
-    }
-
-    // @TODO Get rates by contract?
-
-    return match ($plan) {
-        'conexao' => 0.1,
-        'essencial' => 0.15,
-        'vivencia' => 0.2,
-        'institucional' => 0.25,
-        default => 0.0,
-    };
-}
-
-function get_event_price (int $post_id): float {
-    $raw_value = get_post_meta($post_id, '_ethos_crm:fut_valorinscricao_base');
-
-    if (empty($raw_value)) {
-        $raw_value = get_post_meta($post_id, '_ethos_crm:fut_valorinscricao');
-    }
-
-    if (empty($raw_value)) {
-        $float_value = 0.0;
-    } else {
-        $float_value = floatval($raw_value);
-    }
-
-    return apply_filters('hacklabr/ethos_event_price', $float_value, $post_id);
-}
-
 function get_used_courtesies (int $post_id, string $account_id): int {
     $account = get_crm_entity_by_id('account', $account_id, [ 'cache' => false ]);
 
@@ -243,6 +185,3 @@ function get_user_by_contact (string $contact_id): \WP_User|null {
     return null;
 }
 
-function round_amount (float $amount): float {
-    return round($amount, 2);
-}
