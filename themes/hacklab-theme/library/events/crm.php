@@ -57,6 +57,107 @@ function check_event_availability (int $post_id, string $project_id, string|null
     }
 }
 
+/**
+ * Decide o que fazer quando o contato já possui inscrição no evento.
+ *
+ *  Paga (3) / Empenhada (50) / Negociada (51) / Paga Diretamente (52) → block
+ *  Cancelada (7)                                                     → prossegue
+ *  Pendente (0/1) recente (<180d):
+ *      mesmo tipo de desconto   → checkout (re-abre pagamento, novo intent)
+ *      tipo de desconto difere  → replace (nova inscrição substitui a antiga)
+ *  Pendente antiga (≥180d)                                           → replace (obsoleta)
+ *
+ * @return array|null ['action' => 'block'|'checkout'|'replace', 'participant_id' => uuid] ou null para prosseguir.
+ */
+function check_participant_registration (string $project_id, ?string $contact_id, string $incoming_discount_type): ?array {
+    if (empty($contact_id)) {
+        return null;
+    }
+
+    $participants = get_crm_entities('fut_participante', [
+        'cache'    => false,
+        'per_page' => 50,
+        'filters'  => [
+            'fut_lk_projeto' => $project_id,
+            'fut_lk_contato' => $contact_id,
+        ],
+    ]);
+
+    if (empty($participants->Entities)) {
+        return null;
+    }
+
+    $obsolete_before = time() - 180 * DAY_IN_SECONDS;
+    $recent_pending  = null;
+    $obsolete        = null;
+
+    foreach ($participants->Entities as $participant) {
+        $status = $participant->Attributes['fut_set_statusoperacao'] ?? null;
+
+        if (is_object($status) && isset($status->Value)) {
+            $status = $status->Value;
+        }
+
+        if (in_array((int) $status, [969830003, 969830050, 969830051, 969830052], true)) {
+            return ['action' => 'block', 'participant_id' => (string) $participant->Id];
+        }
+
+        if (969830007 === (int) $status) {
+            continue;
+        }
+
+        // Pendente (Sem status / Aguardando): TTL de 180 dias.
+        $createdon = $participant->Attributes['createdon'] ?? null;
+
+        if ($createdon instanceof \DateTime) {
+            $created_ts = $createdon->getTimestamp();
+        } elseif (is_string($createdon) && false !== ($parsed = strtotime($createdon))) {
+            $created_ts = $parsed;
+        } else {
+            $created_ts = time();
+        }
+
+        if ($created_ts < $obsolete_before) {
+            $obsolete = $participant;
+            continue;
+        }
+
+        $recent_pending = $participant;
+    }
+
+    if (null !== $recent_pending) {
+        $existing_type = normalize_registration_discount_type((string) ($recent_pending->Attributes['fut_txt_tipodedesconto'] ?? ''));
+
+        if ($existing_type === $incoming_discount_type) {
+            return ['action' => 'checkout', 'participant_id' => (string) $recent_pending->Id];
+        }
+
+        return ['action' => 'replace', 'participant_id' => (string) $recent_pending->Id];
+    }
+
+    if (null !== $obsolete) {
+        return ['action' => 'replace', 'participant_id' => (string) $obsolete->Id];
+    }
+
+    return null;
+}
+
+function normalize_registration_discount_type (string $type): string {
+    if ('' === $type) {
+        return '';
+    }
+
+    if (str_starts_with($type, 'VOUCHER')) {
+        return 'VOUCHER';
+    }
+
+    if (str_starts_with($type, 'CORTESIA')) {
+        return 'CORTESIA';
+    }
+
+    return $type;
+}
+
 function create_registration (int $post_id, array $params) {
     $project_id = get_post_meta($post_id, 'entity_fut_projeto', true);
 
@@ -109,7 +210,9 @@ function create_registration (int $post_id, array $params) {
         }
     }
 
-    $availability = check_event_availability($post_id, $project_id, $contact_uuid);
+    // Duplicate handling is delegated to check_participant_registration(),
+    // so availability runs anonymous.
+    $availability = check_event_availability($post_id, $project_id);
     if (!empty($availability['status'])) {
         return $availability;
     }
@@ -141,6 +244,36 @@ function create_registration (int $post_id, array $params) {
                 'message' => $voucher->get_error_message(),
             ];
         }
+    }
+
+    $incoming_discount_type = (null !== $voucher) ? 'VOUCHER'
+        : ((969830000 !== $courtesy_type) ? 'CORTESIA' : '');
+
+    $registration_check = check_participant_registration($project_id, $contact_uuid, $incoming_discount_type);
+    $replace_participant_id = null;
+
+    if (is_array($registration_check)) {
+        if ('block' === $registration_check['action']) {
+            return [
+                'status'  => 'error',
+                'form'    => 'clean',
+                'message' => __('You are already registered in this event.', 'hacklabr'),
+            ];
+        }
+
+        if ('checkout' === $registration_check['action']) {
+            // Same discount type: re-open payment on the existing registration
+            // (legacy "Acesso link pagamento" — a fresh Payment Intent).
+            return [
+                'status'     => 'success',
+                'form'       => 'checkout',
+                'message'    => __('You are registered to this event, but payment is pending.', 'hacklabr'),
+                'entity_id'  => $registration_check['participant_id'],
+                'contact_id' => $contact_id,
+            ];
+        }
+
+        $replace_participant_id = $registration_check['participant_id'];
     }
 
     $attibutes = [
@@ -207,12 +340,27 @@ function create_registration (int $post_id, array $params) {
         $participant_ref = $builder->add_create('fut_participante', $attibutes);
 
         if (null !== $voucher) {
+            // Consome o assento no mesmo changeset: com execute() transacional
+            // o Dynamics aplica tudo ou reverte tudo.
             $builder->add_update('fut_participante', $voucher->source_id, [
                 'fut_int_quantidade_restante' => $voucher->remaining - 1,
             ]);
         }
 
-        $results = $builder->execute($contact_id instanceof Dynamics_Batch_Reference || null !== $voucher);
+        if (null !== $replace_participant_id) {
+            // Substituição: a pendência antiga é cancelada e a referência de
+            // pagamento zerada, na mesma transação.
+            $builder->add_update('fut_participante', $replace_participant_id, [
+                'fut_set_statusoperacao'      => 969830007, // Cancelada
+                'fut_txt_referenciapagseguro' => '0',
+            ]);
+        }
+
+        $results = $builder->execute(
+            $contact_id instanceof Dynamics_Batch_Reference
+            || null !== $voucher
+            || null !== $replace_participant_id
+        );
 
         $participant_result = $builder->get_result($participant_ref);
 
