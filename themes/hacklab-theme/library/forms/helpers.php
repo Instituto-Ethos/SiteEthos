@@ -34,6 +34,21 @@ function get_address_fields (): array {
 	];
 
     $fields = [
+        'end_cep' => [
+            'type' => 'masked',
+            'class' => '-colspan-12',
+            'label' => __('CEP code', 'hacklabr'),
+            'mask' => '00000-000',
+            'placeholder' => __('Enter the CEP code', 'hacklabr'),
+            'hint' => __('Fill in the ZIP code to search the address automatically', 'hacklabr'),
+            'required' => true,
+            'validate' => function ($value, $context) {
+                if (!is_numeric($value) || strlen($value) !== 8) {
+                    return __('Invalid CEP code', 'hacklabr');
+                }
+                return true;
+            },
+        ],
         'end_logradouro' => [
             'type' => 'text',
             'class' => '-colspan-9',
@@ -63,7 +78,7 @@ function get_address_fields (): array {
         ],
         'end_cidade' => [
             'type' => 'text',
-            'class' => '-colspan-12',
+            'class' => '-colspan-6',
             'label' => __('City', 'hacklabr'),
             'placeholder' => __('Enter the city', 'hacklabr'),
             'required' => true,
@@ -77,21 +92,6 @@ function get_address_fields (): array {
             'validate' => function ($value, $context) use ($states_options) {
                 if (!array_key_exists($value, $states_options)) {
                     return _x('Invalid state', 'address', 'hacklabr');
-                }
-                return true;
-            },
-        ],
-        'end_cep' => [
-            'type' => 'masked',
-            'class' => '-colspan-6',
-            'label' => __('CEP code', 'hacklabr'),
-            'mask' => '00000-000',
-            'placeholder' => __('Enter the CEP code', 'hacklabr'),
-            'hint' => __('Fill in the ZIP code to search the address automatically', 'hacklabr'),
-            'required' => true,
-            'validate' => function ($value, $context) {
-                if (!is_numeric($value) || strlen($value) !== 8) {
-                    return __('Invalid CEP code', 'hacklabr');
                 }
                 return true;
             },
