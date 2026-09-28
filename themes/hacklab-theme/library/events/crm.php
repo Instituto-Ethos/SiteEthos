@@ -407,6 +407,44 @@ function create_registration (int $post_id, array $params) {
     }
 }
 
+function get_registration_address_map (): array {
+    return [
+        'end_bairro'      => 'address1_line3',
+        'end_cep'         => 'address1_postalcode',
+        'end_complemento' => 'address1_line2',
+        'end_cidade'      => 'address1_city',
+        'end_logradouro'  => 'fut_address1_logradouro',
+        'end_numero'      => 'fut_address1_nro',
+        'end_estado'      => 'fut_pl_estado',
+    ];
+}
+
+function get_registration_address_attributes (array $params): array {
+    $attributes = [];
+
+    foreach (get_registration_address_map() as $param_key => $attribute_key) {
+        $value = trim($params[$param_key] ?? '');
+
+        if ('' === $value) {
+            continue;
+        }
+
+        if ('end_estado' === $param_key) {
+            $uf = \ethos\crm\BrazilianUF::fromCode($value);
+
+            if (null === $uf) {
+                continue;
+            }
+
+            $value = $uf;
+        }
+
+        $attributes[$attribute_key] = $value;
+    }
+
+    return $attributes;
+}
+
 function create_registration_contact (array $params, string|Dynamics_Batch_Reference|null $lead_id = null, ?Dynamics_Batch_Builder $builder = null): string|Dynamics_Batch_Reference {
     $full_name = trim($params['nome_completo']);
     $name_parts = explode(' ',  $full_name);
@@ -436,6 +474,8 @@ function create_registration_contact (array $params, string|Dynamics_Batch_Refer
             $attributes[$attribute_key] = $value;
         }
     }
+
+    $attributes = array_merge($attributes, get_registration_address_attributes($params));
 
     if (!empty($lead_id)) {
         if ($lead_id instanceof Dynamics_Batch_Reference) {
@@ -496,20 +536,7 @@ function create_registration_lead (array $params, ?Dynamics_Batch_Builder $build
         $attributes['leadsourcecode'] = intval($params['origem_lead']);
     }
 
-    $address_map = [
-        'end_bairro'      => 'address1_line3',
-        'end_cep'         => 'address1_postalcode',
-        'end_complemento' => 'address1_line2',
-        'end_cidade'      => 'address1_city',
-        'end_logradouro'  => 'fut_address1_logradouro',
-        'end_numero'      => 'fut_address1_nro',
-    ];
-
-    foreach ($address_map as $param_key => $attr_key) {
-        if (!empty($params[$param_key])) {
-            $attributes[$attr_key] = $params[$param_key];
-        }
-    }
+    $attributes = array_merge($attributes, get_registration_address_attributes($params));
 
     if ($builder) {
         return $builder->add_create('lead', $attributes);

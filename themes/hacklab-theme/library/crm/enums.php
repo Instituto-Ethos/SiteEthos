@@ -77,6 +77,14 @@ enum BrazilianUF: int {
             default => null
         };
     }
+
+    public static function toCode (int|null $value): string|null {
+        if (empty($value)) {
+            return null;
+        }
+
+        return self::tryFrom($value)?->name;
+    }
 }
 
 enum ContactStatus: int {
