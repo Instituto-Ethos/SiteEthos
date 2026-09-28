@@ -157,20 +157,6 @@ function get_courtesy_type (int $post_id, string|null $contact_id, string|null $
     return 969830000; // NÃO
 }
 
-function get_used_courtesies (int $post_id, string $account_id): int {
-    $account = get_crm_entity_by_id('account', $account_id, [ 'cache' => false ]);
-
-    if (event_is_course($post_id)) {
-        return $account->Attributes->fut_int_cortesias_cursos ?? 0;
-    }
-
-    if (event_is_lecture($post_id)) {
-        return $account->Attributes->fut_int_cortesias_palestras ?? 0;
-    }
-
-    return $account->Attributes->fut_int_cortesias_conferencias ?? 0;
-}
-
 function get_user_by_contact (string $contact_id): \WP_User|null {
     $users = get_users([
         'meta_query' => [
@@ -183,5 +169,67 @@ function get_user_by_contact (string $contact_id): \WP_User|null {
     }
 
     return null;
+}
+
+/**
+ * Per-request context shared between the registration flow (crm.php) and
+ * the helpers it calls: data prefetched by the batch (R2/R3) is consumed
+ * here instead of triggering dedicated CRM roundtrips. Fresh by
+ * construction — fetched during the current request.
+ */
+function set_registration_flow_context (string $key, mixed $value): void {
+    $GLOBALS['_ethos_registration_flow'][$key] = $value;
+}
+
+function get_registration_flow_context (string $key): mixed {
+    return $GLOBALS['_ethos_registration_flow'][$key] ?? null;
+}
+
+/**
+ * Account fields fetched (in batch, when possible) for the courtesy
+ * counters (R3) and the associates financial-status check.
+ */
+function get_registration_account_field_select (): array {
+    return [
+        'fut_int_cortesias_cursos',
+        'fut_int_cortesias_palestras',
+        'fut_int_cortesias_conferencias',
+        'fut_pl_situacaofinanceira',
+    ];
+}
+
+function resolve_crm_option_set_value (mixed $value): ?int {
+    if (is_numeric($value)) {
+        return intval($value);
+    }
+
+    if (is_object($value) && isset($value->Value)) {
+        return intval($value->Value);
+    }
+
+    return null;
+}
+
+function get_used_courtesies (int $post_id, string $account_id): int {
+    $fields = get_registration_flow_context('account_fields');
+
+    if (null === $fields) {
+        $account = get_crm_entity_by_id('account', $account_id, [
+            'cache' => false,
+            'select' => get_registration_account_field_select(),
+        ]);
+
+        $fields = is_object($account) ? ($account->Attributes ?? []) : [];
+    }
+
+    if (event_is_course($post_id)) {
+        return intval($fields['fut_int_cortesias_cursos'] ?? 0);
+    }
+
+    if (event_is_lecture($post_id)) {
+        return intval($fields['fut_int_cortesias_palestras'] ?? 0);
+    }
+
+    return intval($fields['fut_int_cortesias_conferencias'] ?? 0);
 }
 
