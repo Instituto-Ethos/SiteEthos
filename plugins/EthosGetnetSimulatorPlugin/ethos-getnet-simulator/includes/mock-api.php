@@ -82,6 +82,7 @@ function mock_create_payment_intent( array $intent_data ): array {
 		'title'      => (string) ( $intent_data['product'][0]['title'] ?? '' ),
 		'expires_at' => (string) ( $intent_data['expires_at'] ?? '' ),
 		'created_at' => time(),
+		'token'      => wp_generate_password( 32, false, false ),
 	] );
 
 	return [

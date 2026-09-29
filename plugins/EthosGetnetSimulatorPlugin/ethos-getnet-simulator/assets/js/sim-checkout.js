@@ -40,7 +40,7 @@
 		var body = {
 			intent_id: modal.getAttribute( 'data-intent' ),
 			outcome: outcome,
-			nonce: cfg.nonce || ''
+			token: modal.getAttribute( 'data-token' ) || ''
 		};
 
 		if ( paymentId ) {

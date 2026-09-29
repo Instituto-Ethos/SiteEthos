@@ -22,7 +22,7 @@ function sim_register_rest_routes(): void {
 				'required'          => false,
 				'sanitize_callback' => 'sanitize_text_field',
 			],
-			'nonce'      => [
+			'token'      => [
 				'required'          => false,
 				'sanitize_callback' => 'sanitize_text_field',
 			],
@@ -32,8 +32,9 @@ function sim_register_rest_routes(): void {
 add_action( 'rest_api_init', 'ethos\getnetsim\sim_register_rest_routes' );
 
 /**
- * Gate: simulador ativo (não-produção) + (admin OU nonce emitido no render
- * do botão — permite testar o fluxo anônimo, como um inscrito real).
+ * Gate: simulador ativo (não-produção) + (admin OU token da intent — segredo
+ * gerado na criação e renderizado no modal, autoriza o fluxo anônimo do
+ * inscrito real independentemente de estado de login/nonce WP).
  */
 function rest_sim_outcome_permission( \WP_REST_Request $request ): bool {
 	if ( ! ethos_getnet_sim_active() ) {
@@ -44,9 +45,17 @@ function rest_sim_outcome_permission( \WP_REST_Request $request ): bool {
 		return true;
 	}
 
-	$nonce = sanitize_text_field( (string) $request->get_param( 'nonce' ) );
+	$intent_id = sanitize_text_field( (string) $request->get_param( 'intent_id' ) );
+	$token     = sanitize_text_field( (string) $request->get_param( 'token' ) );
 
-	return '' !== $nonce && (bool) wp_verify_nonce( $nonce, 'ethos_getnet_sim_outcome' );
+	if ( '' === $intent_id || '' === $token ) {
+		return false;
+	}
+
+	$intent = get_sim_intent( $intent_id );
+	$intent_token = is_array( $intent ) ? (string) ( $intent['token'] ?? '' ) : '';
+
+	return '' !== $intent_token && hash_equals( $intent_token, $token );
 }
 
 /**

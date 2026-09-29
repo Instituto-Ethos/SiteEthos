@@ -59,13 +59,13 @@ function render_sim_checkout_button( $replacement, string $payment_intent_id, st
 
 	return sprintf(
 		'<button type="button" class="button button--solid %1$s" data-ethos-getnet-sim-trigger="%2$s" aria-controls="%7$s">%3$s</button>
-		<div class="ethos-getnet-sim-backdrop" id="%7$s" hidden data-ethos-getnet-sim-modal data-intent="%2$s" data-last-outcome="" data-last-payment="">
+		<div class="ethos-getnet-sim-backdrop" id="%7$s" hidden data-ethos-getnet-sim-modal data-intent="%2$s" data-token="%8$s" data-last-outcome="" data-last-payment="">
 			<div class="ethos-getnet-sim-modal" role="dialog" aria-modal="true" aria-label="Checkout simulado">
 				<p class="ethos-getnet-sim-modal__title">Simulador de pagamento <span class="ethos-getnet-sim-badge">Getnet SIM</span></p>
 				<p class="ethos-getnet-sim-modal__meta">%4$s · inscrição <code>%5$s</code></p>
 				<div class="ethos-getnet-sim-modal__actions">%6$s</div>
 				<button type="button" class="button ethos-getnet-sim-redeliver" hidden>Reenviar mesmo pagamento (idempotência)</button>
-				<a class="button ethos-getnet-sim-status-link" href="%8$s" hidden>Ver página de status</a>
+				<a class="button ethos-getnet-sim-status-link" href="%9$s" hidden>Ver página de status</a>
 				<pre class="ethos-getnet-sim-result" hidden></pre>
 				<button type="button" class="button ethos-getnet-sim-close">Fechar</button>
 			</div>
@@ -77,6 +77,7 @@ function render_sim_checkout_button( $replacement, string $payment_intent_id, st
 		esc_html( $order_id ),
 		$outcome_buttons,
 		esc_attr( $modal_id ),
+		esc_attr( (string) ( $intent['token'] ?? '' ) ),
 		esc_url( get_sim_status_url( $order_id ) )
 	);
 }
@@ -106,6 +107,5 @@ function sim_enqueue_checkout_assets(): void {
 
 	wp_localize_script( 'ethos-getnet-sim', 'ethosGetnetSim', [
 		'restUrl' => esc_url_raw( rest_url( 'ethos-getnet-sim/v1/outcome' ) ),
-		'nonce'   => wp_create_nonce( 'ethos_getnet_sim_outcome' ),
 	] );
 }
