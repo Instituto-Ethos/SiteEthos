@@ -22,7 +22,7 @@ services:
       - ./plugins/hacklab-dev-utils:/var/www/html/wp-content/plugins/hacklab-dev-utils
       - ./plugins/EthosMigrationPlugin:/var/www/html/wp-content/plugins/EthosMigrationPlugin
       - ./plugins/EthosDynamics365IntegrationPlugin/ethos-dynamics-365-integration:/var/www/html/wp-content/plugins/EthosDynamics365IntegrationPlugin
-      - ./plugins/EthosGetnetSimulatorPlugin:/var/www/html/wp-content/plugins/EthosGetnetSimulatorPlugin/
+      - ./plugins/EthosGetnetSimulatorPlugin/ethos-getnet-simulator:/var/www/html/wp-content/plugins/ethos-getnet-simulator
       - ./plugins/EthosPaymentIntegrationPlugin/ethos-payment-integration:/var/www/html/wp-content/plugins/ethos-payment-integration
       - ./plugins/ethos-associados:/var/www/html/wp-content/plugins/ethos-associados
       - ./compose/local/wordpress/htaccess:/var/www/html/.htaccess
