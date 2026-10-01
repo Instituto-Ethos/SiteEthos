@@ -58,7 +58,9 @@ jobs:
           name: ${{ env.THEME_NAME }}
           path: ./${{ env.THEME_NAME }}/
       - name: Zip artifact
-        run: zip -r ${{ github.event.repository.name }}.zip ./${{ env.THEME_NAME }}
+        run: |
+          mv ./${{ env.THEME_NAME }} ./${{ github.event.repository.name }}
+          zip -r ${{ github.event.repository.name }}.zip ./${{ github.event.repository.name }}
       - name: Create GitHub Release
         id: create_release_develop
         uses: actions/create-release@v1
