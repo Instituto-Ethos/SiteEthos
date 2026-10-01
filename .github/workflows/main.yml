@@ -115,8 +115,8 @@ jobs:
       - name: Execute CURL after release
         if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY != 0
         run: |
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY }}&theme=SiteEthos"
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY }}&theme=SiteEthos&tag=${{ env.tag }}&override"
+          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos"
+          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos&tag=${{ env.tag }}&override"
 
       - name: Update develop environment via webhook
         if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY_DEV != 0
