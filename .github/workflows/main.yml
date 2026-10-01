@@ -73,8 +73,12 @@ jobs:
             --title "Nightly ${{ env.version }}" \
             --notes "Build de ${{ github.sha }} — alimenta o ambiente develop via Git Updater (canal dev)."
       - name: Update develop environment via webhook
-        if: env.DEPLOY_DEV != 0 && secrets.CURL_URL_DEV != ''
+        if: env.DEPLOY_DEV != 0
         run: |
+          if [ -z "${{ secrets.CURL_URL_DEV }}" ]; then
+            echo "CURL_URL_DEV ausente — webhook do develop pulado (cadastre os secrets)."
+            exit 0
+          fi
           DEV_URL="${{ secrets.CURL_URL_DEV }}"
           curl "${DEV_URL%/}/wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos"
           curl "${DEV_URL%/}/wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos&branch=main&override"
