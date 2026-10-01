@@ -8,7 +8,6 @@ on:
       - '*'
 env:
   THEME_NAME: hacklab-theme
-  CURL_URL: https://www.ethos.org.br/
   DEPLOY: 1
   DEPLOY_DEV: 1
 
@@ -115,8 +114,9 @@ jobs:
       - name: Execute CURL after release
         if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY != 0
         run: |
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos"
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos&tag=${{ env.tag }}&override"
+          PROD_URL="${{ secrets.CURL_URL_PROD }}"
+          curl "${PROD_URL%/}/wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos"
+          curl "${PROD_URL%/}/wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos&tag=${{ env.tag }}&override"
 
       - name: Update develop environment via webhook
         if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY_DEV != 0
