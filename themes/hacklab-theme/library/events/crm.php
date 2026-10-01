@@ -66,12 +66,13 @@ function create_registration (int $post_id, array $params) {
     $client = get_client_on_dynamics();
     $builder = new Dynamics_Batch_Builder($client->getClient());
 
+    $account_id = get_registration_account($params);
+
     $lead_id = null;
-    if (!empty($params['cnpj'])) {
+    if (empty($account_id) && !empty($params['cnpj'])) {
         $lead_id = get_registration_lead($params, $builder);
     }
 
-    $account_id = get_registration_account($params);
     $contact_id = get_registration_contact($params, $lead_id, !$associates_event, $builder);
 
     $contact_uuid = null;
@@ -249,7 +250,7 @@ function create_registration_lead (array $params, ?Dynamics_Batch_Builder $build
 
     $attributes = [
         'companyname'                => $company_name,
-        'firstname'                  => $company_name,
+        'firstname'                  => $first_name,
         'fullname'                   => $company_name,
         'fut_st_cnpj'                => format_cnpj($cnpj),
         'fut_st_nome'                => $first_name,

@@ -130,7 +130,7 @@ function map_lead_attributes( int $post_id ) {
         'address1_postalcode'        => get_meta( $post_meta, 'end_cep' ),
         'companyname'                => $company_name,
         'entityimage_url'            => get_the_post_thumbnail_url( $post_id ),
-        'firstname'                  => $company_name,
+        'firstname'                  => $first_name,
         'fullname'                   => $company_name,
         'fut_address1_logradouro'    => get_meta( $post_meta, 'end_logradouro' ),
         'fut_address1_nro'           => get_meta( $post_meta, 'end_numero' ),

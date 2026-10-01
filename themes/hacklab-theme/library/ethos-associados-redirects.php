@@ -66,6 +66,10 @@ function redirect_legacy_event_urls () {
     }
 
     // Redirect of old pages
+    if (str_starts_with($request_url, '/faca-parte-associe-se/')) {
+        wp_redirect(str_replace('/faca-parte-associe-se/', '/associe-se/', $request_url), 301);
+        die;
+    }
     if (str_starts_with($request_url, '/conteudo/')) {
         wp_redirect(str_replace('/conteudo/', '/', $request_url), 301);
         die;

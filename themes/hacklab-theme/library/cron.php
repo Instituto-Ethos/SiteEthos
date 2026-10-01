@@ -95,6 +95,10 @@ function schedule_recurring_tasks () {
 		wp_schedule_event(time(), 'hacklabr_hourly', 'hacklabr\\run_every_hour');
 	}
 
+    if ( function_exists( 'ethos\\migration\\next_daily_run_timestamp' ) && ! wp_next_scheduled( 'ethos_migration\\run_daily' ) ) {
+        wp_schedule_event( \ethos\migration\next_daily_run_timestamp(), 'daily', 'ethos_migration\\run_daily' );
+    }
+
     $frequency = get_option( '_ethos_reconciliation_frequency', 'weekly' );
 
     if ( $frequency === 'manual' ) {
