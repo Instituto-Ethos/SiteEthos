@@ -89,6 +89,28 @@ enum ContactStatus: int {
     }
 }
 
+enum AccountAssociation: int {
+    case Associado = 969830000;
+    case TaxaAdesao = 969830001;
+    case ExAssociado = 969830002;
+    case NaoAssociado = 969830003;
+    case Pendente = 969830004;
+    case Rejeitado = 969830005;
+    case GrupoEconomico = 969830006;
+
+    /**
+     * Valores de `fut_pl_associacao` que tornam uma conta elegível para a
+     * sincronização (espelha `is_active_account()`, em importer.php —
+     * mantenha os dois em sincronia).
+     */
+    public static function activeValues (): array {
+        return [
+            self::Associado->value,
+            self::GrupoEconomico->value,
+        ];
+    }
+}
+
 enum CompanySize: int {
     case Micro = 969830000;
     case Pequena = 969830001;
