@@ -9,7 +9,7 @@ RewriteBase /
 RewriteRule ^index\.php$ - [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^wp-content\/uploads\/?(.*)$ "https\:\/\/ethos.hacklab.com.br\/wp-content\/uploads\/$1" [R=302,L]
+RewriteRule ^wp-content\/uploads\/?(.*)$ "https\:\/\/ethos.org.br\/wp-content\/uploads\/$1" [R=302,L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

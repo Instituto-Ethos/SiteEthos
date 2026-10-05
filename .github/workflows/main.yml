@@ -8,8 +8,8 @@ on:
       - '*'
 env:
   THEME_NAME: hacklab-theme
-  CURL_URL: https://www.ethos.org.br/
   DEPLOY: 1
+  DEPLOY_DEV: 1
 
 jobs:
   build_assets:
@@ -39,6 +39,50 @@ jobs:
           name: ${{ env.THEME_NAME }}
           path: themes/${{ env.THEME_NAME }}
 
+  nightly_release:
+    name: Nightly release (develop)
+    if: github.ref == 'refs/heads/main'
+    needs: [build_assets]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Read theme version
+        run: echo "version=$(grep -Po '^Version:\s*\K.*' themes/${{ env.THEME_NAME }}/style.css)" >> $GITHUB_ENV
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.THEME_NAME }}
+          path: ./${{ env.THEME_NAME }}/
+      - name: Zip artifact
+        run: |
+          mv ./${{ env.THEME_NAME }} ./${{ github.event.repository.name }}
+          zip -r ${{ github.event.repository.name }}-v${{ env.version }}-nightly.zip ./${{ github.event.repository.name }}
+      - name: Replace rolling nightly release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release list --json tagName,isPrerelease \
+            -q '.[] | select(.isPrerelease and (.tagName | contains("-nightly"))) | .tagName' \
+            | xargs -r -n 1 gh release delete --cleanup-tag --yes
+          gh release create "v${{ env.version }}-nightly" \
+            "${{ github.event.repository.name }}-v${{ env.version }}-nightly.zip" \
+            --prerelease --latest=false \
+            --title "Nightly ${{ env.version }}" \
+            --notes "Build de ${{ github.sha }} — alimenta o ambiente develop via Git Updater (canal dev)."
+      - name: Update develop environment via webhook
+        if: env.DEPLOY_DEV != 0
+        run: |
+          if [ -z "${{ secrets.CURL_URL_DEV }}" ]; then
+            echo "CURL_URL_DEV ausente — webhook do develop pulado (cadastre os secrets)."
+            exit 0
+          fi
+          DEV_URL="${{ secrets.CURL_URL_DEV }}"
+          curl "${DEV_URL%/}/wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos"
+          curl "${DEV_URL%/}/wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos&branch=main&override"
+
   create_release:
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -58,7 +102,9 @@ jobs:
           name: ${{ env.THEME_NAME }}
           path: ./${{ env.THEME_NAME }}/
       - name: Zip artifact
-        run: zip -r ${{ env.THEME_NAME }}.zip ./${{ env.THEME_NAME }}
+        run: |
+          mv ./${{ env.THEME_NAME }} ./${{ github.event.repository.name }}
+          zip -r ${{ github.event.repository.name }}.zip ./${{ github.event.repository.name }}
       - name: Create GitHub Release
         id: create_release_develop
         uses: actions/create-release@v1
@@ -75,13 +121,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release_develop.outputs.upload_url }}
-          asset_path: ./${{ env.THEME_NAME }}.zip
-          asset_name: ${{ env.THEME_NAME }}-${{ env.tag }}.zip
+          asset_path: ./${{ github.event.repository.name }}.zip
+          asset_name: ${{ github.event.repository.name }}-${{ env.tag }}.zip
           asset_content_type: application/zip
       - name: Wait for asset to be available
         id: check_asset_availability
         run: |
-          ASSET_NAME="${{ env.THEME_NAME }}-${{ env.tag }}.zip"
+          ASSET_NAME="${{ github.event.repository.name }}-${{ env.tag }}.zip"
           REPO="https://api.github.com/repos/${{ github.repository }}/releases/tags/${{ env.tag }}"
           ATTEMPTS=0
           MAX_ATTEMPTS=3
@@ -101,6 +147,7 @@ jobs:
             fi
           done
           echo "success=$SUCCESS" >> $GITHUB_ENV
+          echo "success=$SUCCESS" >> $GITHUB_OUTPUT
 
           if [ "$SUCCESS" = false ]; then
             echo "Failed to find asset after $MAX_ATTEMPTS attempts."
@@ -111,5 +158,13 @@ jobs:
       - name: Execute CURL after release
         if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY != 0
         run: |
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY }}&theme=${{ env.THEME_NAME }}"
-          curl "${{ env.CURL_URL }}wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY }}&theme=${{ env.THEME_NAME }}&tag=${{ env.tag }}&override"
+          PROD_URL="${{ secrets.CURL_URL_PROD }}"
+          curl "${PROD_URL%/}/wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos"
+          curl "${PROD_URL%/}/wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_PROD }}&theme=SiteEthos&tag=${{ env.tag }}&override"
+
+      - name: Update develop environment via webhook
+        if: steps.check_asset_availability.outputs.success == 'true' && env.DEPLOY_DEV != 0
+        run: |
+          DEV_URL="${{ secrets.CURL_URL_DEV }}"
+          curl "${DEV_URL%/}/wp-json/git-updater/v1/reset-branch/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos"
+          curl "${DEV_URL%/}/wp-json/git-updater/v1/update/?key=${{ secrets.GIT_UPDATER_KEY_DEV }}&theme=SiteEthos&tag=${{ env.tag }}&override"
