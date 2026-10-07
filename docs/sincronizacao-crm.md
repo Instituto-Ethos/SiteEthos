@@ -18,11 +18,39 @@ O CRM espelha dois tipos de registro para o WP:
 
 | Mecanismo | Gatilho |
 |---|---|
-| Migração incremental diária | Todo dia às **02:00** (fuso de Brasília), via cron do servidor |
-| Execução manual | `wp incremental-migration` (ou `wp incremental-migration --force`) |
-| Proteção contra sobreposição | Uma execução por vez (bloqueio de 23h); se a anterior ainda estiver rodando, a nova é ignorada |
+| Migração incremental diária | Todo dia às **02:00** (fuso de Brasília), via cron do servidor: inicia o ciclo e processa a primeira página |
+| Avanço do ciclo | Evento recorrente a cada **5 minutos** (`ethos_migration\run_chunk`): processa **uma página de contas** (100 contas + seus contatos) por execução, até completar o ciclo |
+| Execução manual | `wp incremental-migration` (ou `wp incremental-migration --force`) — processa o ciclo inteiro em um único processo, chunk por chunk |
+| Proteção contra sobreposição | Bloqueio por chunk (15 min); um tick que encontra o anterior em andamento é ignorado |
 
-O agendamento diário é feito pelo tema (`library/cron.php`); o plugin executa.
+O agendamento dos eventos (início diário e tick de chunks) é feito pelo tema
+(`library/cron.php`); o plugin executa.
+
+## Ciclos, chunks e o cursor de páginas
+
+A migração roda em **ciclos**: uma iteração completa pelas contas ativas do
+CRM, dividida em **chunks** de uma página cada. O estado do ciclo — página
+atual, contadores e lista de contas ativas já vistas — fica persistido na
+opção `_ethos_migration_cycle`, e a página é um **cursor numérico estável**
+(paginação FetchXML por número de página, sem cookie opaco): ele sobrevive
+entre execuções e pode ser repetido a qualquer momento.
+
+Comportamentos importantes:
+
+- **Continuação automática**: se um chunk morre no meio (fatal, reinício), o
+  próximo tick retoma da última página persistida; páginas parcialmente
+  processadas são refeitas sem risco (a importação é idempotente).
+- **Falhas de leitura do CRM**: a mesma página é tentada até 3 vezes
+  seguidas; esgotadas as tentativas, o ciclo é **abortado sem executar a
+  limpeza** e a próxima janela diária começa um ciclo novo.
+- **Ciclo travado**: ciclos com mais de 20 horas são descartados pelo tick.
+- **Mudança de formato da consulta**: um deploy que altere filtros, ordem ou
+  tamanho de página muda a assinatura da consulta; o ciclo em andamento é
+  reiniciado da página 1 em vez de continuar sobre offsets inconsistentes.
+- **Pré-filtro no CRM**: a consulta de contas já filtra
+  `statecode = 0` e `fut_pl_associacao ∈ {Associado (969830000), Grupo
+  Econômico (969830006)}` (enum `AccountAssociation`, no tema); a verificação
+  PHP (`is_active_account`) permanece como guarda adicional.
 
 ## O que é "ativo"
 
@@ -83,8 +111,8 @@ o CRM os altere.
 
 ## Limpeza de organizações inativas e travas de segurança
 
-Ao fim de cada execução, as organizações publicadas no WP são comparadas com as
-contas ativas vistas na rodada. O que não apareceu como ativo é removido. Para
+Ao fim de cada **ciclo**, as organizações publicadas no WP são comparadas com as
+contas ativas vistas ao longo do ciclo. O que não apareceu como ativo é removido. Para
 evitar remoções indevidas, a limpeza **é cancelada automaticamente** quando:
 
 - nenhuma conta ativa foi encontrada na rodada (indício de falha de conexão
@@ -134,9 +162,11 @@ flowchart TD
 
 | Arquivo | Papel |
 |---|---|
-| `plugins/EthosMigrationPlugin/includes/crm.php` | Comando `incremental-migration` (`--force`), trava dos 50%, contadores, estatísticas |
-| `plugins/EthosMigrationPlugin/includes/incremental-cron.php` | Execução diária, bloqueio de sobreposição, logs em arquivo |
+| `plugins/EthosMigrationPlugin/includes/crm.php` | Máquina de estados do ciclo (`start_cycle` / `run_migration_chunk` / `finalize_cycle` / `abort_cycle`), comando `incremental-migration` (`--force`, `--per-page`), travas dos 50%, contadores, estatísticas |
+| `plugins/EthosMigrationPlugin/includes/incremental-cron.php` | Execução do início diário (02:00) e do tick de 5 min, bloqueio por chunk, estado do ciclo, logs em arquivo |
 | `plugins/EthosMigrationPlugin/includes/cleanup.php` | Limpeza de organizações inativas + travas de segurança |
+| `themes/hacklab-theme/library/crm/enums.php` | Enum `AccountAssociation` (valores de `fut_pl_associacao` usados no pré-filtro) |
 | `themes/hacklab-theme/library/crm/importer.php` | Regras de importação (`import_account` / `import_contact`), verificação de alterações (`is_post_synced` / `is_user_synced`) |
-| `themes/hacklab-theme/library/cron.php` | Agendamento diário (02:00) |
-| `plugins/EthosDynamics365IntegrationPlugin/.../admin-menu.php` | Painel admin (status, última execução, logs) |
+| `themes/hacklab-theme/library/cron.php` | Agendamentos (início diário às 02:00 e tick de chunks a cada 5 min) |
+| `plugins/EthosDynamics365IntegrationPlugin/.../includes/helpers.php` | Consulta paginada por número de página (`get_crm_entities_page`) |
+| `plugins/EthosDynamics365IntegrationPlugin/.../includes/admin-menu.php` | Painel admin (status, progresso do ciclo, última execução, logs) |
