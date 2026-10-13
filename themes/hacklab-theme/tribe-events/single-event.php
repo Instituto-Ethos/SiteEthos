@@ -218,8 +218,8 @@ if( isset($recurrence['rules']) ) {
         } ?>
     </div>
 
-
     <?php
+
     if ($project_id) {
         if (isset($_GET['certificado'])) {
             echo do_shortcode('[ethosGeraCertificado2]');

@@ -552,7 +552,7 @@ add_filter( 'register_post_type_args', 'wp1482371_custom_post_type_args', 20, 2 
 
 function redirect_single_tribe_events_template() {
 	if ( is_singular( 'tribe_events' ) ) {
-		$new_template = locate_template('single-evento.php');
+		$new_template = locate_template('tribe-events/single-event.php');
 		if ($new_template) {
 			include($new_template);
 			exit;
