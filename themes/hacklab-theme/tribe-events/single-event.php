@@ -199,7 +199,7 @@ if( isset($recurrence['rules']) ) {
 
 <main class="post-content stack container">
     <?php
-    if (empty($project_id) || hacklabr\is_legacy_event($post_id)) {
+    if (empty($project_id) || hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
         the_content();
     }
     ?>
@@ -219,12 +219,11 @@ if( isset($recurrence['rules']) ) {
     </div>
 
     <?php
-
     if ($project_id) {
         if (isset($_GET['certificado'])) {
             echo do_shortcode('[ethosGeraCertificado2]');
         } else {
-            if (hacklabr\is_legacy_event($post_id)) {
+            if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
                 echo do_shortcode('[ethosDadosEvento menu_order=""]');
                 echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
             } else {
