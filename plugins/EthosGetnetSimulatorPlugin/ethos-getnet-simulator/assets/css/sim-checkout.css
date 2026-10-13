@@ -1,0 +1,82 @@
+.ethos-getnet-sim-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 99999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.55);
+	padding: 1rem;
+}
+
+.ethos-getnet-sim-modal {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+	max-width: 420px;
+	width: 100%;
+	padding: 1.25rem 1.5rem;
+}
+
+.ethos-getnet-sim-modal__title {
+	font-weight: 700;
+	margin: 0 0 0.25rem;
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex-wrap: wrap;
+}
+
+.ethos-getnet-sim-badge {
+	background: #b35d00;
+	color: #fff;
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	padding: 0.15rem 0.4rem;
+	border-radius: 3px;
+	text-transform: uppercase;
+}
+
+.ethos-getnet-sim-modal__meta {
+	margin: 0 0 1rem;
+	color: #50575e;
+}
+
+.ethos-getnet-sim-modal__actions {
+	display: grid;
+	gap: 0.5rem;
+	margin-bottom: 1rem;
+}
+
+.ethos-getnet-sim-modal__actions .button,
+.ethos-getnet-sim-redeliver {
+	width: 100%;
+	text-align: center;
+}
+
+.ethos-getnet-sim-redeliver {
+	margin-bottom: 0.5rem;
+}
+
+.ethos-getnet-sim-status-link {
+	display: inline-block;
+	margin-bottom: 0.75rem;
+	text-decoration: none;
+}
+
+.ethos-getnet-sim-result {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	font-size: 0.75rem;
+	max-height: 180px;
+	overflow: auto;
+	padding: 0.5rem;
+	white-space: pre-wrap;
+	margin-bottom: 0.75rem;
+}
+
+.ethos-getnet-sim-close {
+	margin-top: 0.25rem;
+}

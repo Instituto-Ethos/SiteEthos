@@ -2,4 +2,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CDIR=$( pwd )
 cd $DIR/../themes
-zip -r ../zips/hacklab-theme.zip hacklab-theme -x "hacklab-theme/node_modules/*"
+ln -s hacklab-theme SiteEthos
+zip -r ../zips/SiteEthos.zip SiteEthos -x "SiteEthos/node_modules/*"
+rm SiteEthos

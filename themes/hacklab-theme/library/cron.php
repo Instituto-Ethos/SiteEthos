@@ -38,6 +38,13 @@ function add_cron_schedules (array $schedules) {
         'display' => __('Ethos Reconciliation', 'hacklabr'),
     ];
 
+    if ( defined( 'ethos\\migration\\TICK_INTERVAL' ) ) {
+        $schedules['ethos_migration_every_5_minutes'] = [
+            'interval' => \ethos\migration\TICK_INTERVAL,
+            'display' => __('Ethos Migration Chunk', 'hacklabr'),
+        ];
+    }
+
     return $schedules;
 }
 add_filter('cron_schedules', 'hacklabr\\add_cron_schedules');
@@ -97,6 +104,10 @@ function schedule_recurring_tasks () {
 
     if ( function_exists( 'ethos\\migration\\next_daily_run_timestamp' ) && ! wp_next_scheduled( 'ethos_migration\\run_daily' ) ) {
         wp_schedule_event( \ethos\migration\next_daily_run_timestamp(), 'daily', 'ethos_migration\\run_daily' );
+    }
+
+    if ( function_exists( 'ethos\\migration\\run_chunk_migration' ) && ! wp_next_scheduled( 'ethos_migration\run_chunk' ) ) {
+        wp_schedule_event( time() + \ethos\migration\TICK_INTERVAL, 'ethos_migration_every_5_minutes', 'ethos_migration\run_chunk' );
     }
 
     $frequency = get_option( '_ethos_reconciliation_frequency', 'weekly' );
