@@ -71,8 +71,14 @@ function redirect_legacy_event_urls () {
         die;
     }
     if (str_starts_with($request_url, '/conteudo/')) {
-        wp_redirect(str_replace('/conteudo/', '/', $request_url), 301);
-        die;
+        $path = strtok($request_url, '?');
+        $slug = trim(str_replace('/conteudo/', '', $path), '/');
+
+        // Não redirecionar singles reais do CPT conteudo (evita loop com redirect_canonical)
+        if ($slug === '' || !get_page_by_path($slug, OBJECT, 'conteudo')) {
+            wp_redirect(str_replace('/conteudo/', '/', $request_url), 301);
+            die;
+        }
     }
 };
 add_action('template_redirect', 'hacklabr\\redirect_legacy_event_urls');
