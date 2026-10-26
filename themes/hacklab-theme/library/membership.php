@@ -231,6 +231,7 @@ function register_organization_cpt () {
     register_post_type('organizacao', [
         'label' => __('Organizations', 'hacklabr'),
         'public' => true,
+        'publicly_queryable' => false,
         'show_in_rest' => true,
         'menu_icon' => 'dashicons-building',
         'supports' => ['author', 'custom-fields', 'editor', 'thumbnail', 'title'],
