@@ -18,6 +18,7 @@ $pdf = get_field( 'pdf', $post_id );
 $inscrever = get_field( 'inscrever', $post_id );
 
 $project_id = get_post_meta($post_id, '_ethos_crm:fut_pf_id', true);
+$project_uuid = get_post_meta($post_id, 'entity_fut_projeto', true);
 
 $event = tribe_get_event( get_the_ID() );
 
@@ -219,18 +220,18 @@ if( isset($recurrence['rules']) ) {
     </div>
 
     <?php
-    if ($project_id) {
-        if (isset($_GET['certificado'])) {
+    if (isset($_GET['certificado'])) {
+        if (!empty($project_id)) {
             echo do_shortcode('[ethosGeraCertificado2]');
-        } else {
-            if (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
-                echo do_shortcode('[ethosDadosEvento menu_order=""]');
-                echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
-            } else {
-                echo do_shortcode('[event-details]');
-                echo do_shortcode('[event-registration]');
-            }
         }
+    } elseif (hacklabr\is_paid_event($post_id) || hacklabr\is_legacy_event($post_id)) {
+        if (!empty($project_id)) {
+            echo do_shortcode('[ethosDadosEvento menu_order=""]');
+            echo do_shortcode('[ethosDadosEventoCorpo tp_evt=""]');
+        }
+    } elseif (!empty($project_uuid)) {
+        echo do_shortcode('[event-details]');
+        echo do_shortcode('[event-registration]');
     }
     ?>
 </main>
