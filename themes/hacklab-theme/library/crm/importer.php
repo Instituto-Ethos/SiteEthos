@@ -268,7 +268,7 @@ function create_from_account( Entity $account ) {
 
     $post_parent = 0;
     if ( is_subsidiary_company( $account ) ) {
-        $post_parent = get_post_id_by_account( $attributes['parentaccountid']->Id ) ?? 0;
+        $post_parent = get_post_id_by_account( $attributes['parentaccountid']->Id, true ) ?? 0;
     }
 
     $post_id = wp_insert_post( [
@@ -616,7 +616,7 @@ function create_from_contact( Entity $contact, Entity $account ) {
         return null;
     }
 
-    $post_id = get_post_id_by_account( $account->Id );
+    $post_id = get_post_id_by_account( $account->Id, true );
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
 
     if ( ! empty( $group_id ) ) {

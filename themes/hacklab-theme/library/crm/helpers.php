@@ -46,7 +46,7 @@ function get_contact( string $contact_id, string $account_id ): int | null {
     return null;
 }
 
-function get_post_id_by_account( string $account_id ) {
+function get_post_id_by_account( string $account_id, bool $create_if_missing = true ) {
     $existing_post = get_single_post( [
         'post_type' => 'organizacao',
         'meta_query' => [
@@ -55,10 +55,12 @@ function get_post_id_by_account( string $account_id ) {
     ] );
 
     if ( empty( $existing_post ) ) {
-        $account = \hacklabr\get_crm_entity_by_id( 'account', $account_id );
+        if ( $create_if_missing ) {
+            $account = \hacklabr\get_crm_entity_by_id( 'account', $account_id );
 
-        if ( ! empty( $account ) ) {
-            return create_from_account( $account );
+            if ( ! empty( $account ) ) {
+                return create_from_account( $account );
+            }
         }
 
         return null;

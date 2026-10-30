@@ -4,8 +4,6 @@ namespace hacklabr;
 
 use \ethos\crm\Plan;
 
-use function ethos\crm\get_post_id_by_account;
-
 function add_user_to_pmpro_group (int $user_id, int $group_id) {
     $group = get_pmpro_group($group_id);
 
@@ -210,11 +208,11 @@ function require_active_account_for_login(\WP_User|\WP_Error $user) {
         $account_id = get_user_meta($user->ID, '_ethos_crm_account_id', true);
 
         if (!empty($account_id)) {
-            $post_id = get_post_id_by_account($account_id);
+            $post_id = \ethos\crm\get_post_id_by_account($account_id, false);
 
             if (!empty($post_id) && !is_wp_error($post_id)) {
                 $account_status = get_post_status($post_id);
-                $has_active_account = $account_status == 'publish';
+                $has_active_account = $account_status === 'publish';
             }
         }
 

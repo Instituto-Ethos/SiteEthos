@@ -48,7 +48,7 @@ function cli_find_duplicates () {
                 $duplicate_cases += 1;
                 $duplicate_emails += $num_contacts;
 
-                $account_post_id = \ethos\crm\get_post_id_by_account($account_id);
+                $account_post_id = \ethos\crm\get_post_id_by_account($account_id, false);
                 $account_name = get_the_title($account_post_id);
 
                 \WP_CLI::log("Found $num_contacts contacts with email = \"$email\" on account \"$account_name\" ($account_id)\n");
