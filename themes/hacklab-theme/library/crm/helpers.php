@@ -49,6 +49,7 @@ function get_contact( string $contact_id, string $account_id ): int | null {
 function get_post_id_by_account( string $account_id, bool $create_if_missing = true ) {
     $existing_post = get_single_post( [
         'post_type' => 'organizacao',
+        'post_status' => ['publish', 'draft', 'private', 'trash', 'ethos_under_progress'],
         'meta_query' => [
             [ 'key' => '_ethos_crm_account_id', 'value' => $account_id ],
         ],
