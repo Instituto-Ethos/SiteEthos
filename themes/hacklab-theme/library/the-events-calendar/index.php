@@ -56,10 +56,20 @@ function ethos_events_save_meta( $post_id, $post ) {
 add_action( 'admin_menu', 'hacklabr\ethos_events_add_metabox' );
 
 function ethos_events_add_metabox() {
+    if ( ! function_exists( 'tribe' ) ) {
+        return;
+    }
+
+    $metabox_handler = \tribe( 'tec.admin.event-meta-box' );
+
+    if ( ! $metabox_handler || ! method_exists( $metabox_handler, 'init_with_event' ) ) {
+        return;
+    }
+
     add_meta_box(
         'tribe_events_event_details',
         'The Events Calendar',
-        [ tribe( 'tec.admin.event-meta-box' ), 'init_with_event' ],
+        [ $metabox_handler, 'init_with_event' ],
         'tribe_events',
         'normal',
         'high'
