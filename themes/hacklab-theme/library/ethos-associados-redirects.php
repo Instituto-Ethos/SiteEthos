@@ -24,6 +24,7 @@ function redirect_legacy_event_urls () {
             $event_id = (int) $_GET['id'];
 
             $post = get_single_tribe_event([
+                'post_status' => ['publish', 'private'],
                 'meta_query' => [
                     [ 'key' => '_ethos_crm:fut_pf_id', 'value' => $event_id ],
                 ],
