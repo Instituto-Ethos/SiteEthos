@@ -19,7 +19,7 @@ function build_event_url ($base_url, $args) {
 function redirect_legacy_event_urls () {
     $request_url = $_SERVER['REQUEST_URI'];
 
-    if (is_conteudo_url('/inscricao-evento') || is_conteudo_url('/inscricao-conferencia')) {
+    if (is_conteudo_url('/inscricao-evento') || is_conteudo_url('/inscricao-conferencia') || is_conteudo_url('/inscricao-vaga')) {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $event_id = (int) $_GET['id'];
 
