@@ -527,6 +527,19 @@ class Assets
                 }
             ],
 
+            'unlisted-events' => [
+                'file' => 'unlisted-events.js',
+                'pre-load' => false,
+                'admin' => true,
+                'preload_callback' => function () {
+                    $screen = get_current_screen();
+                    if ($screen && $screen->is_block_editor()) {
+                        return $screen->base === 'post' && $screen->post_type === 'tribe_events';
+                    }
+                    return false;
+                },
+            ],
+
             'scroll-behavior'     => [
                 'file' => 'anchor-behavior.js',
                 'pre-load' => true,

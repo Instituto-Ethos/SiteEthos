@@ -393,3 +393,107 @@ function fix_orphaned_events_batch() {
         }
     }
 }
+
+function is_event_unlisted( int $post_id ): bool {
+    return (bool) get_post_meta( $post_id, '_ethos_unlisted', true );
+}
+
+function get_unlisted_event_ids(): array {
+    $cached = wp_cache_get( 'unlisted_event_ids', 'hacklabr_events' );
+
+    if ( is_array( $cached ) ) {
+        return $cached;
+    }
+
+    global $wpdb;
+
+    $ids = $wpdb->get_col( $wpdb->prepare(
+        "SELECT p.ID
+         FROM {$wpdb->posts} p
+         INNER JOIN {$wpdb->postmeta} pm ON pm.post_id = p.ID
+         WHERE p.post_type = %s
+           AND p.post_status NOT IN ( 'trash', 'auto-draft' )
+           AND pm.meta_key = '_ethos_unlisted'
+           AND pm.meta_value = '1'",
+        'tribe_events'
+    ) );
+
+    $ids = array_map( 'intval', $ids );
+
+    wp_cache_set( 'unlisted_event_ids', $ids, 'hacklabr_events', HOUR_IN_SECONDS );
+
+    return $ids;
+}
+
+function flush_unlisted_events_cache() {
+    wp_cache_delete( 'unlisted_event_ids', 'hacklabr_events' );
+}
+add_action( 'save_post_tribe_events', 'hacklabr\\flush_unlisted_events_cache' );
+
+function flush_unlisted_events_cache_on_meta_change( $meta_id, $post_id, $meta_key ) {
+    if ( '_ethos_unlisted' === $meta_key && 'tribe_events' === get_post_type( $post_id ) ) {
+        flush_unlisted_events_cache();
+    }
+}
+add_action( 'added_post_meta', 'hacklabr\\flush_unlisted_events_cache_on_meta_change', 10, 3 );
+add_action( 'updated_post_meta', 'hacklabr\\flush_unlisted_events_cache_on_meta_change', 10, 3 );
+add_action( 'deleted_post_meta', 'hacklabr\\flush_unlisted_events_cache_on_meta_change', 10, 3 );
+
+/**
+ * Excludes unlisted events from non-singular front-end event queries:
+ * TEC archive views, the agenda block/widget, REST archives and search.
+ */
+function exclude_unlisted_events_from_queries( $query ) {
+    if ( is_admin() || $query->is_singular ) {
+        return;
+    }
+
+    $post_type = $query->get( 'post_type' );
+
+    $is_events_query = in_array( 'tribe_events', (array) $post_type, true );
+
+    if ( ! $is_events_query && $query->is_search && in_array( $post_type, [ null, '', 'any' ], true ) ) {
+        $is_events_query = true;
+    }
+
+    if ( ! $is_events_query ) {
+        return;
+    }
+
+    if ( $query->get( 'post_parent' ) ) {
+        return;
+    }
+
+    $unlisted = get_unlisted_event_ids();
+
+    if ( empty( $unlisted ) ) {
+        return;
+    }
+
+    $excluded = array_unique( array_merge( array_map( 'intval', (array) $query->get( 'post__not_in' ) ), $unlisted ) );
+
+    $query->set( 'post__not_in', $excluded );
+}
+add_action( 'pre_get_posts', 'hacklabr\\exclude_unlisted_events_from_queries', 20 );
+
+function exclude_unlisted_events_from_sitemap( $excluded, $post_type, $post_id ) {
+    if ( 'tribe_events' === $post_type && is_event_unlisted( (int) $post_id ) ) {
+        return true;
+    }
+
+    return $excluded;
+}
+add_filter( 'wpseo_sitemap_exclude_post', 'hacklabr\\exclude_unlisted_events_from_sitemap', 10, 3 );
+
+function register_unlisted_event_meta() {
+    register_post_meta( 'tribe_events', '_ethos_unlisted', [
+        'type'          => 'boolean',
+        'description'   => __( 'Hide this event from the agenda, search results and the sitemap. The event stays accessible by direct link.', 'hacklabr' ),
+        'single'        => true,
+        'show_in_rest'  => true,
+        'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+            return current_user_can( 'edit_post', $object_id );
+        },
+    ] );
+}
+add_action( 'init', 'hacklabr\\register_unlisted_event_meta' );

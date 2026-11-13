@@ -95,3 +95,20 @@ function exclude_orphaned_events_from_search( $where, $query ) {
 }
 add_filter( 'posts_where', 'hacklabr\\exclude_orphaned_events_from_search', 10, 2 );
 
+function exclude_unlisted_events_from_search( $where, $query ) {
+    if ( $query->is_search() && ! $query->is_admin() ) {
+        $unlisted = get_unlisted_event_ids();
+
+        if ( ! empty( $unlisted ) ) {
+            global $wpdb;
+            $ids = implode( ',', array_map( 'intval', $unlisted ) );
+            $where .= " AND (
+                {$wpdb->posts}.post_type != 'tribe_events'
+                OR {$wpdb->posts}.ID NOT IN ({$ids})
+            )";
+        }
+    }
+    return $where;
+}
+add_filter( 'posts_where', 'hacklabr\\exclude_unlisted_events_from_search', 10, 2 );
+

@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/hacklab-theme\n"
-"POT-Creation-Date: 2026-06-16T20:27:02+00:00\n"
-"PO-Revision-Date: 2026-06-16 17:28-0300\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/SiteEthos\n"
+"POT-Creation-Date: 2026-11-13T14:52:36+00:00\n"
+"PO-Revision-Date: 2026-11-13 11:55-0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt_BR\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Domain: hacklabr\n"
-"X-Generator: Poedit 3.9\n"
+"X-Generator: Poedit 3.10\n"
 "X-Domain: hacklabr\n"
 "X-Poedit-Basepath: .\n"
 
@@ -128,7 +128,7 @@ msgid "Situation"
 msgstr "Situação"
 
 #: library/blocks/my-plan-table/my-plan-table.php:22
-#: dist/blocks/my-plan-table-row/editor.js:19
+#: dist/blocks/my-plan-table-row/editor.js:2
 #: dist/blocks/my-plan-table-row/editor.js:97
 msgid "Benefits"
 msgstr "Benefícios"
@@ -151,7 +151,7 @@ msgstr "Título"
 msgid "Status"
 msgstr "Status"
 
-#: library/crm/helpers.php:236
+#: library/crm/helpers.php:241
 msgid "Account ID (UUID)"
 msgstr "ID da conta (UUID)"
 
@@ -167,20 +167,24 @@ msgstr "De hora em hora"
 msgid "Ethos Reconciliation"
 msgstr "Reconciliação Ethos"
 
-#: library/events/crm.php:10 library/events/crm.php:27
-#: library/events/crm.php:41
+#: library/cron.php:44
+msgid "Ethos Migration Chunk"
+msgstr "Lote de Migração do Ethos"
+
+#: library/events/crm.php:79 library/events/crm.php:96
+#: library/events/crm.php:108
 msgid "Registrations are closed."
 msgstr "As inscrições foram encerradas."
 
-#: library/events/crm.php:47
-msgid "You are already registered in this event."
-msgstr "Você já se inscreveu neste evento."
+#: library/events/crm.php:414 library/events/crm.php:868
+msgid "Registration failed."
+msgstr "A inscrição falhou."
 
-#: library/events/crm.php:83
+#: library/events/crm.php:631
 msgid "This event is exclusive for associates."
 msgstr "Este evento é exclusivo para associados."
 
-#: library/events/crm.php:94
+#: library/events/crm.php:642
 msgid ""
 "Your registration could not be processed. Please contact your account "
 "manager to resolve any outstanding issues or report any errors."
@@ -188,11 +192,20 @@ msgstr ""
 "Não foi possível processar a sua inscrição. Entre em contato com seu gestor "
 "de contas para solucionar pendências ou reportar erros."
 
-#: library/events/crm.php:134
+#: library/events/crm.php:665 library/events/form.php:335
+msgid "Online payment features are temporarily unavailable. Please contact us."
+msgstr ""
+"Pagamento online está temporariamente indisponível. Por favor, contate-nos."
+
+#: library/events/crm.php:698
+msgid "You are already registered in this event."
+msgstr "Você já se inscreveu neste evento."
+
+#: library/events/crm.php:708 library/events/crm.php:854
 msgid "You are registered to this event, but payment is pending."
 msgstr "Você já se inscreveu neste evento, mas o pagamento está pendente."
 
-#: library/events/crm.php:136
+#: library/events/crm.php:856
 msgid "You are successfully registered to this event!"
 msgstr "Inscrição realizada com sucesso!"
 
@@ -475,7 +488,7 @@ msgstr "Insira o código do voucher, se tiver"
 msgid "Prove you are not a robot"
 msgstr "Prove que você não é um robô"
 
-#: library/events/form.php:306 library/events/form.php:357
+#: library/events/form.php:306 library/events/form.php:381
 msgid "Event registration"
 msgstr "Inscrição no evento"
 
@@ -484,21 +497,26 @@ msgctxt "event"
 msgid "Register"
 msgstr "Inscrever-se"
 
-#: library/events/form.php:340
+#: library/events/form.php:364
 msgid "Await"
 msgstr "Aguarde"
 
-#: library/events/form.php:341
+#: library/events/form.php:365
 msgid "It may take some minutes."
 msgstr "Isso pode levar alguns minutos."
 
-#: library/events/form.php:369
+#: library/events/form.php:393
 msgid "New registration"
 msgstr "Nova inscrição"
 
-#: library/events/form.php:393
+#: library/events/form.php:418
 msgid "Pay"
 msgstr "Pagar"
+
+#: library/events/form.php:424
+msgid "Online payment is temporarily unavailable. Please contact us."
+msgstr ""
+"Pagamento online está temporariamente indisponível. Por favor, contate-nos."
 
 #: library/form-fields.php:95
 msgid "Select an option"
@@ -673,64 +691,68 @@ msgid "Modified fields:"
 msgstr "Campos modificados:"
 
 #: library/forms/helpers.php:40
+msgid "CEP code"
+msgstr "CEP"
+
+#: library/forms/helpers.php:42
+msgid "Enter the CEP code"
+msgstr "Insira o CEP"
+
+#: library/forms/helpers.php:43
+msgid "Fill in the ZIP code to search the address automatically"
+msgstr "Preencha o CEP para buscar o endereço automaticamente"
+
+#: library/forms/helpers.php:47
+msgid "Invalid CEP code"
+msgstr "CEP inválido"
+
+#: library/forms/helpers.php:55
 msgid "Address (street)"
 msgstr "Endereço (logradouro)"
 
-#: library/forms/helpers.php:41
+#: library/forms/helpers.php:56
 msgid "Enter the address street"
 msgstr "Insira o logradouro do endereço"
 
-#: library/forms/helpers.php:47
+#: library/forms/helpers.php:62
 msgctxt "address"
 msgid "Number"
 msgstr "Número"
 
-#: library/forms/helpers.php:53
+#: library/forms/helpers.php:68
 msgctxt "address"
 msgid "Complement"
 msgstr "Complemento"
 
-#: library/forms/helpers.php:54
+#: library/forms/helpers.php:69
 msgid "Enter the address complement"
 msgstr "Insira o complemento"
 
-#: library/forms/helpers.php:60
+#: library/forms/helpers.php:75
 msgid "Neighborhood"
 msgstr "Bairro"
 
-#: library/forms/helpers.php:61
+#: library/forms/helpers.php:76
 msgid "Enter the neighborhood"
 msgstr "Insira o bairro"
 
-#: library/forms/helpers.php:67
+#: library/forms/helpers.php:82
 msgid "City"
 msgstr "Cidade"
 
-#: library/forms/helpers.php:68
+#: library/forms/helpers.php:83
 msgid "Enter the city"
 msgstr "Insira a cidade"
 
-#: library/forms/helpers.php:74
+#: library/forms/helpers.php:89
 msgctxt "address"
 msgid "State"
 msgstr "Estado"
 
-#: library/forms/helpers.php:79
+#: library/forms/helpers.php:94
 msgctxt "address"
 msgid "Invalid state"
 msgstr "Estado inválido"
-
-#: library/forms/helpers.php:87
-msgid "CEP code"
-msgstr "CEP"
-
-#: library/forms/helpers.php:89
-msgid "Enter the CEP code"
-msgstr "Insira o CEP"
-
-#: library/forms/helpers.php:93
-msgid "Invalid CEP code"
-msgstr "CEP inválido"
 
 #: library/forms/my-data.php:35
 msgid "My data"
@@ -1150,7 +1172,7 @@ msgstr "Descrição"
 msgid "Occurrence"
 msgstr "Ocorrência"
 
-#: library/membership.php:200
+#: library/membership.php:230
 msgid "Organizations"
 msgstr "Organizações"
 
@@ -1194,6 +1216,14 @@ msgstr "Médias empresas"
 msgid "Grandes empresas"
 msgstr "Grandes empresas"
 
+#: library/the-events-calendar/index.php:524
+msgid ""
+"Hide this event from the agenda, search results and the sitemap. The event "
+"stays accessible by direct link."
+msgstr ""
+"Oculte este evento da agenda, resultados de busca e mapa do site. O evento "
+"continuará acessível via link direto."
+
 #: library/utils.php:432 library/utils.php:440
 msgid "The reCAPTCHA verification failed. Try again!"
 msgstr "A verificação do reCAPTCHA falhou. Tente novamente!"
@@ -1235,71 +1265,6 @@ msgstr "buscar"
 msgid "New search"
 msgstr "Nova busca"
 
-#: single-evento.php:66 tribe-events/single-event.php:66
-msgid "Monday"
-msgstr "Segunda-feira"
-
-#: single-evento.php:67 tribe-events/single-event.php:67
-msgid "Tuesday"
-msgstr "Terça-feira"
-
-#: single-evento.php:68 tribe-events/single-event.php:68
-msgid "Wednesday"
-msgstr "Quarta-feira"
-
-#: single-evento.php:69 tribe-events/single-event.php:69
-msgid "Thursday"
-msgstr "Quinta-feira"
-
-#: single-evento.php:70 tribe-events/single-event.php:70
-msgid "Friday"
-msgstr "Sexta-feira"
-
-#: single-evento.php:71 tribe-events/single-event.php:71
-msgid "Saturday"
-msgstr "Sábado"
-
-#: single-evento.php:72 tribe-events/single-event.php:72
-msgid "Sunday"
-msgstr "Domingo"
-
-#: single-evento.php:112 single.php:49 template-parts/post-card.php:81
-#: tribe-events/single-event.php:112
-msgid "Published in "
-msgstr "Publicado em "
-
-#: single-evento.php:126 tribe-events/single-event.php:126
-msgid "Start"
-msgstr "Início"
-
-#: single-evento.php:135 tribe-events/single-event.php:135
-msgid "End"
-msgstr "Fim"
-
-#: single-evento.php:141 tribe-events/single-event.php:141
-msgid "Workload"
-msgstr "Carga horária total"
-
-#: single-evento.php:147 tribe-events/single-event.php:147
-msgid "Investment"
-msgstr "Investimento"
-
-#: single-evento.php:158 tribe-events/single-event.php:158
-msgid "Recurrence"
-msgstr "Recorrência"
-
-#: single-evento.php:165 tribe-events/single-event.php:165
-msgid "Number of events"
-msgstr "Quantidade de eventos"
-
-#: single-evento.php:173 tribe-events/single-event.php:173
-msgid "Weekday"
-msgstr "Dia da semana"
-
-#: single-evento.php:189 tribe-events/single-event.php:189
-msgid "Local"
-msgstr "Local"
-
 #: single-publicacao.php:19
 msgid "Publication Sample"
 msgstr "Amostra de publicação"
@@ -1311,6 +1276,11 @@ msgstr "Nenhuma amostra disponível."
 #: single-publicacao.php:41
 msgid "Published in"
 msgstr "Publicado em"
+
+#: single.php:49 template-parts/post-card.php:81
+#: tribe-events/single-event.php:137
+msgid "Published in "
+msgstr "Publicado em "
 
 #: single.php:54
 msgid "Published by "
@@ -1400,271 +1370,353 @@ msgstr "Autor:%s"
 msgid "Membership registration finished"
 msgstr "Cadastro de membro finalizado"
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/card-header/editor.js:19 dist/blocks/download-image/editor.js:29
-#: dist/blocks/banner-with-image/editor.js:129
-#: dist/blocks/card-header/editor.js:115
-#: dist/blocks/download-image/editor.js:129
-msgid "Header content"
-msgstr "Conteúdo do cabeçalho"
+#: tribe-events/single-event.php:70
+msgid "Monday"
+msgstr "Segunda-feira"
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/card-header/editor.js:19 dist/blocks/posts-grid/editor.js:19
-#: dist/blocks/banner-with-image/editor.js:143
-#: dist/blocks/card-header/editor.js:142 dist/blocks/posts-grid/editor.js:1921
-msgid "Layout"
-msgstr "Layout"
+#: tribe-events/single-event.php:71
+msgid "Tuesday"
+msgstr "Terça-feira"
 
-#: dist/blocks/banner-with-image/editor.js:29
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
+#: tribe-events/single-event.php:72
+msgid "Wednesday"
+msgstr "Quarta-feira"
+
+#: tribe-events/single-event.php:73
+msgid "Thursday"
+msgstr "Quinta-feira"
+
+#: tribe-events/single-event.php:74
+msgid "Friday"
+msgstr "Sexta-feira"
+
+#: tribe-events/single-event.php:75
+msgid "Saturday"
+msgstr "Sábado"
+
+#: tribe-events/single-event.php:76
+msgid "Sunday"
+msgstr "Domingo"
+
+#: tribe-events/single-event.php:151
+msgid "Start"
+msgstr "Início"
+
+#: tribe-events/single-event.php:160
+msgid "End"
+msgstr "Fim"
+
+#: tribe-events/single-event.php:166
+msgid "Workload"
+msgstr "Carga horária total"
+
+#: tribe-events/single-event.php:172
+msgid "Investment"
+msgstr "Investimento"
+
+#: tribe-events/single-event.php:183
+msgid "Recurrence"
+msgstr "Recorrência"
+
+#: tribe-events/single-event.php:190
+msgid "Number of events"
+msgstr "Quantidade de eventos"
+
+#: tribe-events/single-event.php:198
+msgid "Weekday"
+msgstr "Dia da semana"
+
+#: tribe-events/single-event.php:214
+msgid "Local"
+msgstr "Local"
+
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:80
+#: dist/blocks/card-header/editor.js:66 dist/blocks/download-image/editor.js:80
+msgid "Change image"
+msgstr "Alterar imagem"
+
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:83
+#: dist/blocks/card-header/editor.js:69 dist/blocks/download-image/editor.js:83
+msgid "Remove image"
+msgstr "Remover imagem"
+
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:89
+#: dist/blocks/card-header/editor.js:75 dist/blocks/download-image/editor.js:89
+msgid "Select image"
+msgstr "Selecionar imagem"
+
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
 #: dist/blocks/banner-with-image/editor.js:97
 #: dist/blocks/banner-with-image/editor.js:146
 #: dist/blocks/card-header/editor.js:83 dist/blocks/download-image/editor.js:97
 msgid "Image"
 msgstr "Imagem"
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:80
-#: dist/blocks/card-header/editor.js:66 dist/blocks/download-image/editor.js:80
-msgid "Change image"
-msgstr "Alterar imagem"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/download-image/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:129
+#: dist/blocks/card-header/editor.js:115
+#: dist/blocks/download-image/editor.js:129
+msgid "Header content"
+msgstr "Conteúdo do cabeçalho"
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:83
-#: dist/blocks/card-header/editor.js:69 dist/blocks/download-image/editor.js:83
-msgid "Remove image"
-msgstr "Remover imagem"
+#: dist/blocks/banner-with-image/editor.js:2
+#: dist/blocks/card-header/editor.js:2 dist/blocks/posts-grid/editor.js:2
+#: dist/blocks/banner-with-image/editor.js:143
+#: dist/blocks/card-header/editor.js:142 dist/blocks/posts-grid/editor.js:1921
+msgid "Layout"
+msgstr "Layout"
 
-#: dist/blocks/banner-with-image/editor.js:39
-#: dist/blocks/card-header/editor.js:29 dist/blocks/download-image/editor.js:39
-#: dist/blocks/banner-with-image/editor.js:89
-#: dist/blocks/card-header/editor.js:75 dist/blocks/download-image/editor.js:89
-msgid "Select image"
-msgstr "Selecionar imagem"
-
-#: dist/blocks/card-body/editor.js:19 dist/blocks/card-body/editor.js:58
+#: dist/blocks/card-body/editor.js:2 dist/blocks/card-body/editor.js:58
 msgid "Body content"
 msgstr "Conteúdo do corpo"
 
-#: dist/blocks/card-header/editor.js:19 dist/blocks/card-header/editor.js:145
+#: dist/blocks/card-header/editor.js:2 dist/blocks/card-header/editor.js:145
 msgid "Background image"
 msgstr "Imagem de fundo"
 
-#: dist/blocks/form/editor.js:19 dist/blocks/form/editor.js:1383
+#: dist/blocks/form/editor.js:2 dist/blocks/form/editor.js:1383
 msgid "Select option"
 msgstr "Selecione a opção"
 
-#: dist/blocks/form/editor.js:19 dist/blocks/form/editor.js:1388
+#: dist/blocks/form/editor.js:2 dist/blocks/form/editor.js:1388
 #: dist/blocks/form/editor.js:1390
 msgid "Form"
 msgstr "Formulário"
 
-#: dist/blocks/my-payments/editor.js:19 dist/blocks/my-payments/editor.js:63
+#: dist/blocks/my-payments/editor.js:2 dist/blocks/my-payments/editor.js:63
 msgid "My Payments"
 msgstr "Meus pagamentos"
 
-#: dist/blocks/my-plan-table-row/editor.js:19
+#: dist/blocks/my-plan-table-row/editor.js:2
 #: dist/blocks/my-plan-table-row/editor.js:61
 #: dist/blocks/my-plan-table-row/editor.js:112
 msgid "Custom text"
 msgstr "Texto customizado"
 
-#: dist/blocks/my-plan-table/editor.js:19
-#: dist/blocks/my-plan-table/editor.js:78
+#: dist/blocks/my-plan-table/editor.js:2 dist/blocks/my-plan-table/editor.js:78
 msgid "My Plan - Table"
 msgstr "Meu Plano - Tabela"
 
-#: dist/blocks/my-plan/editor.js:19 dist/blocks/my-plan/editor.js:72
+#: dist/blocks/my-plan/editor.js:2 dist/blocks/my-plan/editor.js:72
 msgid "My Plan"
 msgstr "Meu Plano"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1938
-msgid "Enable pagination?"
-msgstr "Ativar paginação?"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1346
+msgid "OR"
+msgstr "OU"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1947
-msgid "Posts per page"
-msgstr "Postagens por página"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1347
+msgid "AND"
+msgstr "E"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1961
-msgid "Grid columns"
-msgstr "Colunas do grid"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1350
+msgid "Compare terms"
+msgstr "Comparar termos"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1971
-msgid "Grid rows"
-msgstr "Linhas do grid"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1381
+msgid "Post type"
+msgstr "Tipo de post"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1981
-msgid "Grid gap"
-msgstr "Espaçamento do grid"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1386
+msgid "No post type"
+msgstr "Nenhum tipo de postagem"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1989
-msgid "Hide author"
-msgstr "Ocultar autor"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1419
+msgid "Taxonomy"
+msgstr "Taxonomia"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:1997
-msgid "Hide categories"
-msgstr "Ocultar categorias"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1424
+msgid "No taxonomy"
+msgstr "Sem taxonomia"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:2005
-msgid "Hide date"
-msgstr "Ocultar data"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1446
+msgid "Terms"
+msgstr "Termos"
 
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:2013
-msgid "Hide excerpt"
-msgstr "Ocultar resumo"
-
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:2021
-msgid "Show taxonomies"
-msgstr "Mostrar taxonomias"
-
-#: dist/blocks/posts-grid/editor.js:19 dist/blocks/posts-grid/editor.js:2029
-msgid "Prevent repeat posts"
-msgstr "Evitar repetição de posts"
-
-#: dist/blocks/posts-grid/editor.js:30 dist/blocks/posts-grid/editor.js:1502
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1502
 msgid "Query"
 msgstr "Consulta"
 
-#: dist/blocks/posts-grid/editor.js:30 dist/blocks/posts-grid/editor.js:1526
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1526
 msgid "Show children posts?"
 msgstr "Mostar posts filhos?"
 
-#: dist/blocks/posts-grid/editor.js:30 dist/blocks/posts-grid/editor.js:1570
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1570
 msgid "Filter posts to not display"
 msgstr "Filtre as postagens para não serem exibidas"
 
-#: dist/blocks/posts-grid/editor.js:41 dist/blocks/posts-grid/editor.js:1632
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1632
 msgid "Card model"
 msgstr "Modelo de card"
 
-#: dist/blocks/posts-grid/editor.js:41 dist/blocks/posts-grid/editor.js:1637
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1637
 msgctxt "card"
 msgid "Default model"
 msgstr "Modelo padrão"
 
-#: dist/blocks/posts-grid/editor.js:52 dist/blocks/posts-grid/editor.js:1678
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1678
 msgid "Card modifier"
 msgstr "Modificador do card"
 
-#: dist/blocks/posts-grid/editor.js:63 dist/blocks/posts-grid/editor.js:1346
-msgid "OR"
-msgstr "OU"
-
-#: dist/blocks/posts-grid/editor.js:63 dist/blocks/posts-grid/editor.js:1347
-msgid "AND"
-msgstr "E"
-
-#: dist/blocks/posts-grid/editor.js:63 dist/blocks/posts-grid/editor.js:1350
-msgid "Compare terms"
-msgstr "Comparar termos"
-
-#: dist/blocks/posts-grid/editor.js:74 dist/blocks/posts-grid/editor.js:1381
-msgid "Post type"
-msgstr "Tipo de post"
-
-#: dist/blocks/posts-grid/editor.js:74 dist/blocks/posts-grid/editor.js:1386
-msgid "No post type"
-msgstr "Nenhum tipo de postagem"
-
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1742
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1742
 msgctxt "size"
 msgid "Large"
 msgstr "Grande"
 
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1743
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1743
 msgctxt "size"
 msgid "Medium"
 msgstr "Médio"
 
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1744
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1744
 msgctxt "size"
 msgid "Small"
 msgstr "Pequeno"
 
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1745
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1745
 msgctxt "size"
 msgid "Extra Large"
 msgstr "Muito Grande"
 
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1746
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1746
 msgctxt "size"
 msgid "Extra Small"
 msgstr "Muito Pequeno"
 
-#: dist/blocks/posts-grid/editor.js:85 dist/blocks/posts-grid/editor.js:1794
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1794
 msgid "Size"
 msgstr "Tamanho"
 
-#: dist/blocks/posts-grid/editor.js:96 dist/blocks/posts-grid/editor.js:1836
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1836
 msgid "Taxonomies"
 msgstr "Taxonomias"
 
-#: dist/blocks/posts-grid/editor.js:107 dist/blocks/posts-grid/editor.js:1419
-msgid "Taxonomy"
-msgstr "Taxonomia"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1938
+msgid "Enable pagination?"
+msgstr "Ativar paginação?"
 
-#: dist/blocks/posts-grid/editor.js:107 dist/blocks/posts-grid/editor.js:1424
-msgid "No taxonomy"
-msgstr "Sem taxonomia"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1947
+msgid "Posts per page"
+msgstr "Postagens por página"
 
-#: dist/blocks/posts-grid/editor.js:118 dist/blocks/posts-grid/editor.js:1446
-msgid "Terms"
-msgstr "Termos"
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1961
+msgid "Grid columns"
+msgstr "Colunas do grid"
 
-#: dist/blocks/read-more/editor.js:19 dist/blocks/read-more/editor.js:66
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1971
+msgid "Grid rows"
+msgstr "Linhas do grid"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1981
+msgid "Grid gap"
+msgstr "Espaçamento do grid"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1989
+msgid "Hide author"
+msgstr "Ocultar autor"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:1997
+msgid "Hide categories"
+msgstr "Ocultar categorias"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:2005
+msgid "Hide date"
+msgstr "Ocultar data"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:2013
+msgid "Hide excerpt"
+msgstr "Ocultar resumo"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:2021
+msgid "Show taxonomies"
+msgstr "Mostrar taxonomias"
+
+#: dist/blocks/posts-grid/editor.js:2 dist/blocks/posts-grid/editor.js:2029
+msgid "Prevent repeat posts"
+msgstr "Evitar repetição de posts"
+
+#: dist/blocks/read-more/editor.js:2 dist/blocks/read-more/editor.js:66
 msgid "Full text"
 msgstr "Texto completo"
 
-#: dist/blocks/read-more/editor.js:19 dist/blocks/read-more/editor.js:86
+#: dist/blocks/read-more/editor.js:2 dist/blocks/read-more/editor.js:86
 msgid "Lines shown"
 msgstr "Linhas mostradas"
 
-#: dist/blocks/read-more/editor.js:19 dist/blocks/read-more/index.js:19
+#: dist/blocks/read-more/editor.js:2 dist/blocks/read-more/index.js:1
 #: dist/blocks/read-more/editor.js:105 dist/blocks/read-more/index.js:16
 msgid "Read less"
 msgstr "Leia menos"
 
-#: dist/blocks/read-more/editor.js:19 dist/blocks/read-more/index.js:19
+#: dist/blocks/read-more/editor.js:2 dist/blocks/read-more/index.js:1
 #: dist/blocks/read-more/editor.js:105 dist/blocks/read-more/editor.js:123
 #: dist/blocks/read-more/index.js:13
 msgid "Read more"
 msgstr "Leia mais"
 
-#: dist/blocks/steps-viewer/editor.js:29 dist/blocks/steps-viewer/editor.js:97
+#: dist/blocks/steps-viewer/editor.js:2 dist/blocks/steps-viewer/editor.js:97
 msgid "Steps"
 msgstr "Etapas"
 
-#: dist/blocks/steps-viewer/editor.js:29 dist/blocks/steps-viewer/editor.js:100
+#: dist/blocks/steps-viewer/editor.js:2 dist/blocks/steps-viewer/editor.js:100
 msgid "Current step"
 msgstr "Etapa atual"
 
-#: dist/blocks/steps-viewer/editor.js:29 dist/blocks/steps-viewer/editor.js:110
+#: dist/blocks/steps-viewer/editor.js:2 dist/blocks/steps-viewer/editor.js:110
 msgid "Last step"
 msgstr "Última etapa"
 
-#: dist/blocks/steps-viewer/editor.js:29 dist/blocks/steps-viewer/editor.js:120
+#: dist/blocks/steps-viewer/editor.js:2 dist/blocks/steps-viewer/editor.js:120
 #: dist/blocks/steps-viewer/editor.js:136
 msgid "Step %s of %s"
 msgstr "Etapa %s de %s"
 
-#: dist/blocks/subscription/editor.js:19 dist/blocks/subscription/editor.js:63
+#: dist/blocks/subscription/editor.js:2 dist/blocks/subscription/editor.js:63
 msgid "Subscription"
 msgstr "Inscrição"
 
-#: dist/js/functionalities/gutenberg.js:29
+#: dist/js/functionalities/event-registration.js:2
+#: dist/js/functionalities/event-registration.js:3393
+msgid "Searching address..."
+msgstr "Buscando endereço..."
+
+#: dist/js/functionalities/event-registration.js:2
+#: dist/js/functionalities/event-registration.js:3408
+msgid "Address not found for this ZIP code. Please fill it in manually."
+msgstr "Endereço não encontrado para este CEP. Preencha manualmente."
+
+#: dist/js/functionalities/gutenberg.js:2
 #: dist/js/functionalities/gutenberg.js:2510
 msgid "Iconify ID"
 msgstr "ID do Iconify"
 
-#: dist/js/functionalities/sync-crm.js:29
+#: dist/js/functionalities/sync-crm.js:2
 #: dist/js/functionalities/sync-crm.js:119
 #: dist/js/functionalities/sync-crm.js:122
 msgid "Sync with CRM"
 msgstr "Sincronizar com o CRM"
+
+#: dist/js/functionalities/unlisted-events.js:2
+#: dist/js/functionalities/unlisted-events.js:70
+msgid "Hide from agenda"
+msgstr "Ocultar da agenda"
+
+#: dist/js/functionalities/unlisted-events.js:2
+#: dist/js/functionalities/unlisted-events.js:71
+msgid ""
+"Keep this event accessible only by direct link — hidden from the agenda, "
+"search results and sitemap."
+msgstr ""
+"Torne este evento acessível apenas via link direto  —  oculto da agenda, "
+"resultados de busca e mapa do site."
 
 #: library/blocks/banner-with-image/block.json
 msgctxt "block title"
@@ -2060,15 +2112,3 @@ msgstr "Sistema"
 msgctxt "Font family name"
 msgid "Title"
 msgstr "Título"
-
-#: assets/javascript/functionalities/event-registration.js
-msgid "Searching address..."
-msgstr "Buscando endereço..."
-
-#: assets/javascript/functionalities/event-registration.js
-msgid "Address not found for this ZIP code. Please fill it in manually."
-msgstr "Endereço não encontrado para este CEP. Preencha manualmente."
-
-#: library/forms/helpers.php
-msgid "Fill in the ZIP code to search the address automatically"
-msgstr "Preencha o CEP para buscar o endereço automaticamente"
