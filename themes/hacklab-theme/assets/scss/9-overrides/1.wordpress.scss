@@ -18,4 +18,11 @@
     }
 }
 
+.post-password-form {
 
+    input[type="submit"] {
+        @extend .button;
+        @extend .button--solid;
+        @extend .button--primary;
+    }
+}

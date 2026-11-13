@@ -2,6 +2,8 @@
 
 global $post;
 
+hacklabr\restore_protected_event_titles( $post );
+
 get_header();
 
 $post_id  = get_the_ID();
@@ -95,6 +97,27 @@ if( isset($recurrence['rules']) ) {
             }
         }
     }
+}
+
+if ( post_password_required( $post ) ) { ?>
+    <header class="post-header">
+        <div class="post-header__postdata alingfull">
+            <div class="post-header__postdata__date container--wide">
+                <?php if ( $terms ) : ?>
+                    <div class="tag-event -text-center">
+                        <span class="tag"><?php echo $terms ?></span>
+                    </div>
+                <?php endif; ?>
+                <h1 class="post-header__title"> <?php the_title(); ?> </h1>
+            </div>
+        </div>
+    </header>
+    <main class="post-content stack container">
+        <?php echo get_the_password_form(); ?>
+    </main>
+    <?php
+    get_footer();
+    return;
 }
 
 ?>

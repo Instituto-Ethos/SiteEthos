@@ -113,6 +113,39 @@ function get_venue_from_crm( string|null $venue ): string|null {
 
 add_filter( 'tribe_get_venue', 'hacklabr\\get_venue_from_crm' );
 
+/**
+ * Mantém os títulos visíveis em eventos protegidos por senha.
+ *
+ * O The Events Calendar aplica `the_title` => `__return_empty_string` em eventos
+ * protegidos, o que também apaga os rótulos do menu no header/footer. Como o TEC
+ * re-adiciona os filtros a cada disparo de `the_post` (inclusive durante
+ * header/footer), eles sao removidos depois de cada disparo, em prioridade
+ * posterior (TEC usa 10, usamos 20).
+ *
+ * Deve ser chamado no topo do template de evento single, antes do get_header().
+ *
+ * @param \WP_Post|null $post Post do evento da query principal.
+ */
+function restore_protected_event_titles( ?\WP_Post $post ): void {
+    if ( ! $post instanceof \WP_Post || ! post_password_required( $post ) ) {
+        return;
+    }
+
+    add_action( 'the_post', 'hacklabr\remove_tec_title_filters', 20 );
+}
+
+function remove_tec_title_filters(): void {
+    remove_filter( 'the_title', '__return_empty_string' );
+
+    $callbacks = $GLOBALS['wp_filter']['the_title']->callbacks[10] ?? [];
+
+    foreach ( $callbacks as $callback_id => $callback ) {
+        if ( str_contains( $callback_id, 'filter_the_title_display' ) ) {
+            remove_filter( 'the_title', $callback['function'], 10, (int) $callback['accepted_args'] );
+        }
+    }
+}
+
 add_action( 'ethos_job:fix_orphaned_events', 'hacklabr\\fix_orphaned_events_batch' );
 
 /**
