@@ -85,12 +85,28 @@ class Assets
 
     public function action_preload_javascripts()
     {
+        global $wp_scripts;
+
         $js_uri = get_theme_file_uri('/dist/js/functionalities/');
         $js_files = $this->get_js_files();
 
         foreach ($js_files as $handle => $data) {
             $src = $js_uri . $data['file'];
             if ($data['pre-load']) {
+                // Only preload scripts that are actually enqueued for this request,
+                // and keep the href identical to the <script> tag that WordPress
+                // prints (same ?ver= query string), so the browser reuses the
+                // preload instead of downloading the file twice.
+                if (!isset($wp_scripts->registered[$handle])) {
+                    continue;
+                }
+
+                $version = $wp_scripts->registered[$handle]->ver;
+                if (empty($version)) {
+                    $version = $wp_scripts->default_version;
+                }
+                $src = add_query_arg('ver', $version, $src);
+
                 echo "\n";
                 echo '<link rel="preload" id="' . esc_attr($handle) . '-preload" href="' . esc_url($src) . '" as="script">';
                 echo "\n";
@@ -105,7 +121,7 @@ class Assets
             $src = $font_uri . $data['file'];
             if ($data['pre-load']) {
                 echo "\n";
-                echo '<link rel="preload" id="' . esc_attr($handle) . '-preload" href="' . esc_url($src) . '" as="font">';
+                echo '<link rel="preload" id="' . esc_attr($handle) . '-preload" href="' . esc_url($src) . '" as="font" crossorigin>';
                 echo "\n";
             }
         }
