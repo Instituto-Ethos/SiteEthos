@@ -209,7 +209,7 @@ function get_posts_by_month( $args = [] ) {
                 $close_ul = true;
             endif;
 
-            $thumbnail = ( has_post_thumbnail( get_the_ID() ) ) ? get_the_post_thumbnail( get_the_ID() ) : '<img src="' . get_stylesheet_directory_uri() . '/assets/images/default-image.png">';
+            $thumbnail = ( has_post_thumbnail( get_the_ID() ) ) ? get_the_post_thumbnail( get_the_ID() ) : '<img loading="lazy" decoding="async" src="' . get_stylesheet_directory_uri() . '/assets/images/default-image.png">';
 
             $content_slider .= sprintf(
                 '<li id="item-%1$s" class="item item-month-%2$s"><a href="%3$s"><div class="thumb">%4$s</div><div class="title"><h3>%5$s</h3></div></a></li>',
