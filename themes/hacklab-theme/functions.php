@@ -13,6 +13,7 @@ require __DIR__ . '/library/menus.php';
 require __DIR__ . '/library/settings.php';
 require __DIR__ . '/library/assets.php';
 require __DIR__ . '/library/plugin-assets.php';
+require __DIR__ . '/library/block-styles.php';
 require __DIR__ . '/library/crm/index.php';
 require __DIR__ . '/library/membership.php';
 require __DIR__ . '/library/forms.php';
