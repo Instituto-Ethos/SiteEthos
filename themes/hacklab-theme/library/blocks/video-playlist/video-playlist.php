@@ -44,7 +44,7 @@ function embed($video){
 
 function thumbnail($video){
     $thumb = "<a class=\"col-xs-6\" href=\"https://www.youtube.com/watch?v=" . extract_vid_id( $video ) . "\" target=\"_blank\">
-                <img src=\"" . extract_vid_thumbnail( $video ) . "\" />
+                <img loading=\"lazy\" decoding=\"async\" src=\"" . extract_vid_thumbnail( $video ) . "\" />
                 <h2>". extract_vid_title( $video ) ."</h2>
              </a>";
 

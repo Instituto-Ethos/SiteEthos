@@ -6,7 +6,7 @@
                     <?php if ( has_post_thumbnail() ) : ?>
                         <?php the_post_thumbnail( 'medium_large' ); ?>
                     <?php else : ?>
-                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/default-image.png" alt="<?php the_title(); ?>">
+                        <img loading="lazy" decoding="async" src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/default-image.png" alt="<?php the_title(); ?>">
                     <?php endif; ?>
                 </div><!-- /.aspect-ratio -->
             </a>

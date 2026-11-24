@@ -9,7 +9,7 @@
 
         <div class="main-footer__credit">
             <div class="content">
-                <img loading="lazy" src="<?= get_template_directory_uri() ?>/assets/images/site-por-hacklab.png" alt="site por hacklab" height="15" width="103">
+                <img loading="lazy" decoding="async" src="<?= get_template_directory_uri() ?>/assets/images/site-por-hacklab.png" alt="site por hacklab" height="15" width="103">
             </div>
 
         </div>
