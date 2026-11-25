@@ -194,10 +194,18 @@ function require_approval_for_login ($user) {
     if (!empty($group_id)) {
         $group = get_pmpro_group($group_id);
         $level_id = $group->group_parent_level_id;
-        $child_level_id = get_pmpro_child_level($level_id);
 
-        if (!\PMPro_Approvals::isApproved($user->ID, $level_id) && !\PMPro_Approvals::isApproved($user->ID, $child_level_id)) {
-            return new \WP_Error('failed', 'Associação ainda não foi aprovada.');
+        /*
+         * Grupo sem nível vinculado (usuário de teste, grupo órfão ou
+         * membership expirado): não há membership a aprovar — o check de
+         * aprovação não se aplica (a guarda de conta ativa permanece valendo).
+         */
+        if (!empty($level_id)) {
+            $child_level_id = get_pmpro_child_level($level_id);
+
+            if (!\PMPro_Approvals::isApproved($user->ID, $level_id) && !\PMPro_Approvals::isApproved($user->ID, $child_level_id)) {
+                return new \WP_Error('failed', 'Associação ainda não foi aprovada.');
+            }
         }
     }
 
