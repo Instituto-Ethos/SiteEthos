@@ -6,6 +6,11 @@ LimitRequestBody 102400000000
 <IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteBase /
+
+# Pass Basic-auth Authorization header through to PHP (required by the
+# Getnet webhook REST route) — standard fix for Apache + mod_php setups.
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
 RewriteRule ^index\.php$ - [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
