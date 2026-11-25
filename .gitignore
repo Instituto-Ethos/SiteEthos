@@ -13,3 +13,6 @@ mariadb_data/
 mix-manifest.json
 wp-root
 themes/hacklab-theme/mix-manifest.json
+
+# Reservado para documentos sensíveis
+docs-locais/
