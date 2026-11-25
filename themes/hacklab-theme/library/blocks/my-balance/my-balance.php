@@ -23,7 +23,10 @@ function get_my_balance_data () {
         return null;
     }
 
-    $balance = consultar_saldo( $cnpj );
+    // Detalhado (composição + utilizados) quando disponível; saldo simples caso contrário.
+    $balance = function_exists( 'hacklabr\consultar_saldo_detalhado' )
+        ? consultar_saldo_detalhado( $cnpj )
+        : consultar_saldo( $cnpj );
 
     if ( is_wp_error( $balance ) || empty( $balance->saldos ) ) {
         return null;
@@ -41,12 +44,23 @@ function render_my_balance_callback ( $attributes ) {
 
     $plano = $balance->plano->nome ?? '';
     $total = (int) ( $balance->resumo->quantidadeTotalCreditos ?? 0 );
+    $utilizados = $balance->utilizados ?? null;
+    $total_utilizados = ( ! empty( $utilizados['disponivel'] ) ) ? (int) $utilizados['total'] : null;
+
+    $vigencia = '';
+    if ( ! empty( $balance->parceria->dataFim ) ) {
+        $fim = \DateTimeImmutable::createFromFormat( 'Y-m-d\TH:i:s\Z', $balance->parceria->dataFim );
+        $vigencia = $fim ? $fim->format( 'd/m/Y' ) : '';
+    }
 
     ob_start();
 ?>
     <div class="my-balance">
         <div class="my-balance__summary">
             <p><?php esc_html_e( 'Seus créditos disponíveis no plano', 'hacklabr' ); ?> <strong><?= esc_html( $plano ) ?></strong>.</p>
+            <?php if ( '' !== $vigencia ) : ?>
+                <p class="my-balance__vigencia"><?php printf( esc_html__( 'Vigência da associação até %s', 'hacklabr' ), '<strong>' . esc_html( $vigencia ) . '</strong>' ); ?></p>
+            <?php endif; ?>
         </div>
 
         <ul class="my-balance__faixas">
@@ -62,7 +76,13 @@ function render_my_balance_callback ( $attributes ) {
         </ul>
 
         <p class="my-balance__total">
-            <?php printf( esc_html__( 'Total de participações disponíveis: %d', 'hacklabr' ), $total ); ?>
+            <?php
+            if ( null !== $total_utilizados ) {
+                printf( esc_html__( 'Total: %1$d participações disponíveis · %2$d utilizadas', 'hacklabr' ), $total, $total_utilizados );
+            } else {
+                printf( esc_html__( 'Total de participações disponíveis: %d', 'hacklabr' ), $total );
+            }
+            ?>
         </p>
     </div>
 <?php
