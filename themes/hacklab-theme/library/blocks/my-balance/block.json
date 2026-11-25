@@ -1,0 +1,16 @@
+{
+    "$schema": "https://schemas.wp.org/trunk/block.json",
+    "apiVersion": 3,
+    "name": "hacklabr/my-balance",
+    "title": "My Balance",
+    "description": "Available association credits by faixa (A, B, C), from the CRM balance API",
+    "category": "theme",
+    "icon": "awards",
+    "supports": {
+        "html": false
+    },
+    "attributes": {},
+    "textdomain": "hacklabr",
+    "editorScript": ["file:../../../dist/blocks/my-balance/editor.js"],
+    "style": ["file:../../../dist/blocks/my-balance/index.css"]
+}

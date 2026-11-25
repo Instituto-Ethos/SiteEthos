@@ -1,0 +1,46 @@
+@import '../../../assets/scss/includes';
+
+.my-balance {
+
+    &__summary {
+        margin-bottom: $gap--large;
+
+        p {
+            font-size: $font-size--large;
+        }
+
+        strong {
+            color: $color--primary-dark;
+        }
+    }
+
+    &__faixas {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $gap--small;
+        list-style: none;
+        padding: 0;
+    }
+
+    &__faixa {
+        border: 1px solid $border-color--dark;
+        border-radius: 8px;
+        min-width: 6rem;
+        padding: $gap--small;
+        text-align: center;
+    }
+
+    &__faixa-label {
+        color: $color--primary-dark;
+        display: block;
+    }
+
+    &__faixa-value {
+        display: block;
+        font-size: $font-size--large;
+    }
+
+    &__total {
+        margin-top: $gap--small;
+    }
+}
