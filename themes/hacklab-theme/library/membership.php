@@ -118,6 +118,16 @@ function get_pmpro_plan (int $user_id) {
 
     $group = get_pmpro_group($group_id);
     $level_id = $group->group_parent_level_id;
+
+    /*
+     * Grupo sem nível vinculado (ex.: usuário de teste, grupo recém-criado
+     * ou membership expirado): sem plano definido, não há o que derivar —
+     * retornar null mantém o contrato dos consumers (tratam vazio).
+     */
+    if (empty($group) || empty($level_id)) {
+        return null;
+    }
+
     return Plan::fromLevel($level_id)->toSlug();
 }
 
