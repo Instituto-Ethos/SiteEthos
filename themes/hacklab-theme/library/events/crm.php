@@ -656,6 +656,18 @@ function create_registration (int $post_id, array $params) {
 
     $courtesy_type = get_courtesy_type($post_id, $contact_uuid, $account_id);
 
+    /*
+     * Novo modelo de créditos: inscrição de associada coberta pelo saldo da
+     * parceria — o DEV-0007 do CRM consome 1 crédito da faixa
+     * automaticamente na criação da participante (o site NÃO chama
+     * i4d_CriarTransacao). O contexto é o mesmo do gate RQ-0004 (já
+     * resolvido na entrada do formulário, cache estático do request).
+     */
+    $balance_context = function_exists('hacklabr\get_event_balance_context')
+        ? \hacklabr\get_event_balance_context($post_id)
+        : null;
+    $covered_by_credits = (null !== $balance_context && !empty($balance_context['parceria_id']));
+
     $voucher = null;
     if ($voucher_present) {
         if (!$payments_ready) {
@@ -685,7 +697,8 @@ function create_registration (int $post_id, array $params) {
     }
 
     $incoming_discount_type = (null !== $voucher) ? 'VOUCHER'
-        : ((969830000 !== $courtesy_type) ? 'CORTESIA' : '');
+        : ($covered_by_credits ? 'CREDITO'
+        : ((969830000 !== $courtesy_type) ? 'CORTESIA' : ''));
 
     $registration_check = check_participant_registration($project_id, $contact_uuid, $incoming_discount_type);
     $replace_participant_id = null;
@@ -753,7 +766,18 @@ function create_registration (int $post_id, array $params) {
         $attibutes['fut_int_quantidade_adquirida'] = 1;
         $attibutes['fut_int_quantidade_restante'] = 0;
 
-        if (null !== $voucher) {
+        if ($covered_by_credits) {
+            /*
+             * Novo modelo: a inscrição é coberta pelos créditos da parceria
+             * (sem checkout). HIPÓTESE LOCAL — dúvida 1 enviada à I4D em
+             * 26/11 (pendente de resposta): o site marca a operação como
+             * Paga com tipo de desconto CREDITO, sem campos financeiros,
+             * análogo ao fluxo de cortesia/voucher. Ajustar este bloco
+             * quando a I4D definir quem marca o status.
+             */
+            $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
+            $attibutes['fut_txt_tipodedesconto'] = 'CREDITO';
+        } elseif (null !== $voucher) {
             $attibutes['fut_set_statusoperacao'] = 969830003; // Pago
             $attibutes['fut_txt_tipodedesconto'] = 'VOUCHER';
             $attibutes['fut_txt_token_gerado']   = $voucher->source_id;
@@ -794,6 +818,16 @@ function create_registration (int $post_id, array $params) {
         $attibutes['fut_lk_empresa']           = create_crm_reference('account', $account_id);
         $attibutes['fut_lk_empresa_associada'] = create_crm_reference('account', $account_id);
         $attibutes['fut_lk_fatura_pj']         = create_crm_reference('account', $account_id);
+    }
+
+    if ($covered_by_credits) {
+        /*
+         * Novo modelo: parceria vigente da associada (GUID do saldo) — é o
+         * gatilho do consumo automático pelo DEV-0007 na criação. Lookup
+         * confirmado no $metadata do sandbox (fut_parceria_participante_id
+         * → fut_parceria).
+         */
+        $attibutes['fut_parceria_participante_id'] = create_crm_reference('fut_parceria', $balance_context['parceria_id']);
     }
 
     if (!empty($params['acessibilidade'])) {
@@ -849,7 +883,15 @@ function create_registration (int $post_id, array $params) {
 
             $form = 'hide';
 
-            if ($paid_event && (null === $voucher) && (969830000 === $courtesy_type)) {
+            /*
+             * Checkout apenas para inscrições pagas NÃO cobertas por
+             * crédito (público geral, associada legada sem parceria, ou
+             * evento sem faixa). Associadas do novo modelo sem saldo na
+             * faixa são bloqueadas ANTES, no gate RQ-0004 (form.php), e o
+             * desconto do plano para pagamento em dinheiro é Fase 2
+             * (item 4.2: Fase 1 = preço cheio).
+             */
+            if ($paid_event && !$covered_by_credits && (null === $voucher) && (969830000 === $courtesy_type)) {
                 $form = 'checkout';
                 $message = __('You are registered to this event, but payment is pending.', 'hacklabr');
             } else {
@@ -1159,7 +1201,13 @@ function generate_registration_number (int $post_id, int $count) {
 function get_registration_account_local (array $params): string|null {
     // Case 1. Retrieve UUID from current user's organization
     if (empty($params['cnpj'])) {
-        if (($post_id = get_organization_by_user()) && ($account_id = get_post_meta($post_id, '_ethos_crm_account_id', true))) {
+        /*
+         * get_organization_by_user() returns a WP_Post — use its ID for
+         * get_post_meta (the object itself resolves to no metadata, a
+         * latent issue that mattered once the association model started
+         * requiring fut_lk_empresa on every member registration).
+         */
+        if (($org = get_organization_by_user()) && ($account_id = get_post_meta($org->ID, '_ethos_crm_account_id', true))) {
             return $account_id;
         } else {
             return null;

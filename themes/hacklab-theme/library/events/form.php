@@ -376,6 +376,67 @@ function validate_event_registration_form (string $form_id, array $form, array $
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
 
 /**
+ * Contexto do novo modelo de créditos para a inscrição em evento pago
+ * (mesma resolução do gate RQ-0004, reutilizada pela criação da
+ * participante em events/crm.php).
+ *
+ * Retorna não-null quando o novo modelo se aplica: evento pago + usuário
+ * logado com organização/CNPJ + saldo do CRM com saldos por faixa + evento
+ * classificado por faixa. Casos sem dados do novo modelo (visitante,
+ * membro legado, evento sem faixa, API fora do ar) → null → fluxo atual.
+ *
+ * Resolve UMA vez por request (cache estático): o gate valida na entrada
+ * do formulário e a criação da participante reusa o mesmo saldo/parceria.
+ */
+function get_event_balance_context ( int $post_id ): ?array {
+    static $resolved = [];
+
+    if ( isset( $resolved[ $post_id ] ) ) {
+        return $resolved[ $post_id ];
+    }
+
+    $context = null;
+
+    if ( is_paid_event( $post_id )
+        && function_exists( 'hacklabr\consultar_saldo' )
+        && function_exists( 'hacklabr\obter_faixa_do_projeto' ) ) {
+
+        $user_id = get_current_user_id();
+
+        if ( ! empty( $user_id ) ) {
+            $organization = get_organization_by_user( $user_id );
+
+            if ( ! empty( $organization ) ) {
+                $cnpj = get_post_meta( $organization->ID, 'cnpj', true );
+
+                if ( ! empty( $cnpj ) ) {
+                    $saldo = \hacklabr\consultar_saldo( $cnpj, true );
+
+                    if ( ! is_wp_error( $saldo ) && ! empty( $saldo->saldos ) ) {
+                        $projeto_guid = get_post_meta( $post_id, 'entity_fut_projeto', true );
+                        $faixa = $projeto_guid ? \hacklabr\obter_faixa_do_projeto( $projeto_guid ) : null;
+
+                        if ( ! empty( $faixa ) ) {
+                            $context = [
+                                'user_id'         => (int) $user_id,
+                                'organization_id' => (int) $organization->ID,
+                                'saldo'           => $saldo,
+                                'faixa'           => $faixa,
+                                'parceria_id'     => \hacklabr\normalizar_guid( $saldo->parceria->id ?? '' ),
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    $resolved[ $post_id ] = $context;
+
+    return $context;
+}
+
+/**
  * Checa saldo/vigência para inscrição em evento pago (novo modelo).
  *
  * Retorna a mensagem de bloqueio ou null quando a inscrição deve seguir o
@@ -383,53 +444,22 @@ add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form'
  * saldo da organização do usuário) e evento classificado por faixa.
  */
 function check_event_balance_availability (int $post_id): ?string {
-    if ( ! is_paid_event( $post_id ) ) {
+    $context = get_event_balance_context( $post_id );
+
+    if ( null === $context ) {
         return null;
     }
 
-    if ( ! function_exists( 'hacklabr\consultar_saldo' ) || ! function_exists( 'hacklabr\obter_faixa_do_projeto' ) ) {
-        return null;
-    }
-
-    $user_id = get_current_user_id();
-
-    if ( empty( $user_id ) ) {
-        return null;
-    }
-
-    $organization = get_organization_by_user( $user_id );
-
-    if ( empty( $organization ) ) {
-        return null;
-    }
-
-    $cnpj = get_post_meta( $organization->ID, 'cnpj', true );
-
-    if ( empty( $cnpj ) ) {
-        return null;
-    }
-
-    $saldo = \hacklabr\consultar_saldo( $cnpj, true );
-
-    if ( is_wp_error( $saldo ) || empty( $saldo->saldos ) ) {
-        return null;
-    }
+    $saldo = $context['saldo'];
 
     if ( ! \hacklabr\parceria_esta_vigente( $saldo ) ) {
         return __( 'A vigência da sua associação está encerrada. Entre em contato com o Ethos para renovar antes de se inscrever.', 'hacklabr' );
     }
 
-    $projeto_guid = get_post_meta( $post_id, 'entity_fut_projeto', true );
-    $faixa = $projeto_guid ? \hacklabr\obter_faixa_do_projeto( $projeto_guid ) : null;
-
-    if ( empty( $faixa ) ) {
-        return null;
-    }
-
-    if ( ! \hacklabr\tem_saldo_na_faixa( $saldo, $faixa ) ) {
+    if ( ! \hacklabr\tem_saldo_na_faixa( $saldo, $context['faixa'] ) ) {
         return sprintf(
             __( 'Saldo insuficiente: sua associação não tem créditos disponíveis na Faixa %s. Verifique com o atendimento do Ethos a conversão de créditos de faixa superior.', 'hacklabr' ),
-            esc_html( $faixa )
+            esc_html( $context['faixa'] )
         );
     }
 

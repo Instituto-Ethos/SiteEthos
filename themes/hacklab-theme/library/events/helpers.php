@@ -129,6 +129,17 @@ function get_courtesy_type (int $post_id, string|null $contact_id, string|null $
         return 969830000; // NÃO
     }
 
+    /*
+     * Novo modelo de créditos: associadas com parceria no CRM não usam
+     * cortesias - inscrições em eventos pagos são cobertas por créditos,
+     * consumidos automaticamente pelo CRM na criação da participante
+     * (DEV-0007). Cortesias seguem apenas para associadas legadas, até o
+     * go-live (descontinuadas sem migração).
+     */
+    if (function_exists('hacklabr\get_event_balance_context') && null !== \hacklabr\get_event_balance_context($post_id)) {
+        return 969830000; // NÃO
+    }
+
     $user = get_user_by_contact($contact_id);
     if (empty($user)) {
         return 969830000; // NÃO
