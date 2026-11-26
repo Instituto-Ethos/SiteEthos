@@ -29,11 +29,21 @@ function get_my_plan_data () {
             'slug' => 'vivencia',
             'contains' => ['vivencia', 'essencial', 'conexao'],
         ];
-    } else {
+    } elseif ($plan_slug === 'institucional') {
         $plan = (object) [
             'label' => 'Institucional',
             'slug' => 'institucional',
             'contains' => ['institucional', 'vivencia', 'essencial', 'conexao'],
+        ];
+    } else {
+        /*
+         * Planos do novo modelo (ex.: 'ethos-transformar') ou qualquer outro
+         * slug não legado: exibe o nome como veio, sem hierarquia legada.
+         */
+        $plan = (object) [
+            'label' => ucwords( str_replace( '-', ' ', $plan_slug ) ),
+            'slug' => $plan_slug,
+            'contains' => [ $plan_slug ],
         ];
     }
 

@@ -350,10 +350,91 @@ function validate_event_registration_form (string $form_id, array $form, array $
             }
         }
 
+        /*
+         * Novo modelo de créditos (RQ-0004): bloqueio prévio de
+         * saldo/vigência para associadas com parceria no CRM. Sem dados do
+         * novo modelo (visitante, membro legado, evento sem faixa) → segue
+         * o fluxo atual. Nota de transição: o débito do crédito aguarda a
+         * definição da arquitetura de consumo (dúvida 1/I4D) — associadas
+         * COM saldo seguem para o checkout nesta fase.
+         */
+        $saldo_mensagem = check_event_balance_availability( $post_id );
+
+        if ( null !== $saldo_mensagem ) {
+            global $hl_event_registration;
+            $hl_event_registration = [
+                'status'  => 'error',
+                'form'    => 'preserve',
+                'message' => $saldo_mensagem,
+            ];
+            return;
+        }
+
         register_for_event($post_id, $params);
     }
 }
 add_action('hacklabr\\form_action', 'hacklabr\\validate_event_registration_form', 10, 3);
+
+/**
+ * Checa saldo/vigência para inscrição em evento pago (novo modelo).
+ *
+ * Retorna a mensagem de bloqueio ou null quando a inscrição deve seguir o
+ * fluxo atual. Só opinam dados do novo modelo: parceria ativa no CRM (via
+ * saldo da organização do usuário) e evento classificado por faixa.
+ */
+function check_event_balance_availability (int $post_id): ?string {
+    if ( ! is_paid_event( $post_id ) ) {
+        return null;
+    }
+
+    if ( ! function_exists( 'hacklabr\consultar_saldo' ) || ! function_exists( 'hacklabr\obter_faixa_do_projeto' ) ) {
+        return null;
+    }
+
+    $user_id = get_current_user_id();
+
+    if ( empty( $user_id ) ) {
+        return null;
+    }
+
+    $organization = get_organization_by_user( $user_id );
+
+    if ( empty( $organization ) ) {
+        return null;
+    }
+
+    $cnpj = get_post_meta( $organization->ID, 'cnpj', true );
+
+    if ( empty( $cnpj ) ) {
+        return null;
+    }
+
+    $saldo = \hacklabr\consultar_saldo( $cnpj, true );
+
+    if ( is_wp_error( $saldo ) || empty( $saldo->saldos ) ) {
+        return null;
+    }
+
+    if ( ! \hacklabr\parceria_esta_vigente( $saldo ) ) {
+        return __( 'A vigência da sua associação está encerrada. Entre em contato com o Ethos para renovar antes de se inscrever.', 'hacklabr' );
+    }
+
+    $projeto_guid = get_post_meta( $post_id, 'entity_fut_projeto', true );
+    $faixa = $projeto_guid ? \hacklabr\obter_faixa_do_projeto( $projeto_guid ) : null;
+
+    if ( empty( $faixa ) ) {
+        return null;
+    }
+
+    if ( ! \hacklabr\tem_saldo_na_faixa( $saldo, $faixa ) ) {
+        return sprintf(
+            __( 'Saldo insuficiente: sua associação não tem créditos disponíveis na Faixa %s. Verifique com o atendimento do Ethos a conversão de créditos de faixa superior.', 'hacklabr' ),
+            esc_html( $faixa )
+        );
+    }
+
+    return null;
+}
 
 function form_spinner() {
     ob_start();

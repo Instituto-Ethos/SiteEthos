@@ -109,7 +109,51 @@ function get_pmpro_level_options (int $organization_id, bool $for_manager = true
     ];
 }
 
+function get_plan_slug_from_crm (int $user_id): ?string {
+    /*
+     * Novo modelo: plano da parceria no CRM, via saldo da organização do
+     * usuário (plugin de integração, com cache curto). Sem plugin ativo,
+     * sem organização/CNPJ ou sem parceria → null (cai no legado).
+     */
+    if ( ! function_exists( 'hacklabr\consultar_saldo' ) ) {
+        return null;
+    }
+
+    $organization = get_organization_by_user( $user_id );
+
+    if ( empty( $organization ) ) {
+        return null;
+    }
+
+    $cnpj = get_post_meta( $organization->ID, 'cnpj', true );
+
+    if ( empty( $cnpj ) ) {
+        return null;
+    }
+
+    $saldo = \hacklabr\consultar_saldo( $cnpj );
+
+    if ( is_wp_error( $saldo ) || empty( $saldo->plano->nome ) ) {
+        return null;
+    }
+
+    return sanitize_title( $saldo->plano->nome );
+}
+
 function get_pmpro_plan (int $user_id) {
+    /*
+     * Fonte híbrida (transição para o novo modelo): o plano da parceria
+     * prevalece quando existir (slug derivado do nome, ex.
+     * 'ethos-transformar'); consumers desconhecem o slug e falham fechados
+     * (cortesias 0, blocos exibem o nome). Membros atuais sem parceria no
+     * CRM seguem no legado (nível PMPro), sem regressão.
+     */
+    $plano_parceria = get_plan_slug_from_crm( $user_id );
+
+    if ( null !== $plano_parceria ) {
+        return $plano_parceria;
+    }
+
     $group_id = (int) get_user_meta($user_id, '_pmpro_group', true);
 
     if (empty($group_id)) {
@@ -236,6 +280,35 @@ function require_active_account_for_login(\WP_User|\WP_Error $user) {
 
         if (!$has_active_account) {
             return new \WP_Error('failed', 'Associação não está ativa.');
+        }
+
+        /*
+         * Novo modelo de associação: vigência da parceria (dataFim), via
+         * API de saldo do CRM (cache curto; a API devolve a parceria
+         * vigente). Vigência encerrada → acesso expira junto. Sem dados
+         * no CRM (membros em transição/legados) → não bloqueia.
+         */
+        if (function_exists('hacklabr\consultar_saldo')) {
+            $organization = get_organization_by_user($user->ID);
+
+            if (!empty($organization)) {
+                $cnpj = get_post_meta($organization->ID, 'cnpj', true);
+
+                if (!empty($cnpj)) {
+                    $saldo = \hacklabr\consultar_saldo($cnpj);
+
+                    if (!is_wp_error($saldo) && !empty($saldo->parceria->dataFim)) {
+                        $fim = \DateTimeImmutable::createFromFormat('Y-m-d\TH:i:s\Z', $saldo->parceria->dataFim);
+
+                        if ($fim && time() >= $fim->getTimestamp()) {
+                            return new \WP_Error('failed', sprintf(
+                                'Sua associação expirou em %s. Entre em contato para renovar.',
+                                $fim->format('d/m/Y')
+                            ));
+                        }
+                    }
+                }
+            }
         }
     }
 
