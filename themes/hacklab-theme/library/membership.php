@@ -4,6 +4,32 @@ namespace hacklabr;
 
 use \ethos\crm\Plan;
 
+/**
+ * Nível PMPro neutro do novo modelo de associação.
+ *
+ * No novo modelo o plano contratado vive no CRM (parceria) e o nível do
+ * grupo PMPro não carrega semântica: serve apenas de encanamento para o
+ * PMProGroupAcct (coluna group_parent_level_id), o fluxo de aprovação e o
+ * guard de login. 11 = "Institucional Micro (gerente)": preço 0, sem
+ * billing, válido para qualquer porte (o fluxo novo não deriva nível por
+ * porte). Consumers de plano devem usar get_pmpro_plan() (híbrido: parceria
+ * no CRM → meta de interesse → legado por nível), nunca o nível diretamente.
+ *
+ * Usado pelo wizard (step 3) e pelo importer (dual-read) — mesma peça.
+ */
+const ETHOS_NEUTRAL_PMPRO_LEVEL = 11;
+
+/**
+ * Normaliza um GUID do Dynamics (case, chaves, espaços) para comparação
+ * estável entre fontes distintas: OData do wizard, lookup do sync e meta
+ * _ethos_plano_interesse.
+ */
+function normalizar_guid ($guid): string {
+    $guid = strtolower( trim( (string) $guid ) );
+
+    return trim( $guid, '{}' );
+}
+
 function add_user_to_pmpro_group (int $user_id, int $group_id) {
     $group = get_pmpro_group($group_id);
 
@@ -112,8 +138,10 @@ function get_pmpro_level_options (int $organization_id, bool $for_manager = true
 function get_plan_slug_from_crm (int $user_id): ?string {
     /*
      * Novo modelo: plano da parceria no CRM, via saldo da organização do
-     * usuário (plugin de integração, com cache curto). Sem plugin ativo,
-     * sem organização/CNPJ ou sem parceria → null (cai no legado).
+     * usuário (plugin de integração, com cache curto). Janela de transição
+     * (cadastro no site → parceria fechada no CRM): plano de interesse
+     * gravado pelo wizard. Sem plugin ativo, sem organização ou sem ambos
+     * → null (cai no legado).
      */
     if ( ! function_exists( 'hacklabr\consultar_saldo' ) ) {
         return null;
@@ -127,17 +155,32 @@ function get_plan_slug_from_crm (int $user_id): ?string {
 
     $cnpj = get_post_meta( $organization->ID, 'cnpj', true );
 
-    if ( empty( $cnpj ) ) {
-        return null;
+    if ( ! empty( $cnpj ) ) {
+        $saldo = \hacklabr\consultar_saldo( $cnpj );
+
+        if ( ! is_wp_error( $saldo ) && ! empty( $saldo->plano->nome ) ) {
+            return sanitize_title( $saldo->plano->nome );
+        }
     }
 
-    $saldo = \hacklabr\consultar_saldo( $cnpj );
+    /*
+     * Atalho da meta de interesse (wizard do novo modelo): resolve o GUID
+     * gravado na organização na lista de planos disponíveis do CRM (cache
+     * longo no plugin). Também cobre a API de saldo indisponível com a
+     * parceria ainda inexistente — o grupo já criado com nível neutro não
+     * deriva plano legado errado.
+     */
+    $plano_interesse = normalizar_guid( get_post_meta( $organization->ID, '_ethos_plano_interesse', true ) );
 
-    if ( is_wp_error( $saldo ) || empty( $saldo->plano->nome ) ) {
-        return null;
+    if ( ! empty( $plano_interesse ) && function_exists( 'hacklabr\obter_planos_disponiveis' ) ) {
+        foreach ( \hacklabr\obter_planos_disponiveis() ?? [] as $plano ) {
+            if ( normalizar_guid( $plano->id ) === $plano_interesse ) {
+                return sanitize_title( $plano->nome );
+            }
+        }
     }
 
-    return sanitize_title( $saldo->plano->nome );
+    return null;
 }
 
 function get_pmpro_plan (int $user_id) {

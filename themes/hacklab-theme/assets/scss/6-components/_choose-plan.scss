@@ -145,4 +145,35 @@
             }
         }
     }
+
+    /*
+     * Novo modelo de associação (wizard step 3): cards AGIR/AVANÇAR/TRANSFORMAR
+     * sem os círculos dos planos legados; o 4º card (Institucional — manual)
+     * mantém o círculo. Especificidade igual à do legado: este bloco vem
+     * depois no mesmo arquivo e prevalece.
+     */
+    &--association {
+        .choose-plan__plan:nth-child(1),
+        .choose-plan__plan:nth-child(2),
+        .choose-plan__plan:nth-child(3) {
+            .choose-plan__title {
+                background-image: none;
+
+                strong {
+                    position: static;
+                }
+            }
+        }
+
+        .choose-plan__unavailable {
+            grid-column: 1 / -1;
+
+            p {
+                margin: 0;
+                color: #000;
+                font-family: $font-family--primary;
+                font-size: size(14);
+            }
+        }
+    }
 }

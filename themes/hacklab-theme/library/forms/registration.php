@@ -375,17 +375,25 @@ function get_registration_step2_params ($form) {
 
 function get_registration_step3_fields () {
     $fields = [
-        'nivel' => [
-            'type' => 'pmpro_level',
-            'class' => '-colspan-12 choose-plan',
+        'plano_associacao' => [
+            'type' => 'association_plans',
+            'class' => '-colspan-12 choose-plan choose-plan--association',
             'label' => _x('Plan', 'membership', 'hacklabr'),
-            'for_manager' => true,
             'required' => true,
             'validate' => function ($value, $context) {
-                if (!is_numeric($value)) {
-                    return _x('Invalid plan', 'membership', 'hacklabr');
+                if (!is_string($value) || !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i', $value)) {
+                    return _x('Select a plan to continue', 'membership', 'hacklabr');
                 }
-                return true;
+
+                $planos = function_exists('hacklabr\obter_planos_disponiveis') ? \hacklabr\obter_planos_disponiveis() : null;
+
+                foreach (($planos ?? []) as $plano) {
+                    if (\hacklabr\normalizar_guid($plano->id) === \hacklabr\normalizar_guid($value)) {
+                        return true;
+                    }
+                }
+
+                return _x('Selected plan is not available', 'membership', 'hacklabr');
             }
         ],
     ];
@@ -398,13 +406,12 @@ function get_registration_step3_params () {
 
     $params = sanitize_form_params();
 
-    if (empty($params['nivel']) && !empty($post)) {
-        $group_id = (int) get_post_meta($post->ID, '_pmpro_group', true);
-
-        if (!empty($group_id)) {
-            $group = get_pmpro_group($group_id);
-            $params['nivel'] = $group->group_parent_level_id;
-        }
+    /*
+     * Novo modelo: restaura a escolha anterior (GUID do plano) da meta de
+     * interesse da organização — ex. ao voltar ao step 3 depois do submit.
+     */
+    if (empty($params['plano_associacao']) && !empty($post)) {
+        $params['plano_associacao'] = normalizar_guid(get_post_meta($post->ID, '_ethos_plano_interesse', true));
     }
 
     return $params;
@@ -743,7 +750,20 @@ function validate_registration_form ($form_id, $form, $params) {
         $post = get_post_by_transaction('organizacao', $transaction);
         $user = get_user_by_transaction($transaction);
 
-        $level_id = (int) $params['nivel'];
+        /*
+         * Novo modelo de associação: a escolha do wizard é registrada como
+         * interesse (GUID do plano no CRM) na organização e no gestor — o
+         * contrato (parceria) é fechado pelo comercial no CRM, que passa a
+         * prevalecer nas regras (get_pmpro_plan() híbrido). O grupo PMPro é
+         * criado com nível neutro: o nível é só encanamento do
+         * PMProGroupAcct/aprovação, sem semântica de plano.
+         */
+        $plano_interesse = normalizar_guid($params['plano_associacao']);
+
+        update_post_meta($post->ID, '_ethos_plano_interesse', $plano_interesse);
+        update_user_meta($user->ID, '_ethos_plano_interesse', $plano_interesse);
+
+        $level_id = ETHOS_NEUTRAL_PMPRO_LEVEL;
 
         $group_id = get_post_meta($post->ID, '_pmpro_group', true);
 
