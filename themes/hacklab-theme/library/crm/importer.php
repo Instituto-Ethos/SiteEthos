@@ -93,6 +93,28 @@ function is_active_account( Entity $account ) {
     return in_array( $account_status, ['Associado', 'Grupo Econômico'] );
 }
 
+/**
+ * Dual-read do novo modelo: GUID do plano de associação da conta
+ * (i4d_plano_associacao, lookup opcional para i4d_planoses).
+ *
+ * Contas do novo modelo preenchem o campo; contas legadas não — o importer
+ * decide o fluxo por ele. Valor normalizado (case/chaves) para bater com o
+ * wizard e com a meta _ethos_plano_interesse.
+ */
+function get_plano_associacao_guid( Entity $account ): string {
+    $plano = $account->Attributes['i4d_plano_associacao'] ?? null;
+
+    $guid = '';
+
+    if ( is_object( $plano ) && isset( $plano->Id ) ) {
+        $guid = (string) $plano->Id;
+    } elseif ( is_string( $plano ) && ! empty( $plano ) ) {
+        $guid = $plano;
+    }
+
+    return \hacklabr\normalizar_guid( $guid );
+}
+
 function is_active_contact( Entity $contact, Entity|null $account = null ) {
     if ( ! ContactStatus::isActive( $contact->Attributes['statecode'] ) ) {
         return false;
@@ -169,6 +191,17 @@ function parse_account_into_post_meta( Entity $account ) {
         'end_estado' => $formatted['fut_pl_estado'] ?? '',
         'end_cep' => sanitize_number( $attributes['address1_postalcode'] ?? '' ),
     ];
+
+    /*
+     * Novo modelo (dual-read): plano de associação da conta → meta canônica
+     * de interesse, mesma peça do wizard. Renovação muda o plano na conta →
+     * sync regrava a meta (a parceria via API de saldo prevalece nas regras).
+     */
+    $plano_associacao_guid = get_plano_associacao_guid( $account );
+
+    if ( ! empty( $plano_associacao_guid ) ) {
+        $post_meta['_ethos_plano_interesse'] = $plano_associacao_guid;
+    }
 
     foreach ( $attributes as $key => $value ) {
         $meta_key = '_ethos_crm:' . $key;
@@ -282,7 +315,11 @@ function create_from_account( Entity $account ) {
 
     // @TODO Set featured image
 
-    if ( ! empty( $attributes['primarycontactid'] ) && ! empty( $attributes['fut_pl_tipo_associacao'] ) ) {
+    /*
+     * Dual-read: grupo criado com tipo legado OU plano do novo modelo —
+     * contas novas do novo modelo podem vir sem fut_pl_tipo_associacao.
+     */
+    if ( ! empty( $attributes['primarycontactid'] ) && ( ! empty( $attributes['fut_pl_tipo_associacao'] ) || ! empty( $attributes['i4d_plano_associacao'] ) ) ) {
         $group_id = create_primary_contact( $post_id, $account );
 
         if ( ! empty( $group_id ) ) {
@@ -336,8 +373,19 @@ function create_primary_contact( int $post_id, Entity $account ): int | null {
         return null;
     }
 
-    $revenue = get_post_meta( $post_id, 'faturamento_anual', true ) ?: 'small';
-    $level_id = Plan::from( $attributes['fut_pl_tipo_associacao'] )->toLevel( $revenue, true );
+    $plano_associacao_guid = get_plano_associacao_guid( $account );
+
+    if ( ! empty( $plano_associacao_guid ) ) {
+        /*
+         * Novo modelo: plano vem da conta (i4d_plano_associacao) — grupo com
+         * nível neutro, sem derivação por tipo de associação/porte. A meta
+         * do plano já foi gravada pelo parse_account_into_post_meta().
+         */
+        $level_id = \hacklabr\ETHOS_NEUTRAL_PMPRO_LEVEL;
+    } else {
+        $revenue = get_post_meta( $post_id, 'faturamento_anual', true ) ?: 'small';
+        $level_id = Plan::from( $attributes['fut_pl_tipo_associacao'] )->toLevel( $revenue, true );
+    }
 
     $group = \hacklabr\create_pmpro_group( $user_id, $level_id );
 
@@ -414,7 +462,11 @@ function update_from_account( Entity $account, \WP_Post $post ) {
 
     $group_id = (int) get_post_meta( $post_id, '_pmpro_group', true );
 
-    if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) && ! empty( $attributes['fut_pl_tipo_associacao'] ) ) {
+    /*
+     * Dual-read: cria o grupo com tipo legado OU plano do novo modelo —
+     * contas novas do novo modelo podem vir sem fut_pl_tipo_associacao.
+     */
+    if ( empty( $group_id ) && ! empty( $attributes['primarycontactid'] ) && ( ! empty( $attributes['fut_pl_tipo_associacao'] ) || ! empty( $attributes['i4d_plano_associacao'] ) ) ) {
         //`Create group, if it does not exist
         $group_id = create_primary_contact( $post_id, $account );
     }
