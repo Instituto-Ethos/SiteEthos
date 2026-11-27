@@ -79,10 +79,59 @@ function get_request_crm_type (string $subject): string|null {
     }
 }
 
+/**
+ * Assunto do request corrente: POST do submit/re-render, ou pré-seleção
+ * por query string (?assunto=alteracao-plano — entry point do botão
+ * "Alterar plano" do bloco my-plan). Superglobals (não filter_input) para
+ * o campo aparecer já no render; o valor é validado contra whitelist.
+ */
+function get_request_current_subject (): string {
+    $subject = $_POST['_assunto'] ?? '';
+
+    if (!is_string($subject) || '' === $subject) {
+        $subject = $_GET['assunto'] ?? '';
+    }
+
+    return is_string($subject) ? trim($subject) : '';
+}
+
+/**
+ * Options do campo "Plano desejado" da solicitação de mudança de plano:
+ * planos de associação disponíveis no CRM (mesma fonte do wizard do novo
+ * modelo) + orientação do comercial. A mudança sempre converge para o novo
+ * modelo (o comercial opera a troca via renovação da parceria). Fail
+ * closed: sem dados do CRM, segue apenas a orientação — a descrição livre
+ * complementa o pedido.
+ */
+function get_request_plan_options (): array {
+    $options = [];
+
+    if (function_exists('hacklabr\obter_planos_disponiveis')) {
+        foreach (\hacklabr\obter_planos_disponiveis() ?? [] as $plano) {
+            if (!empty($plano->id) && !empty($plano->nome)) {
+                $options[$plano->id] = $plano->nome;
+            }
+        }
+    }
+
+    $options['orientacao'] = __('Quero orientação do time comercial', 'hacklabr');
+
+    return $options;
+}
+
 function get_request_occurrence_fields () {
     $privacy_policy_url =  get_privacy_policy_url();
 
     $subject_options = get_request_subject_options();
+
+    /*
+     * Campo condicional do novo modelo: "Plano desejado" só aparece (e só
+     * é obrigatório) quando o assunto é mudança de plano. No render
+     * inicial vem da pré-seleção ?assunto= (entry point do bloco
+     * my-plan); no re-render de erro, do POST — o init remonta os campos
+     * com o required já ligado.
+     */
+    $is_plan_change = ('alteracao-plano' === get_request_current_subject());
 
     $fields = [
         'assunto' => [
@@ -108,12 +157,35 @@ function get_request_occurrence_fields () {
             'class' => '-hidden',
             'required' => false,
         ],
+        'plano_desejado' => [
+            'type' => 'select',
+            'class' => '-colspan-12',
+            'label' => __('Plano desejado', 'hacklabr'),
+            'placeholder' => __('Selecione o plano desejado', 'hacklabr'),
+            'options' => $is_plan_change ? get_request_plan_options() : [],
+            'required' => $is_plan_change,
+            'conditional' => function () use ($is_plan_change) {
+                return $is_plan_change;
+            },
+            'validate' => function ($value, $context) {
+                if (!array_key_exists($value, get_request_plan_options())) {
+                    return __('Invalid plan', 'hacklabr');
+                }
+                return true;
+            },
+        ],
         'titulo' => [
             'type' => 'text',
             'class' => '-colspan-12',
             'label' => __('Title', 'hacklabr'),
             'placeholder' => __('Request title', 'hacklabr'),
             'required' => true,
+            'validate' => function ($value, $context) {
+                if (mb_strlen($value) > 200) {
+                    return __('Title is too long (max 200 characters)', 'hacklabr');
+                }
+                return true;
+            },
         ],
         'descricao' => [
             'type' => 'textarea',
@@ -121,6 +193,12 @@ function get_request_occurrence_fields () {
             'label' => __('Describe your requirements', 'hacklabr'),
             'placeholder' => __("Describe briefly your demand", 'hacklabr'),
             'required' => true,
+            'validate' => function ($value, $context) {
+                if (mb_strlen($value) > 5000) {
+                    return __('Description is too long (max 5000 characters)', 'hacklabr');
+                }
+                return true;
+            },
         ],
         'politica_privacidade' => [
             'type' => 'checkbox',
@@ -170,15 +248,49 @@ function validate_request_occurrence_form ($form_id, $form, $params) {
         $account_id = get_user_meta($current_user, '_ethos_crm_account_id', true);
         $contact_id = get_user_meta($current_user, '_ethos_crm_contact_id', true);
 
+        $subject = $params['assunto'];
+
+        /*
+         * Sanitização na fronteira de uso: os textos livres alimentam o
+         * CRM e o e-mail em HTML - strip de tags (o corpo do e-mail só
+         * injeta <br/> de quebras legítimas) e colapso de espaços, com
+         * CRLF removido do título (proteção extra contra header/subject
+         * injection). A validação (whitelist/limites) acontece no
+         * validate_form; a sanitização aqui garante o dado limpo mesmo
+         * com campos sem closure própria.
+         */
+        $title = sanitize_text_field(str_replace(["\r", "\n"], ' ', $params['titulo']));
+        $description = sanitize_textarea_field($params['descricao']);
+        $params['titulo'] = $title;
+        $params['descricao'] = $description;
+
+        /*
+         * Novo modelo: mudança de plano - a escolha estruturada do plano
+         * encabeça a descrição do incident (e do e-mail ao comercial),
+         * que opera a troca via renovação da parceria no CRM. Sem
+         * dependência de schema: texto legível no case.
+         */
+        if ('alteracao-plano' === $subject && !empty($params['plano_desejado'])) {
+            $plan_options = get_request_plan_options();
+            $plano_nome = $plan_options[$params['plano_desejado']] ?? null;
+
+            if ('orientacao' === $params['plano_desejado']) {
+                $plano_nome = __('a definir com o time comercial', 'hacklabr');
+            }
+
+            if (!empty($plano_nome)) {
+                $description = sprintf(__('Plano desejado: %s', 'hacklabr'), $plano_nome) . "\n\n" . $description;
+                $params['descricao'] = $description;
+            }
+        }
+
         $attributes = [
             'caseorigincode' => 3, // Site
             'contactid'      => create_crm_reference('contact', $contact_id),
             'customerid'     => create_crm_reference('account', $account_id),
-            'description'    => $params['descricao'],
-            'title'          => $params['titulo'],
+            'description'    => $description,
+            'title'          => $title
         ];
-
-        $subject = $params['assunto'];
 
         $crm_area = get_request_crm_area($subject);
         if (!empty($crm_area)) {
@@ -215,7 +327,14 @@ function send_request_occurrence_email (int $user_id, string $incident_id, array
     $company =  get_organization_by_user($user_id);
     $manager = get_manager_data($company->ID);
 
-    $sender = get_user($user_id);
+    /*
+     * Latent bug fix: get_user() only exists since WP 6.7 — this stack
+     * runs 6.6 (and the plugins declare Requires at least 5.2), so the
+     * unqualified call inside the namespace resolved to an undefined
+     * function and fatalled the request email flow. get_userdata() is
+     * the version-safe call (available since WP 2.0).
+     */
+    $sender = get_userdata($user_id);
     $sender_name = $sender->display_name;
     $sender_email = $sender->user_email;
 

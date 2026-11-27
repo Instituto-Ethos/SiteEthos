@@ -12,6 +12,11 @@
         strong {
             color: $color--primary-dark;
         }
+
+        .my-plan__change {
+            display: inline-block;
+            margin-top: $margin--medium;
+        }
     }
 
     &__featured-column {
